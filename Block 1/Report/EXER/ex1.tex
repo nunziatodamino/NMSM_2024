@@ -1,0 +1,36 @@
+\chapter*{Lecture 1: Crude Monte Carlo and inversion sampling}
+
+\paragraph{Sampling random points within D-dimensional domains by hit and miss}
+
+
+
+\paragraph{Sampling random numbers from a given distribution: inversion method}
+
+We start from the following PDF's:
+
+$$ \rho_1(x) = cxe^{-x^2}\ ,x \in \mathbb{R}^+ \qquad \rho_2(x) = bx^4\ , x \in [0,3]$$
+
+We first proceed by doing the normalization to find the coefficients $c$ and $b$:
+
+$$ \int_{\mathbb{R}^+}\rho_1(x)dx =1 \iff c=2 \qquad \int_{0}^3\rho_2(x)dx =1 \iff b = \frac{5}{243} $$
+
+Then one can evaluate the CDF's by definition:
+
+$$ F_1(t)=\int_{0}^t\rho_1(x)dx = 1-e^{-t^2}, \ t \in \mathbb{R}^+ \qquad F_2(t)=\int_{0}^t\rho_2(x)dx = \frac{t^5}{243}, \ t \in [0,3] $$
+
+Finally by inversion:
+
+$$ F^{-1}_1(y) = \sqrt{\ln\left(\frac{1}{1-y}\right)} \qquad F^{-1}_2(y)= \sqrt[5]{243 y}$$
+
+For both $y \in (0,1]$.
+
+We report in the following the obtained graphs:
+
+\begin{figure}[t!]
+\centering
+\includegraphics[width=0.48\textwidth]{FIG/exercise_1_images/Figure_1.png}
+\hfill
+\includegraphics[width=0.48\textwidth]{FIG/exercise_1_images/Figure_2.png}
+\caption{Sampling from distribution $\rho_1$ and $\rho_2$ using the inversion method.}
+\label{fig:combined_figure}
+\end{figure}

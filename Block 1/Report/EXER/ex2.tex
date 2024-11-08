@@ -1,0 +1,54 @@
+\chapter*{Lecture 2: Rejection method}
+
+The rejection sampling method is useful when our pdf is not easily invertible, and so the inversion method cannot be applied. \\
+Suppose to have as pdf:
+
+$$ \rho(x) = A_f \exp\left( -8 \left( \frac{x^2}{2}+\frac{x^4}{4} \right) \right) $$
+
+Imposing the normalization condition we obtain:
+
+$$ \int_{\mathbb{R}} \rho(x) dx = 1 \qquad \iff \qquad   \frac{eA_f}{\sqrt{2}}K_{1/4}(1) = 1$$
+
+Where we denote with $K_{1/4}(x)$ the Bessel function of the second kind. 
+We find that $A_f \simeq 1.21$.
+Now we want to find an invertible pdf $g(x)$ (that we'll call candidate density) with the property:
+
+$$ \rho(x) \leq c g(x) \qquad \forall x \in S $$
+
+Where $S$ is the sample space of $\rho(x)$.
+The closer the function $cg(x)$ is to $\rho(x)$ the more efficient the sampling is. \\
+
+There can be different ways to choose the candidate density. We explore different possibilities in 1D and higher dimensions. \\
+First we must start with a guess for the candidate density and the $c$ parameter. Then we see if this guess respects the proposed inequality: if it does we are done, if not we do another guess and try again. \\ 
+In 1D the easiest way to to test our guess is the graphical one: we plot $\rho(x)$ and $cg(x)$ in the same graph and evaluate if the inequality holds. Another way can be to evaluate point-wise the inequality.
+In dimensions where no graphical rapresentation is available, the second method can be easily extended and in order to reduce the computational complexity instead of starting with a proper point-wise evaluation, we can roughly grid the hyper-domain to check if our guess of the candidate density is sensible. If it is, we refine the grid and iterate the process until we are satisfied.
+
+For our exercise, we can choose as candidate density $\mathcal{N}(0,\frac{1}{2})$ with c = 1.6, as shown in the picture \ref{chapter2_rej_ineq} \\
+
+\begin{figure}[t!]
+\centering
+\includegraphics[width=0.48\textwidth]{FIG/exercise_2_images/rejection_sampling_inequality_check.png}
+\caption{Graphical method for evaluating the inequality $\rho(x)< cg(x)$ in the rejection method}
+\label{chapter2_rej_ineq}
+\end{figure}
+
+Then the sampling is done with algorithm \ref{rejection}. Note that to obtain exactly $N$ samples a while loop must be used in the algorithm.
+
+\begin{algorithm}
+\caption{Rejection Sampling Algorithm}
+\begin{algorithmic}[1]
+\State \( S \leftarrow \emptyset \)
+\State \( \text{count} \leftarrow 0 \)
+\While{count < N}
+    \State Sample \( X \sim g(x) \) \Comment{Generate candidate sample}
+    \State Sample \( U \sim \text{Uniform}(0, 1) \) \Comment{Generate uniform random number}
+    \State \( A \leftarrow \frac{f(X)}{c \cdot g(X)} \) \Comment{Calculate acceptance threshold}
+    \If{$U \leq A$}
+        \State Append \( X \) to \( S \)
+        \State \( \text{count} \leftarrow \text{count} + 1 \)
+    \EndIf
+\EndWhile
+\State \textbf{Return} \( S \)
+\end{algorithmic}
+\label{rejection}
+\end{algorithm}
