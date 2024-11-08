@@ -47,7 +47,7 @@ plt.hist(random_variables, bins=30, density=True, alpha=0.4, color='r', label= "
 plt.xlabel("Random variable")
 plt.ylabel("Probability density")
 plt.legend(fontsize = 10)
-image_name = "rejection_sampling_varify.png"
+image_name = "rejection_sampling_verify.png"
 entire_path = os.path.join(report_path, exercise_folder, image_name)
 plt.savefig(entire_path)
 plt.show()

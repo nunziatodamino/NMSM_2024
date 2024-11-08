@@ -27,12 +27,24 @@ For our exercise, we can choose as candidate density $\mathcal{N}(0,\frac{1}{2})
 
 \begin{figure}[t!]
 \centering
-\includegraphics[width=0.48\textwidth]{FIG/exercise_2_images/rejection_sampling_inequality_check.png}
+\includegraphics[width=1\textwidth]{FIG/exercise_2_images/rejection_sampling_inequality_check.png}
 \caption{Graphical method for evaluating the inequality $\rho(x)< cg(x)$ in the rejection method}
 \label{chapter2_rej_ineq}
 \end{figure}
 
-Then the sampling is done with algorithm \ref{rejection}. Note that to obtain exactly $N$ samples a while loop must be used in the algorithm.
+Then the sampling is done with algorithm \ref{rejection}. Note that to obtain exactly $N$ samples a while loop must be used in the algorithm. 
+One can show graphically that the sample is good by plotted the properly binned random variables obtained by the process together with the 
+target density, as showed in figure \ref{chapter2_rej_variables}
+
+\begin{figure}[t!]
+\centering
+\includegraphics[width=1\textwidth]{FIG/exercise_2_images/rejection_sampling_verify.png}
+\caption{Sampled variables with target density}
+\label{chapter2_rej_variables}
+\end{figure}
+        
+
+
 
 \begin{algorithm}
 \caption{Rejection Sampling Algorithm}

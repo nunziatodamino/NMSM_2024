@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1731076548 "/home/nunziato-damino/Documents/Github/NMSM_2024/Block 1/Report/main.tex" "main.pdf" "main" 1731076549 0
+["pdflatex"] 1731078830 "/home/nunziato-damino/Documents/Github/NMSM_2024/Block 1/Report/main.tex" "main.pdf" "main" 1731078831 0
   "/etc/texmf/web2c/texmf.cnf" 1730382086 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/home/nunziato-damino/Documents/Github/NMSM_2024/Block 1/Report/main.tex" 1731076348 1634 e3c13c3ac3ec90bf9d487a4af420b907 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -163,7 +163,7 @@
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1730382102 4643645 d2d1d8b8ba87ed005f4aaf1ce646a79e ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1730382118 7909135 48d618ec1d1a62c60af1823f81555af3 ""
   "EXER/ex1.tex" 1731068916 1233 19ff0fadfb1ee009bd87e1a9769576b4 ""
-  "EXER/ex2.tex" 1731076548 2973 65cd494aa226bbcfec9b8350fbf34a24 ""
+  "EXER/ex2.tex" 1731078830 3399 642eddb47ae0493e0cae5ac5311f496c ""
   "EXER/ex3.tex" 1731068916 43 9ac4c99fc6fa4b964a0f2c4b6082d043 ""
   "EXER/ex4.tex" 1731068916 37 85bdd5b554dae1950cd007ea305b7cf9 ""
   "EXER/ex5.tex" 1731068916 33 d6162a8c7e4f7febcf461a0af0a715ed ""
@@ -171,9 +171,10 @@
   "EXER/ex7.tex" 1731068916 37 6fdd404b34f5bf0142ca40e409f3dc25 ""
   "FIG/exercise_1_images/Figure_1.png" 1731068916 50311 8640408f627ef3cb6f19a308f9c48dd4 ""
   "FIG/exercise_1_images/Figure_2.png" 1731068916 42705 5151e4ba2b06b5f58d6efc1f8aa81772 ""
-  "FIG/exercise_2_images/rejection_sampling_inequality_check.png" 1731074426 51076 ba5f39c9fa31a4e20791a1ffcd7c9d64 ""
-  "main.aux" 1731076548 1830 accefe10c15ebd7f1a41e927c26217d2 "pdflatex"
-  "main.out" 1731076548 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+  "FIG/exercise_2_images/rejection_sampling_inequality_check.png" 1731078687 51076 ba5f39c9fa31a4e20791a1ffcd7c9d64 ""
+  "FIG/exercise_2_images/rejection_sampling_verify.png" 1731078689 39454 2af63dbec93442628e79cad3c4158bee ""
+  "main.aux" 1731078831 2079 1017db105893f625fd0dfc953e80d73f "pdflatex"
+  "main.out" 1731078831 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
   "main.tex" 1731076348 1634 e3c13c3ac3ec90bf9d487a4af420b907 ""
   (generated)
   "main.aux"
