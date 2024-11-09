@@ -1,0 +1,47 @@
+\chapter*{Appendix : algorithms}
+
+\begin{algorithm}
+    \caption{Rejection Sampling Algorithm}
+    \begin{algorithmic}[1]
+    \State \( S \leftarrow \emptyset \)
+    \State \( \text{count} \leftarrow 0 \)
+    \While{count < N}
+        \State Sample \( X \sim g(x) \) \Comment{Generate sample from candidate distribution}
+        \State Sample \( U \sim \text{Uniform}(0, 1) \) 
+        \State \( A \leftarrow \frac{f(X)}{c \cdot g(X)} \) \Comment{Calculate acceptance threshold}
+        \If{$U \leq A$}
+            \State Append \( X \) to \( S \)
+            \State \( \text{count} \leftarrow \text{count} + 1 \)
+        \EndIf
+    \EndWhile
+    \State \textbf{Return} \( S \)
+    \end{algorithmic}
+    \label{rejection}
+    \end{algorithm}
+    
+\phantomsection
+\label{par:detail_rejection}  
+Implementation detail : Note that to obtain exactly $N$ samples a while loop must be used in the algorithm. \\
+Moreover is interesting to discuss some technical details regarding the implementation of this algorithm in Python when the candidate
+distribution is a truncated distribution, or in general a distribution that cannot be generated easily but needs the \fbox{\texttt{scipy.stats}} package
+to be generated.\\
+In this case a naive implementation of algorithm \ref{rejection} can hinder the perfomance greatly, because even if one has in mind to speed
+up the function with a \fbox{\texttt{numba}} decorator, this will not work, due to known incompatibility issues within the 2 cited packages. \\
+The easiest solution to this problem is to vectorize our algorithm using the \fbox{\texttt{numpy}} library, overproducing samples 
+and then cutting what is not necessary. This approach has a clear caveat, we risk an \fbox{\texttt{int}} overflow, so we must put attention
+in not choosing an high value of $N$ for this solution. If a big number of samples is required, this approach must be revised.
+
+  \begin{algorithm}
+    \caption{Importance Sampling Algorithm}
+    \begin{algorithmic}[1]
+    \State \( \mu \leftarrow 0 \) 
+    \State \( \text{count} \leftarrow 0 \)
+    \While{count < N}
+        \State Sample \( X \sim g(x) \) \Comment{Generate sample from proposal distribution \( g(x) \)}
+        \State \( \mu \leftarrow \mu + \frac{f(X)}{g(X)}\rho(X) \)
+        \State \( \text{count} \leftarrow \text{count} + 1 \)
+    \EndWhile
+    \State \textbf{Return} \( \mu / N \) 
+    \end{algorithmic}
+    \label{importance_sampling}
+\end{algorithm}

@@ -1,10 +1,104 @@
 
 \chapter*{Lecture 3: Importance sampling}
 
+\paragraph{Part 1}
+
+\begin{wrapfigure}{r}{0.5\textwidth}
+    \centering
+    \includegraphics[width=0.33\textwidth]{FIG/exercise_3_images/crude_mc.png}
+  \caption{Crude Monte Carlo distribution (1000 iterations per point)}
+  \label{crude_mc}
+  \end{wrapfigure}
+
 We want to estimate the following integral:
 
 $$ \int_0^{\pi/2} \sin(x) dx $$
 
-Using first a crude Monte Carlo approximation and then using the importance sampling method using the family of functions as sampling functions:
+First we observe that the integral is easily evaluable analitically and is equal to 1. \\
+We then proceed in doing a crude Monte Carlo estimate, obtaining the result in figure \ref{crude_mc}, leading to the evaluation:
 
-$$ g_{a,b}(x) = a+ bx^2 $$
+$$ \langle f \rangle_{\text{Crude MC}} \simeq 1.0010 \pm 0.0153 $$
+
+In order to reduce the error on the Monte Carlo evaluation one common approach is to use the importance sampling method. \\
+The main algorithm is described in \ref{importance_sampling}. \\
+We propose as the new sampling function the family of functions defined such that:
+
+$$ g_{a,b}(x) = a+ bx^2 \qquad a,b \in \mathbb{R}  $$
+
+We first make some consideration on the family of functions $g_{a,b}(x)$.
+First we impose, as they must be PDF's, the normalization condition on $[0, \pi/2]$, so that we obtain the constraint:
+
+$$ b = \frac{24}{\pi^3} - \frac{12 a}{\pi^2} $$
+
+\begin{wrapfigure}{r}{0.5\textwidth}
+    \vspace{-25pt}
+    \centering
+    \includegraphics[width=0.33\textwidth]{FIG/exercise_3_images/choice_sampling_function.png}
+  \caption{Graphical criterion for choosing a in the $g_a(x)$ family}
+  \label{choice_g}
+  \end{wrapfigure}
+
+In this way $g_{a,b}(x)$ collapses to a one parameter family:
+
+$$ g_{a}(x) = a+ \left( \frac{24}{\pi^3} - \frac{12 a}{\pi^2} \right) x^2 $$
+
+Moreover if we impose the condition $g_{a}(x) > 0$ we obtain for $a$ the restriction $ 0 < a < 1 $ \\
+
+There are now many recipes for choosing the function $g_a(x)$. We prescribe to the one that choose $g(x)$ if satisfies the condition 
+$\rho(x)<g(x)$ when the product $f^2(x)\rho(x)$ is "large" and $\rho(x)>g(x)$ when the product $f^2(x)\rho(x)$ is "small" , 
+where $\rho(x)$ in our case is the original sampling distribution, which is $U(0, \frac{\pi}{2})$. \\
+We show in fig \ref{choice_g} that for $a = \frac{1}{\pi}$ these conditions are satisfied. \\
+
+\begin{figure}[t!]
+    \centering
+    \includegraphics[width=0.7\textwidth]{FIG/exercise_3_images/distribution_comparison.png}
+    \caption{Distribution comparison between crude Monte Carlo and importance sampling with the same number of iterations}
+    \label{distribution_comparison}
+    \end{figure}
+
+To sample from $g(x)$ we will use a rejection method algorithm using as a candidate distribution the truncated normal $\mathcal{N}(\frac{\pi}{2}, 1)_{\mid [0, \frac{\pi}{2}]}$. 
+Note that this specific sampling presents some interesting technical details in Python discussed in the relative algorithm \hyperref[par:detail_rejection]{section} \\
+Now we perform the importance sampling for the same number of iterations as the crude Monte Carlo, and compare the results, seen in figure \ref{distribution_comparison}. \\
+As expected the variance is reduced. Specifically we have for this Monte Carlo evaluation:
+
+$$ \langle f \rangle_{\text{Importance sampling}} \simeq 1.0001 \pm 0.0078 $$
+
+Which is an error reduction of $\sim 51 \%$.
+
+\paragraph*{Part 2} We want now to evaluate the integral
+
+
+$$\int_{\mathbb{R}}\left[ e^{-(x-3)^2/2}+e^{-(x-6)^2/2} \right] \mathcal{N}(0,1) dx = \int_{\mathbb{R}} f(x) \mathcal{N}(0,1) $$
+
+Where $\mathcal{N}(0,1)$ is the normal distribution with mean 0 and variance 1.
+One can prove (to prove) that the integral has the analytical value:
+
+$$ \int_{\mathbb{R}}\left[ e^{-(x-3)^2/2}+e^{-(x-6)^2/2} \right] \mathcal{N}(0,1) dx = \frac{1 + e^{27/4}}{\sqrt{2} e^9} \simeq 0.075 $$
+
+Instead of going through the analytical route, one can think to evaluate it by using a crude Monte Carlo method, by sampling respect the normal distribution, 
+i.e. by evaluating $\langle f(x) \rangle_{\mathcal{N}(0,1)}$. \\
+We obtain:
+
+$$ \langle f(x) \rangle_{\mathcal{N}(0,1)} = 0.07431809274645616 \pm 0.004796287626550513 $$
+
+As also shown in the picture \ref{crude_mc_integral2}.
+
+\begin{wrapfigure}{r}{0.5\textwidth}
+  \vspace{-25pt}
+  \centering
+  \includegraphics[width=0.33\textwidth]{FIG/exercise_3_images/distribution_crude_mc_ex2.png}
+\caption{Monte Carlo distribution for the evaluation of $\langle f(x) \rangle_{\mathcal{N}(0,1)}$}
+\label{crude_mc_integral2}
+\end{wrapfigure}
+
+If, as proposed by the exercise, we now try to evaluate the same integral by the importance sampling 
+method using as sampling function the uniform distribution $U(-8, -1)$ for 1000 iterations, we will see nothing. \\
+It's easy to see way if we show the involved functions together in a graph \ref{badchoice} \\
+The uniform distribution samples in that interval values for which the integrand function assumes values between $10^{-41}$ to $10^{-5}$
+
+\begin{figure}[t!]
+  \centering
+  \includegraphics[width=0.7\textwidth]{FIG/exercise_3_images/distribution_consideration.png}
+  \caption{Graphical analysis for the bad choice of $U(-8,-1)$ as a sampling function for the integral $\langle f(x) \rangle_{\mathcal{N}(0,1)}$}
+  \label{badchoice}
+  \end{figure}

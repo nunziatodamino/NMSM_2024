@@ -18,6 +18,15 @@ $$ \rho(x) \leq c g(x) \qquad \forall x \in S $$
 Where $S$ is the sample space of $\rho(x)$.
 The closer the function $cg(x)$ is to $\rho(x)$ the more efficient the sampling is. \\
 
+\begin{wrapfigure}{r}{0.5\textwidth}
+    \vspace{-25pt}
+    \centering
+    \includegraphics[width=0.5\textwidth]{FIG/exercise_2_images/rejection_sampling_inequality_check.png}
+    \caption{Graphical method for evaluating the inequality $\rho(x)< cg(x)$ in the rejection method}
+    \label{chapter2_rej_ineq}
+\end{wrapfigure}
+
+
 There can be different ways to choose the candidate density. We explore different possibilities in 1D and higher dimensions. \\
 First we must start with a guess for the candidate density and the $c$ parameter. Then we see if this guess respects the proposed inequality: if it does we are done, if not we do another guess and try again. \\ 
 In 1D the easiest way to to test our guess is the graphical one: we plot $\rho(x)$ and $cg(x)$ in the same graph and evaluate if the inequality holds. Another way can be to evaluate point-wise the inequality.
@@ -25,14 +34,7 @@ In dimensions where no graphical rapresentation is available, the second method 
 
 For our exercise, we can choose as candidate density $\mathcal{N}(0,\frac{1}{2})$ with c = 1.6, as shown in the picture \ref{chapter2_rej_ineq} \\
 
-\begin{figure}[t!]
-\centering
-\includegraphics[width=1\textwidth]{FIG/exercise_2_images/rejection_sampling_inequality_check.png}
-\caption{Graphical method for evaluating the inequality $\rho(x)< cg(x)$ in the rejection method}
-\label{chapter2_rej_ineq}
-\end{figure}
-
-Then the sampling is done with algorithm \ref{rejection}. Note that to obtain exactly $N$ samples a while loop must be used in the algorithm. 
+Then the sampling is done with algorithm \ref{rejection}. 
 One can show graphically that the sample is good by plotted the properly binned random variables obtained by the process together with the 
 target density, as showed in figure \ref{chapter2_rej_variables}
 
@@ -43,24 +45,3 @@ target density, as showed in figure \ref{chapter2_rej_variables}
 \label{chapter2_rej_variables}
 \end{figure}
         
-
-
-
-\begin{algorithm}
-\caption{Rejection Sampling Algorithm}
-\begin{algorithmic}[1]
-\State \( S \leftarrow \emptyset \)
-\State \( \text{count} \leftarrow 0 \)
-\While{count < N}
-    \State Sample \( X \sim g(x) \) \Comment{Generate candidate sample}
-    \State Sample \( U \sim \text{Uniform}(0, 1) \) \Comment{Generate uniform random number}
-    \State \( A \leftarrow \frac{f(X)}{c \cdot g(X)} \) \Comment{Calculate acceptance threshold}
-    \If{$U \leq A$}
-        \State Append \( X \) to \( S \)
-        \State \( \text{count} \leftarrow \text{count} + 1 \)
-    \EndIf
-\EndWhile
-\State \textbf{Return} \( S \)
-\end{algorithmic}
-\label{rejection}
-\end{algorithm}

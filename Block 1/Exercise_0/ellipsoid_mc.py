@@ -34,9 +34,9 @@ def integration_box_volume (a:np.float64, b:np.float64, c:np.float64) -> np.floa
     return a * b * c
 
 @numba.njit
-def monte_carlo_ellipsoid_octant (a:np.float64, b:np.float64, c:np.float64, iteration_number:np.int32) -> np.float64 :
+def monte_carlo_ellipsoid_octant (a:np.float64, b:np.float64, c:np.float64, iteration_number:np.int32) -> (np.float64, np.float64) :
     """
-    Estimates the volume of one octant of an ellipsoid using the Monte Carlo method.
+    Estimates the volume of one octant of an ellipsoid using the Monte Carlo method and its standard error.
 
     Parameters:
     a (np.float64): The semi-axis length along the x-axis.
@@ -45,8 +45,8 @@ def monte_carlo_ellipsoid_octant (a:np.float64, b:np.float64, c:np.float64, iter
     iteration_number (np.int32): The number of random samples to use in the Monte Carlo simulation.
 
     Returns:
-    np.float64: The estimated volume of one octant of the ellipsoid based on the Monte Carlo method.
-    
+    volume_estimate (np.float64): The estimated volume of one octant of the ellipsoid based on the Monte Carlo method.
+    standard_error (np.float64): The error associated to the Monte Carlo estimate. Note that the variance is assumed to be following the Bernoulli distribution (Var(X) = Np(1-p))  
     """
     counter = 0
     for _ in range(iteration_number):
@@ -56,4 +56,7 @@ def monte_carlo_ellipsoid_octant (a:np.float64, b:np.float64, c:np.float64, iter
         ellipsoid = (x**2 / a**2) + (y**2 / b**2) + (z**2 / c**2)
         if ellipsoid < 1 :
             counter += 1
-    return counter / iteration_number * integration_box_volume(a, b, c)
+    p_estimate = counter / iteration_number
+    volume_estimate = p_estimate * integration_box_volume(a, b, c)    
+    standard_error = np.sqrt(p_estimate * (1 - p_estimate) / iteration_number) * integration_box_volume(a,b,c)    
+    return volume_estimate, standard_error
