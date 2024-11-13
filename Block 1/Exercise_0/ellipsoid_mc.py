@@ -34,7 +34,7 @@ def integration_box_volume (a:np.float64, b:np.float64, c:np.float64) -> np.floa
     return a * b * c
 
 @numba.njit
-def monte_carlo_ellipsoid_octant (a:np.float64, b:np.float64, c:np.float64, iteration_number:np.int32) -> (np.float64, np.float64) :
+def monte_carlo_ellipsoid_octant (a:np.float64, b:np.float64, c:np.float64, iteration_number:np.int32) -> tuple[np.float64, np.float64] :
     """
     Estimates the volume of one octant of an ellipsoid using the Monte Carlo method and its standard error.
 
@@ -59,4 +59,4 @@ def monte_carlo_ellipsoid_octant (a:np.float64, b:np.float64, c:np.float64, iter
     p_estimate = counter / iteration_number
     volume_estimate = p_estimate * integration_box_volume(a, b, c)    
     standard_error = np.sqrt(p_estimate * (1 - p_estimate) / iteration_number) * integration_box_volume(a,b,c)    
-    return volume_estimate, standard_error
+    return (volume_estimate, standard_error)

@@ -3,6 +3,50 @@
 \paragraph{Sampling random points within D-dimensional domains by hit and miss}
 
 
+\begin{wrapfigure}{r}{0.5\textwidth}
+    \vspace{-25pt}
+    \centering
+    \includegraphics[width=0.33\textwidth]{FIG/exercise_0_images/first_ellipsoid_distribution.png}
+  \caption{Volume distribution of the Monte Carlo estimate by hit and miss}
+  \label{lec1:first_ellipsoid}
+  \end{wrapfigure}
+
+We want to evaluate the volume of an ellipsoid of given semi-axes $a=3,\ b=2,\ c=2$. 
+In order to reduce the error on our estimate from the get go, we make the following consideration. We can approach the problem in 2 ways : 
+we can consider an integration box containing the whole ellipsoid and proceed with our calculation, or use to our advantage the problem's symmetry, 
+and use as integration box the one containing one octant of the ellipsoid, and then multiply our estimate by 8. \\
+The latter choice has the effect to reduce the variance in our sampling, and by consequence the error on our estimate. \\
+This happens because , given that each hit or miss procedure is in fact a Bernoulli trial, the error on the volume estimate is evaluated by :
+
+$$ \sigma_V = \sqrt{\frac{p( 1-p )}{N}} V_{\text{integration box}} $$
+
+Where $p$ is our success probability, i.e. the probability to hit inside the integration box, and $N$ is the number of trials, i.e. the number of iterations.\\
+So, as we seen $\sigma_V \propto V_{\text{integration box}}$, so the smaller it is, better is our estimate.
+
+\begin{wrapfigure}{r}{0.5\textwidth}
+    \vspace{-25pt}
+    \centering
+    \includegraphics[width=0.33\textwidth]{FIG/exercise_0_images/first_and_second_ellipsoid_distribution.png}
+  \caption{Volume distribution comparison between the 2 ellipsoids}
+  \label{lec1:first_and_second_ellipsoid}
+  \end{wrapfigure}
+
+Given this consideration we report in figure \ref{lec1:first_ellipsoid} the result obtained using the procedure with the ellipsoid octant for an ellipsoid of given semi-axes $a=3,\ b=1,\ c=1$:
+
+$$\langle V \rangle_1 \simeq 6.283 \pm 0.060$$
+
+Now we propose to evaluate the volume of an ellipsoid of given semi-axes $a=3,\ b=1,\ c=1$. \\
+From the previous considerations we'll expect to have on this evaluation a smaller error, specifically, considering a situation in which $p$
+and $N$ are the same, we can expect an error that is $\frac{V_{\text{box1}}}{V_{\text{box2}}} = 4$ times smaller, even before running any simulation. \\
+We obtain for this ellipsoid:
+
+$$\langle V \rangle_2 \simeq 1.571 \pm 0.015$$
+
+Which confirms our prediction on the error. One can see also graphically this by compating the 2 volume distributions and see in figure \ref{lec1:first_and_second_ellipsoid} that the one with the
+smaller integration box is narrower.
+
+
+
 
 \paragraph{Sampling random numbers from a given distribution: inversion method}
 

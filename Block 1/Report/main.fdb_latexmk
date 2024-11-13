@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1731169093 "/home/nunziato-damino/Documents/Github/NMSM_2024/Block 1/Report/main.tex" "main.pdf" "main" 1731169094 0
+["pdflatex"] 1731488278 "/home/nunziato-damino/Documents/Github/NMSM_2024/Block 1/Report/main.tex" "main.pdf" "main" 1731488279 0
   "/etc/texmf/web2c/texmf.cnf" 1730382086 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/home/nunziato-damino/Documents/Github/NMSM_2024/Block 1/Report/main.tex" 1731143279 1661 93a80e2186a751360841c61a38500c6a ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -159,6 +159,7 @@
   "/usr/share/texmf/fonts/type1/public/cm-super/sfbx1200.pfb" 1730382093 140176 d4962f948b4cc0adf4d3dde77a128c95 ""
   "/usr/share/texmf/fonts/type1/public/cm-super/sfbx2074.pfb" 1730382093 140194 627cc7f36c05b80e25d178974ccb3442 ""
   "/usr/share/texmf/fonts/type1/public/cm-super/sfbx2488.pfb" 1730382093 135938 299ac3a69892db3b7674a8b2543b0a77 ""
+  "/usr/share/texmf/fonts/type1/public/cm-super/sfrm0600.pfb" 1730382093 162624 9dcc92cd3b1dfe2ecc80e6da7f2eb6bd ""
   "/usr/share/texmf/fonts/type1/public/cm-super/sfrm0800.pfb" 1730382093 164227 3df942b4ff2124425d8fb1b6d3e01c7a ""
   "/usr/share/texmf/fonts/type1/public/cm-super/sfrm0900.pfb" 1730382093 149037 995a6f1e12c1d647b99b1cf55db78699 ""
   "/usr/share/texmf/fonts/type1/public/cm-super/sfrm1095.pfb" 1730382093 145929 f25e56369a345c4ff583b067cd87ce8e ""
@@ -168,13 +169,15 @@
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1730382102 4643645 d2d1d8b8ba87ed005f4aaf1ce646a79e ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1730382118 7909135 48d618ec1d1a62c60af1823f81555af3 ""
   "EXER/algorithm.tex" 1731161484 2444 338e143e95b7525f40af2fb719f1fb63 ""
-  "EXER/ex1.tex" 1731068916 1233 19ff0fadfb1ee009bd87e1a9769576b4 ""
+  "EXER/ex1.tex" 1731488277 3882 c4cd7a3b569e8e3a1a5378a71fb2f50e ""
   "EXER/ex2.tex" 1731161589 2710 67b6aa3ebc86fcb8277c2c460cc08cb2 ""
   "EXER/ex3.tex" 1731167119 5180 d01ce1a6bc8c6750dd9dbf1267c1d5aa ""
   "EXER/ex4.tex" 1731161484 3318 034a382a30039cc3419fc10dcc7072ca ""
   "EXER/ex5.tex" 1731068916 33 d6162a8c7e4f7febcf461a0af0a715ed ""
   "EXER/ex6.tex" 1731068916 36 60472b16f3ccbc6ecd80990a74f66641 ""
   "EXER/ex7.tex" 1731068916 37 6fdd404b34f5bf0142ca40e409f3dc25 ""
+  "FIG/exercise_0_images/first_and_second_ellipsoid_distribution.png" 1731485875 27111 9bb8f6a3e167298d6c930fb60264d374 ""
+  "FIG/exercise_0_images/first_ellipsoid_distribution.png" 1731485874 24515 d74535d42472e58f50360a8799945eac ""
   "FIG/exercise_1_images/Figure_1.png" 1731068916 50311 8640408f627ef3cb6f19a308f9c48dd4 ""
   "FIG/exercise_1_images/Figure_2.png" 1731068916 42705 5151e4ba2b06b5f58d6efc1f8aa81772 ""
   "FIG/exercise_2_images/rejection_sampling_inequality_check.png" 1731078687 51076 ba5f39c9fa31a4e20791a1ffcd7c9d64 ""
@@ -185,8 +188,8 @@
   "FIG/exercise_3_images/distribution_consideration.png" 1731165966 57075 acbcef8890b9846822ac9531f6a0a1f9 ""
   "FIG/exercise_3_images/distribution_crude_mc_ex2.png" 1731165964 22534 2497a26a86db78edf5ed9c925ab211de ""
   "FIG/exercise_4_images/Exercise 4_part1.png" 1731160180 289442 5b7594b8032a6e6f750f2e4c79a0ce80 ""
-  "main.aux" 1731169094 4573 1c4b90e6267b74ec1660eb58a89e9144 "pdflatex"
-  "main.out" 1731169093 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+  "main.aux" 1731488279 5178 56679c04f2e27a4d3e8c9d6df50defbf "pdflatex"
+  "main.out" 1731488279 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
   "main.tex" 1731143279 1661 93a80e2186a751360841c61a38500c6a ""
   (generated)
   "main.aux"
