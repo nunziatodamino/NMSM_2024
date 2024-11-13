@@ -1,3 +1,17 @@
-
 \chapter*{Lecture 7: Brussellator}
 
+A state $\mathcal{C}=(X,Y)$ of the system represents the numbers $X$ and $Y$ of molecules of two species $A_X,A_Y.$ 
+The chemical reactions of the Brusselator are:
+
+$$
+\begin{cases}
+    \emptyset\xrightarrow{k_1}A_X \\
+    A_X\xrightarrow{k_2}\emptyset  \\
+    2A_X+A_Y \xrightarrow{k_3} 3A_X\\
+    A_X\xrightarrow{k_4} A_Y
+\end{cases}
+$$
+
+The stochastic version of the Brusselator, translating the original deterministic dynamics into a Markov jump process, 
+introduces the finite size of the system via a “volume” $\Omega$. 
+Following the sketch of Fig. 4, these $\mathcal{C}$-dependent rates are rewritten as

@@ -21,16 +21,7 @@ This happens because , given that each hit or miss procedure is in fact a Bernou
 $$ \sigma_V = \sqrt{\frac{p( 1-p )}{N}} V_{\text{integration box}} $$
 
 Where $p$ is our success probability, i.e. the probability to hit inside the integration box, and $N$ is the number of trials, i.e. the number of iterations.\\
-So, as we seen $\sigma_V \propto V_{\text{integration box}}$, so the smaller it is, better is our estimate.
-
-\begin{wrapfigure}{r}{0.5\textwidth}
-    \vspace{-25pt}
-    \centering
-    \includegraphics[width=0.33\textwidth]{FIG/exercise_0_images/first_and_second_ellipsoid_distribution.png}
-  \caption{Volume distribution comparison between the 2 ellipsoids}
-  \label{lec1:first_and_second_ellipsoid}
-  \end{wrapfigure}
-
+So, as we seen $\sigma_V \propto V_{\text{integration box}}$, so the smaller it is, better is our estimate. \\
 Given this consideration we report in figure \ref{lec1:first_ellipsoid} the result obtained using the procedure with the ellipsoid octant for an ellipsoid of given semi-axes $a=3,\ b=1,\ c=1$:
 
 $$\langle V \rangle_1 \simeq 6.283 \pm 0.060$$
@@ -42,10 +33,29 @@ We obtain for this ellipsoid:
 
 $$\langle V \rangle_2 \simeq 1.571 \pm 0.015$$
 
+\begin{wrapfigure}{H}{0.5\textwidth}
+  \centering
+  \includegraphics[width=0.33\textwidth]{FIG/exercise_0_images/first_and_second_ellipsoid_distribution.png}
+\caption{Volume distribution comparison between the 2 ellipsoids}
+\label{lec1:first_and_second_ellipsoid}
+\end{wrapfigure}
+
 Which confirms our prediction on the error. One can see also graphically this by compating the 2 volume distributions and see in figure \ref{lec1:first_and_second_ellipsoid} that the one with the
-smaller integration box is narrower.
+smaller integration box is narrower. \\
+Moreover, given that the same volume can be evaluate analitically, we can study the deviation of the estimate from the analytical value. \\
+In figure \ref{lec1:deviation_comparison} we report for each of the 2 simulations the deviation from the analytical value, i.e $\Delta f = \mid f_{th}-\langle f \rangle \mid $ as a function
+of the number of iterations. \\
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\textwidth]{FIG/exercise_0_images/relative_error_trend.png}
+  \caption{Comparison between the relative deviations for the 2 ellipsoids and the expected theroretical trend}
+  \label{lec1:deviation_comparison}
+  \end{figure}
 
+Notice that, as discussed before, even if having a bigger number of iterations has a net effect of diminishing the error, the bigger variance in 
+the case of the first ellipsoid makes the deviations bigger respect to the second ellipsoid. \\
+We plotted for reference the general trend $\frac{1}{\sqrt{N}}$ which is the one to be expected in this kind of curves.  
 
 
 \paragraph{Sampling random numbers from a given distribution: inversion method}
@@ -70,7 +80,7 @@ For both $y \in (0,1]$.
 
 We report in the following the obtained graphs:
 
-\begin{figure}[t!]
+\begin{figure}[H]
 \centering
 \includegraphics[width=0.48\textwidth]{FIG/exercise_1_images/Figure_1.png}
 \hfill

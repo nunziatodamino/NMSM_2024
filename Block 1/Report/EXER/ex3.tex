@@ -49,9 +49,9 @@ $\rho(x)<g(x)$ when the product $f^2(x)\rho(x)$ is "large" and $\rho(x)>g(x)$ wh
 where $\rho(x)$ in our case is the original sampling distribution, which is $U(0, \frac{\pi}{2})$. \\
 We show in fig \ref{choice_g} that for $a = \frac{1}{\pi}$ these conditions are satisfied. \\
 
-\begin{figure}[t!]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\textwidth]{FIG/exercise_3_images/distribution_comparison.png}
+    \includegraphics[width=0.5\textwidth]{FIG/exercise_3_images/distribution_comparison.png}
     \caption{Distribution comparison between crude Monte Carlo and importance sampling with the same number of iterations}
     \label{distribution_comparison}
     \end{figure}
@@ -79,7 +79,7 @@ Instead of going through the analytical route, one can think to evaluate it by u
 i.e. by evaluating $\langle f(x) \rangle_{\mathcal{N}(0,1)}$. \\
 We obtain:
 
-$$ \langle f(x) \rangle_{\mathcal{N}(0,1)} = 0.07431809274645616 \pm 0.004796287626550513 $$
+$$ \langle f(x) \rangle_{\mathcal{N}(0,1)} = 0.0743 \pm 0.0048 $$
 
 As also shown in the picture \ref{crude_mc_integral2}.
 
@@ -94,11 +94,26 @@ As also shown in the picture \ref{crude_mc_integral2}.
 If, as proposed by the exercise, we now try to evaluate the same integral by the importance sampling 
 method using as sampling function the uniform distribution $U(-8, -1)$ for 1000 iterations, we will see nothing. \\
 It's easy to see way if we show the involved functions together in a graph \ref{badchoice} \\
-The uniform distribution samples in that interval values for which the integrand function assumes values between $10^{-41}$ to $10^{-5}$
+The uniform distribution samples in that interval values for which the integrand function assumes values between $10^{-41}$ to $10^{-5}$, 
+so is not possible with this iteration number to reach convergence.  
 
-\begin{figure}[t!]
+\begin{figure}[H]
   \centering
-  \includegraphics[width=0.7\textwidth]{FIG/exercise_3_images/distribution_consideration.png}
+  \includegraphics[width=0.5\textwidth]{FIG/exercise_3_images/distribution_consideration.png}
   \caption{Graphical analysis for the bad choice of $U(-8,-1)$ as a sampling function for the integral $\langle f(x) \rangle_{\mathcal{N}(0,1)}$}
   \label{badchoice}
   \end{figure}
+
+With this number of iterations one can do way better if proposes for the importance sampling the distribution $U(-1, 4.5)$, in this case one obtain the better estimate:
+
+$$ \langle f(x)\mathcal{N}(0,1) \rangle_{U(-1,4.5)} =  0.074518 \pm 0.000003  $$
+
+This result is further presented in figure \ref{lec3:comparison_part2}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth]{FIG/exercise_3_images/distribution_comparison_part2.png}
+  \caption{Comparison between the integral estimate distributions}
+  \label{lec3:comparison_part2}
+  \end{figure}
+

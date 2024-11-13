@@ -48,11 +48,14 @@ def jump_function(old_configuration):
 
 def algorithm(initial_configuration, time_max):
     time_total = 0
+    time_series = []
     configurations = [] 
     current_configuration = initial_configuration
     while time_total < time_max:
-        time_total += residence_time_cdf_inverse(current_configuration, np.random.random())
+        residence_time = residence_time_cdf_inverse(current_configuration, np.random.random())
+        time_total += residence_time
+        time_series.append(time_total)
         current_configuration = jump_function(current_configuration)
         configurations.append(current_configuration)
 
-    return configurations    
+    return configurations, time_series    
