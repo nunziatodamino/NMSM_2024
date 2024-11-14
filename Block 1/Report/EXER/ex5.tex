@@ -1,3 +1,74 @@
-
 \chapter*{Lecture 5: Ising 2D}
 
+The Ising model is, by earsay, the undisputed king of the Monte Carlo simulations. Its simplicity, combined with the richness of its behavior, 
+makes it an ideal playground for testing and developing important computational techniques as the Metropolis algorithm, that we will 
+see in the following. \\
+In this exercise we'll simulate the 2D Ising model on a square lattice, using the Glauber dynamics (local spin flip) and the Metropolis algorithm
+for the configuration evolution. We'll then evaluate typical system observables at equilibrium for different temperatures and different system sizes.
+
+We recall briefly some fundamental theoretical facts about the Ising model that we'll use through the simulation.
+We begin considering a generic lattice where we place $N$ spins of the type $\sigma_i  = \pm 1$. If one fixes an origin on the lattice, and consider
+from this the set of positions $\{\bar{r}_0, \bar{r}_1, \dots \bar{r}_{N-1}\}$ of the other lattice points, then is possible 
+to define a configuration $\CC = \{\sigma_{\bar{r}_0}, \dots \sigma_{\bar{r}_{N-1}}\}$ as the set of spin values assumed on each lattice point. \\
+We define the energy of configuration $\CC$ as:
+
+$$
+\mathcal{H}(C) = -J \sum_{\langle \bar{r_i}\bar{r_j} \rangle} \sigma_{\bar{r_i}} \sigma_{\bar{r_i}}
+$$
+
+Where the symbol $\sum_{\langle \bar{r_i}\bar{r_j} \rangle}$ implies that the sum is done only over the nearest neighbors. In our simulation 
+we'll consider for simplicity $J=1$. \\
+
+We report also, given that this model can be solved exactly (Onsager), the result for the critical temperature and the expected magnetisation in function
+of the temperature. \\
+We have that the magnetization has the following function:
+
+$$
+M = 
+\begin{cases}
+(1-\sinh^{-4}(2\beta J))^{1/8} \quad&T<T_c\\
+0 &T \geq T_c    
+\end{cases}
+$$
+
+
+Where holds for the critical temperature the relation:
+
+$$ \frac{k_BT_c}{J} = \frac{2}{\ln(1 +\sqrt{2})} \simeq 2.269 $$
+
+Again, to simplify our simulation, we will consider $k_B = 1$ (natural units). \\
+
+Now we can begin discussing the simulation details .\\
+We begin by generating a random configuration at the start of the simulation such that the probability to have a spin up or a spin down is
+$\frac{1}{2}$. With this choice, if the system evolves with $T<T_C$ can either reach an equilibrium configuration where all spins are up or down ,
+according to the phase diagram. \\
+Notice that if we, for whatever reason, would like to reach an equilibrium configuration respect to the other we can do that by skewing
+the picking probability in favor of what we desire. \\
+Then we go from this configuration $\CC$ to a new configuration $\CC'$ performing $N$ spin local moves, 
+where the algorithm to perform a single spin flip and decide to accept it or not, is described in the following:
+
+\begin{algorithm}
+    \caption{Metropolis Spin-Flip Dynamics}
+    \begin{algorithmic}[1]
+        \State \((i, j) \sim \text{U}(0, \text{length})\)
+        \State \(\text{neighbor\_sum} \gets \sum \left( \text{old\_configuration}[\text{neighbor}] \; \text{for each neighbor in} \; \text{neighbors\_list}[(i, j)] \right)\)
+        \State \(\Delta E \gets 2J \times \text{old\_configuration}[i, j] \times \text{neighbor\_sum}\)
+        \State \(\text{new\_configuration} \gets \text{copy of old\_configuration}\)
+        \State \(\text{new\_configuration}[i, j] \gets -\text{old\_configuration}[i, j]\) \Comment{Flip the spin at \((i, j)\)}
+        \If{\(\Delta E \leq 0\)}
+            \State \textbf{Return} \(\text{new\_configuration}\)
+        \Else
+            \State \(u \sim U(0,1)\)
+            \If{\(u \leq e^{-\beta \Delta E}\)}
+                \State \textbf{Return} \(\text{new\_configuration}\)
+            \Else
+                \State \textbf{Return} \(\text{old\_configuration}\)
+            \EndIf
+        \EndIf
+    \end{algorithmic}
+    \label{metropolis_spin_flip}
+\end{algorithm}
+
+Notice that in order to reduce the computation time a neighbor list for each atom, considering the periodic boundary condition, 
+is evaluated using an hash table at the start of the program, so that the algorithm can use it as input. This can be implemented
+ easily in Python using a dictionary.

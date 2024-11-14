@@ -3,6 +3,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+from statsmodels.tsa.stattools import acf
 import ising_2d as ising
 
 plt.rcParams.update({'font.size': 18}) # global font parameter for plots
@@ -17,7 +18,7 @@ exercise_folder = "FIG/exercise_5_images"
 LENGTH = 50
 CRITICAL_TEMP = 2 / np.log(1 + np.sqrt(2))
 BETA_CRITICAL = 1 / CRITICAL_TEMP
-temp_mult = (0.25, 0.88, 1.2, 2.5)
+temp_mult = (0.25, 0.97, 1.05, 2.5)
 TEMP_LIST = np.array(temp_mult) * CRITICAL_TEMP
 BETA_LIST = 1 / TEMP_LIST
 
@@ -32,17 +33,20 @@ initial_configuration = np.random.choice([SPIN_UP, SPIN_DOWN], size=(LENGTH, LEN
 
 np.random.seed(None) # in this way the initial configuration is set always in the same way, but the rest of the evolution no
 
-plt.imshow(initial_configuration, cmap="coolwarm", interpolation="nearest")
+plt.figure(figsize=(9, 6))
+plt.imshow(initial_configuration, cmap="coolwarm", interpolation="nearest", origin="lower")
 cbar = plt.colorbar(ticks=[SPIN_DOWN, SPIN_UP]) 
 cbar.set_label("Spin")
 plt.title("Initial Spin Configuration")
-plt.show()
+image_name = f"initial_spin_{LENGTH}.png"
+entire_path = os.path.join(report_path, exercise_folder, image_name)
+plt.savefig(entire_path)
+plt.close()
 
 neighbors_list = ising.neighbors_list_square_pbc(LENGTH) # the neighbor list is configuration independent and can be evaluated at the start of the procedure.   
 
-MC_TIMESTEPS = 5000
+MC_TIMESTEPS = 10000
 TIMESTEPS = LENGTH * LENGTH
-beta = 1/ (0.881 * CRITICAL_TEMP)
 
 configurations = np.zeros((len(BETA_LIST), MC_TIMESTEPS, LENGTH, LENGTH))
 config = initial_configuration  
@@ -81,6 +85,7 @@ for j, beta in enumerate(BETA_LIST):
     plt.plot(time, magnetisation_per_spin[j], label = f"magnetisation per spin at {1/beta/CRITICAL_TEMP} T_c")
     plt.xlabel("Time in MC timestep units")
     plt.ylabel("Observables")
+    plt.ylim(-3, 3) 
     plt.legend(fontsize = 10)
     image_name = f"observables_temp{1/beta/CRITICAL_TEMP:.2f}T_c_dimension{LENGTH}.png"
     entire_path = os.path.join(report_path, exercise_folder, image_name)
@@ -103,10 +108,14 @@ error_magnetic_suscept = np.zeros(len(BETA_LIST))
 
 energy_autocorrelation = np.zeros((len(BETA_LIST), MC_TIMESTEPS))
 magnetisation_autocorrelation = np.zeros((len(BETA_LIST), MC_TIMESTEPS))
+tau_energy_autocorrelation = np.zeros(len(BETA_LIST))
+tau_magnetisation_autocorrelation = np.zeros(len(BETA_LIST))
 
 for j, beta in enumerate(BETA_LIST):
-    energy_autocorrelation[j] = ising.normalized_auto_correlation(energy_per_spin[j], 0, MC_TIMESTEPS)
-    magnetisation_autocorrelation[j] = ising.normalized_auto_correlation(magnetisation_per_spin, 0, MC_TIMESTEPS)
+    energy_autocorrelation[j] = acf(energy_per_spin[j], nlags = MC_TIMESTEPS)
+    magnetisation_autocorrelation[j] = acf(magnetisation_per_spin[j], nlags = MC_TIMESTEPS)
+    tau_energy_autocorrelation[j] = np.trapz(energy_autocorrelation[j], dx = 1 ) 
+    tau_magnetisation_autocorrelation[j] = np.trapz(magnetisation_autocorrelation[j], dx = 1)
     energy[j] = ising.mean_value_observable_equilibrium(energy_per_spin[j], t_equilibrium, MC_TIMESTEPS)
     error_energy[j] = ising.error_observable_equilibrium(energy_per_spin[j], t_equilibrium, MC_TIMESTEPS)
     magnetisation[j] = ising.mean_value_observable_equilibrium(magnetisation_per_spin[j], t_equilibrium, MC_TIMESTEPS)
@@ -118,14 +127,20 @@ for j, beta in enumerate(BETA_LIST):
     print(f"At T = {1/beta/CRITICAL_TEMP} T_c, for a square lattice of side {LENGTH}, magnetisation = {magnetisation[j]} +- {error_magnetisation[j]}")
     print(f"At T = {1/beta/CRITICAL_TEMP} T_c, for a square lattice of side {LENGTH}, heat capacity = {heat_capacity[j]}")
     print(f"At T = {1/beta/CRITICAL_TEMP} T_c, for a square lattice of side {LENGTH}, magnetic susceptibility = {magnetic_suscept[j]}")
+    print(f"At T = {1/beta/CRITICAL_TEMP} T_c, for a square lattice of side {LENGTH}, tau energy autocorrelation = {tau_energy_autocorrelation[j]}")
+    print(f"At T = {1/beta/CRITICAL_TEMP} T_c, for a square lattice of side {LENGTH}, tau magnetisation autocorrelation = {tau_magnetisation_autocorrelation[j]}")
     print("-----------------------------------------------------------------------------------------------------------------------------------")
 
 for j, beta in enumerate(BETA_LIST):
     plt.figure(figsize=(10, 10))
-    plt.plot(time, energy_autocorrelation[j], label = f"energy autocorrellation at {1/beta/CRITICAL_TEMP} T_c")
+    plt.plot(time, energy_autocorrelation[j], label = f"energy autocorrelation at {1/beta/CRITICAL_TEMP} T_c")
+    plt.plot(time, magnetisation_autocorrelation[j], label = f"magnetisation autocorrelation at {1/beta/CRITICAL_TEMP} T_c")
     plt.xlabel("Time in MC timestep units")
-    plt.ylabel("Energy autocorrelation")
+    plt.ylabel("Autocorrelation")
     plt.legend(fontsize = 10)
-    plt.show()
+    image_name = f"observables_autocorrelation_temp{1/beta/CRITICAL_TEMP:.2f}T_c_dimension{LENGTH}.png"
+    entire_path = os.path.join(report_path, exercise_folder, image_name)
+    plt.savefig(entire_path)
+    plt.close()
 
 # %%

@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1731578471 "/home/nunziato-damino/Documents/Github/NMSM_2024/Block 1/Report/main.tex" "main.pdf" "main" 1731578472 0
+["pdflatex"] 1731601468 "/home/nunziato-damino/Documents/Github/NMSM_2024/Block 1/Report/main.tex" "main.pdf" "main" 1731601470 0
   "/etc/texmf/web2c/texmf.cnf" 1730382086 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/home/nunziato-damino/Documents/Github/NMSM_2024/Block 1/Report/main.tex" 1731143279 1661 93a80e2186a751360841c61a38500c6a ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -55,6 +55,7 @@
   "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb" 1248133631 32734 69e00a6b65cedb993666e42eedb3d48f ""
   "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb" 1248133631 32726 0a1aea6fcd6468ee2cf64d891f5c43c8 ""
   "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb" 1248133631 32569 5e5ddc8df908dea60932f3c484a54c0d ""
+  "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb" 1248133631 32587 1788b0c1c5b39540c96f5e42ccd6dae8 ""
   "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb" 1248133631 32626 4f5c1b83753b1dd3a97d1b399a005b4b ""
   "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb" 1248133631 34694 ad62b13721ee8eda1dcc8993c8bd7041 ""
   "/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii" 1461363279 71627 94eb9990bed73c364d7f53f960cc8c5b ""
@@ -173,9 +174,9 @@
   "EXER/ex2.tex" 1731161589 2710 67b6aa3ebc86fcb8277c2c460cc08cb2 ""
   "EXER/ex3.tex" 1731512905 5793 c4c76ee6a4635400a038102cc2ef5666 ""
   "EXER/ex4.tex" 1731161484 3318 034a382a30039cc3419fc10dcc7072ca ""
-  "EXER/ex5.tex" 1731068916 33 d6162a8c7e4f7febcf461a0af0a715ed ""
+  "EXER/ex5.tex" 1731601468 4230 5c94f2c7305fc803fd9700520e6ce589 ""
   "EXER/ex6.tex" 1731068916 36 60472b16f3ccbc6ecd80990a74f66641 ""
-  "EXER/ex7.tex" 1731578471 3934 1ecd2dbf3e249c178e8deb1172f548ec ""
+  "EXER/ex7.tex" 1731578508 3934 1ecd2dbf3e249c178e8deb1172f548ec ""
   "FIG/exercise_0_images/first_and_second_ellipsoid_distribution.png" 1731511381 27130 fd70eef4df71e7054cdcfd3923185332 ""
   "FIG/exercise_0_images/first_ellipsoid_distribution.png" 1731511381 24323 a4b9aa0b8748a275aef3de22c555298b ""
   "FIG/exercise_0_images/relative_error_trend.png" 1731511382 79475 25b541b089dbbedd31eda32d5940d0df ""
@@ -196,8 +197,8 @@
   "FIG/exercise_7_images/gillespiexy_volume100.0.png" 1731570654 117799 4f142355d10a03efa2f5bb66a6a2c4fb ""
   "FIG/exercise_7_images/gillespiexy_volume1000.0.png" 1731570773 73940 4ccf18e7ebfd866ab53202a75a84db6f ""
   "FIG/exercise_7_images/gillespiexy_volume10000.0.png" 1731570857 63705 d922d65b46458386c5ccf6a486a5af73 ""
-  "main.aux" 1731578472 6547 3bb6558119614b273c4050b0d3c8d3c1 "pdflatex"
-  "main.out" 1731578471 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+  "main.aux" 1731601470 6771 66dd86289ca2f974a0cc2db1e7890f00 "pdflatex"
+  "main.out" 1731601469 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
   "main.tex" 1731143279 1661 93a80e2186a751360841c61a38500c6a ""
   (generated)
   "main.aux"

@@ -26,8 +26,8 @@ def system_energy(configuration, neighbors_list):
 def metropolis_spin_flip_dynamics (old_configuration, neighbors_list, length, beta):
     """
     """
-    i = np.random.randint(0, length)
-    j = np.random.randint(0, length)
+    i = np.random.randint(0, length )
+    j = np.random.randint(0, length )
     neighbor_sum = sum(old_configuration[neighbor] for neighbor in neighbors_list[(i, j)])
     delta_energy = 2 * J * old_configuration[i,j] * neighbor_sum
     new_configuration= old_configuration.copy()
@@ -37,8 +37,8 @@ def metropolis_spin_flip_dynamics (old_configuration, neighbors_list, length, be
     return old_configuration   
 
 def glauber_spin_flip_dynamics (old_configuration, neighbors_list, length, beta):
-    i = np.random.randint(0, length)
-    j = np.random.randint(0, length)
+    i = np.random.randint(0, length )
+    j = np.random.randint(0, length )
     neighbor_sum = sum(old_configuration[neighbor] for neighbor in neighbors_list[(i, j)])
     delta_energy = 2 * J * old_configuration[i,j] * neighbor_sum
     new_configuration= old_configuration.copy()
@@ -79,23 +79,6 @@ def variance_observable_equilibrium(observable, t_equilibrium, t_max):
 
 def error_observable_equilibrium(observable, t_equilibrium, t_max):
     return np.sqrt(variance_observable_equilibrium(observable, t_equilibrium, t_max) / (t_max - t_equilibrium))
-
-def normalized_auto_correlation(distribution, t_equilibrium, time_max):
-    """
-    Autocorrelation function between time t_eq to t_max
-    """
-    auto_corr = np.zeros(time_max - t_equilibrium)
-    for t in range(t_equilibrium, time_max):
-        tmp_sum_1 = 0
-        tmp_sum_2 = 0
-        tmp_sum_3 = 0
-        for i in range(time_max - t):
-            tmp_sum_1 += distribution[i] * distribution[i+t]
-            tmp_sum_2 += distribution[i]
-            tmp_sum_3 += distribution[i+t]
-        prefactor = 1 / (time_max - t)
-        auto_corr[t] = prefactor * tmp_sum_1 - prefactor * tmp_sum_2 * prefactor * tmp_sum_3 
-    return auto_corr/auto_corr[t_equilibrium]  
 
 def heat_capacity (energy_variance, temperature):
     return energy_variance / temperature**2
