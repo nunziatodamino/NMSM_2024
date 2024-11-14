@@ -1,6 +1,6 @@
 import numpy as np
 import scipy.stats as stats
-from typing import Callable
+from collections.abc import Callable
 
 def inversion(cdf_inverse: Callable[[float], float], number_sampled_points: int) -> np.ndarray:
     random_variables = np.zeros(number_sampled_points)

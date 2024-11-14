@@ -1,7 +1,21 @@
 \chapter*{Lecture 7: Brussellator}
 
-A state $\mathcal{C}=(X,Y)$ of the system represents the numbers $X$ and $Y$ of molecules of two species $A_X,A_Y.$ 
-The chemical reactions of the Brusselator are:
+The Brussellator is a model that describes an autocatalytic and oscillatory chemical reaction. In literature is given as follows:
+
+\begin{equation}
+    \begin{cases} 
+        A \xrightarrow{K_1} X, & \text{(1a)} \\ 
+        B + X \xrightarrow{K_2} Y + D, & \text{(2a)} \\
+         2X + Y \xrightarrow{K_3} 3X, & \text{(3a)} \\ 
+         X \xrightarrow{K_4} E. & \text{(4a)}     
+    \end{cases}    
+\label{bruss_orig}
+\end{equation}
+
+Notice that for the reaction dynamics, only the third equation is important, i.e. the autocatalysis reaction $2X + Y \rightarrow 3X$, while
+the other equations describe ,in order, the $X$ production (1a), the $X \to Y$ conversion (2a), the $Y$ depletion (4a). \\
+So, in a context in which we are interest in simulating just the autocatalysis dynamics and not the system details, we can reduce 
+the set of reactions to the following one:
 
 $$
 \begin{cases}
@@ -12,6 +26,53 @@ $$
 \end{cases}
 $$
 
-The stochastic version of the Brusselator, translating the original deterministic dynamics into a Markov jump process, 
-introduces the finite size of the system via a “volume” $\Omega$. 
-Following the sketch of Fig. 4, these $\mathcal{C}$-dependent rates are rewritten as
+Where with $A_X,A_Y$ we denote molecules of two different species. \\ The only hypothesis one has to make is that the molecules $A$ and $B$ are
+in high concentration so that the reactions (1a) and (2a) can happen with no problem. \\
+This implies automatically that our system will perform limit cycles and the stationary state will be unstable and oscillatory.\\
+This because, from the stability analysis of \ref{bruss_orig}, we have that the system is unstable if the following condition is satisfied:
+
+$$ K_2 [B] - K_4 - K_3[X_{eq}]^2 > 0 $$
+
+Which is satisfied for an high $B$ concentration. \\
+
+Instead of going through the deterministic route, we can consider the stochastic version of these reactions, transforming in this way the deterministic dynamics into a Markov process. \\
+
+We denote from now with $ \CC=(X,Y)$ a state of the system where $X$ and $Y$ represents the number molecules of the two species $A_X$ and $A_Y$
+respectively. The transition rates for a state $ \CC=(X,Y)$ in this process are given by the equations:
+
+$$
+\begin{cases}
+    w_{1} = a\Omega \quad &\text{for}\quad(X,Y)\to(X+1,Y)\\
+    w_{2} = X\quad&\text{for}\quad(X,Y)\to(X-1,Y)\\
+    w_{3} = \frac{1}{\Omega^{2}}X(X-1)Y\quad&\text{for}\quad(X,Y)\to(X+1,Y-1)\\
+    w_{4} = bX\quad&\text{for}\quad(X,Y)\to(X-1,Y+1)
+\end{cases}
+$$
+
+Notice that these equations introduces the finite size of the system via a volume $\Omega$. 
+We study in the following the effects on evolution for different volumes ($\Omega = 10^2, 10^3, 10^4$) , given $a = 2$, $b = 5$.  \\
+We report in figure \ref{lec7:moleculesxy_comparison} the molecules orbits for the different volumes.
+
+\begin{figure}[t!]
+    \centering
+    \includegraphics[width=0.33\textwidth]{FIG/exercise_7_images/gillespiexy_volume100.0.png} \hspace{0.5cm}
+    \includegraphics[width=0.33\textwidth]{FIG/exercise_7_images/gillespiexy_volume1000.0.png} \hspace{0.5cm}
+    \includegraphics[width=0.33\textwidth]{FIG/exercise_7_images/gillespiexy_volume10000.0.png}
+    \caption{Comparison between the molecules graphs for different volumes}
+    \label{lec7:moleculesxy_comparison}
+\end{figure}
+
+As expected we can see we have a limit cycle for each volume, and moreover we expect an oscillatory, described by picture \ref{lec7:moleculesxyevolution_comparison}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{FIG/exercise_7_images/gillespiexy_time_volume100.0.png} 
+    \vfill
+    \includegraphics[width=0.6\textwidth]{FIG/exercise_7_images/gillespiexy_time_volume1000.0.png} 
+    \vfill
+    \includegraphics[width=0.6\textwidth]{FIG/exercise_7_images/gillespiexy_time_volume10000.0.png}
+    \caption{Comparison between the molecules graphs for different volumes}
+    \label{lec7:moleculesxyevolution_comparison}
+\end{figure}
+
+Notice that the volume has a regularizing effect on the oscillations.

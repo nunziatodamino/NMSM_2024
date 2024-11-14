@@ -2,7 +2,7 @@ import numpy as np
 import numba
 
 # parameters
-VOLUME = 10e2
+VOLUME = 1e4
 A = 2
 B = 5
 
