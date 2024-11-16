@@ -1,4 +1,3 @@
-# %%
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -11,6 +10,7 @@ plt.rcParams.update({'font.size': 18}) # global font parameter for plots
 # paths for saving images in report
 ########################################
 report_path = "/home/nunziato-damino/Documents/Github/NMSM_2024/Block 1/Report"
+file_path = "/home/nunziato-damino/Documents/Github/NMSM_2024/Block 1/Exercise_5"
 exercise_folder = "FIG/exercise_5_images"
 ########################################
 
@@ -18,8 +18,8 @@ exercise_folder = "FIG/exercise_5_images"
 LENGTH = 50
 CRITICAL_TEMP = 2 / np.log(1 + np.sqrt(2))
 BETA_CRITICAL = 1 / CRITICAL_TEMP
-temp_mult = (0.25, 0.97, 1.05, 2.5)
-TEMP_LIST = np.array(temp_mult) * CRITICAL_TEMP
+TEMP_MULT = (0.5, 0.95, 1.05, 2.5)
+TEMP_LIST = np.array(TEMP_MULT) * CRITICAL_TEMP
 BETA_LIST = 1 / TEMP_LIST
 
 # Initial configuration
@@ -45,7 +45,7 @@ plt.close()
 
 neighbors_list = ising.neighbors_list_square_pbc(LENGTH) # the neighbor list is configuration independent and can be evaluated at the start of the procedure.   
 
-MC_TIMESTEPS = 10000
+MC_TIMESTEPS = 100000
 TIMESTEPS = LENGTH * LENGTH
 
 configurations = np.zeros((len(BETA_LIST), MC_TIMESTEPS, LENGTH, LENGTH))
@@ -87,60 +87,14 @@ for j, beta in enumerate(BETA_LIST):
     plt.ylabel("Observables")
     plt.ylim(-3, 3) 
     plt.legend(fontsize = 10)
-    image_name = f"observables_temp{1/beta/CRITICAL_TEMP:.2f}T_c_dimension{LENGTH}.png"
+    image_name = f"thermalization_temp{1/beta/CRITICAL_TEMP:.2f}T_c_dimension{LENGTH}.png"
     entire_path = os.path.join(report_path, exercise_folder, image_name)
     plt.savefig(entire_path)
     plt.close()
 
-# %%
-# Data analysis
-
-t_equilibrium = 1000 # LENGTH = 50
-
-energy = np.zeros(len(BETA_LIST))
-error_energy = np.zeros(len(BETA_LIST))
-magnetisation = np.zeros(len(BETA_LIST))
-error_magnetisation = np.zeros(len(BETA_LIST))
-heat_capacity = np.zeros(len(BETA_LIST))
-error_heat_capacity = np.zeros(len(BETA_LIST))
-magnetic_suscept = np.zeros(len(BETA_LIST))
-error_magnetic_suscept = np.zeros(len(BETA_LIST))
-
-energy_autocorrelation = np.zeros((len(BETA_LIST), MC_TIMESTEPS))
-magnetisation_autocorrelation = np.zeros((len(BETA_LIST), MC_TIMESTEPS))
-tau_energy_autocorrelation = np.zeros(len(BETA_LIST))
-tau_magnetisation_autocorrelation = np.zeros(len(BETA_LIST))
-
-for j, beta in enumerate(BETA_LIST):
-    energy_autocorrelation[j] = acf(energy_per_spin[j], nlags = MC_TIMESTEPS)
-    magnetisation_autocorrelation[j] = acf(magnetisation_per_spin[j], nlags = MC_TIMESTEPS)
-    tau_energy_autocorrelation[j] = np.trapz(energy_autocorrelation[j], dx = 1 ) 
-    tau_magnetisation_autocorrelation[j] = np.trapz(magnetisation_autocorrelation[j], dx = 1)
-    energy[j] = ising.mean_value_observable_equilibrium(energy_per_spin[j], t_equilibrium, MC_TIMESTEPS)
-    error_energy[j] = ising.error_observable_equilibrium(energy_per_spin[j], t_equilibrium, MC_TIMESTEPS)
-    magnetisation[j] = ising.mean_value_observable_equilibrium(magnetisation_per_spin[j], t_equilibrium, MC_TIMESTEPS)
-    error_magnetisation[j] = ising.error_observable_equilibrium(magnetisation_per_spin[j], t_equilibrium, MC_TIMESTEPS)  
-    heat_capacity[j] = ising.heat_capacity(ising.variance_observable_equilibrium(energy_per_spin[j], t_equilibrium, MC_TIMESTEPS), 1/beta/CRITICAL_TEMP)
-    magnetic_suscept[j] = ising.magnetic_susceptibility(LENGTH, beta, ising.variance_observable_equilibrium(magnetisation_per_spin[j], t_equilibrium, MC_TIMESTEPS))
-    print("-----------------------------------------------------------------------------------------------------------------------------------")
-    print(f"At T = {1/beta/CRITICAL_TEMP} T_c, for a square lattice of side {LENGTH}, energy = {energy[j]} +- {error_energy[j]}")
-    print(f"At T = {1/beta/CRITICAL_TEMP} T_c, for a square lattice of side {LENGTH}, magnetisation = {magnetisation[j]} +- {error_magnetisation[j]}")
-    print(f"At T = {1/beta/CRITICAL_TEMP} T_c, for a square lattice of side {LENGTH}, heat capacity = {heat_capacity[j]}")
-    print(f"At T = {1/beta/CRITICAL_TEMP} T_c, for a square lattice of side {LENGTH}, magnetic susceptibility = {magnetic_suscept[j]}")
-    print(f"At T = {1/beta/CRITICAL_TEMP} T_c, for a square lattice of side {LENGTH}, tau energy autocorrelation = {tau_energy_autocorrelation[j]}")
-    print(f"At T = {1/beta/CRITICAL_TEMP} T_c, for a square lattice of side {LENGTH}, tau magnetisation autocorrelation = {tau_magnetisation_autocorrelation[j]}")
-    print("-----------------------------------------------------------------------------------------------------------------------------------")
-
-for j, beta in enumerate(BETA_LIST):
-    plt.figure(figsize=(10, 10))
-    plt.plot(time, energy_autocorrelation[j], label = f"energy autocorrelation at {1/beta/CRITICAL_TEMP} T_c")
-    plt.plot(time, magnetisation_autocorrelation[j], label = f"magnetisation autocorrelation at {1/beta/CRITICAL_TEMP} T_c")
-    plt.xlabel("Time in MC timestep units")
-    plt.ylabel("Autocorrelation")
-    plt.legend(fontsize = 10)
-    image_name = f"observables_autocorrelation_temp{1/beta/CRITICAL_TEMP:.2f}T_c_dimension{LENGTH}.png"
-    entire_path = os.path.join(report_path, exercise_folder, image_name)
-    plt.savefig(entire_path)
-    plt.close()
-
-# %%
+np.save(os.path.join(file_path, f"critical_temp.npy"), CRITICAL_TEMP)
+np.save(os.path.join(file_path, f"beta_list.npy"), BETA_LIST)
+np.save(os.path.join(file_path, f"mc_timesteps.npy"), MC_TIMESTEPS)
+np.save(os.path.join(file_path, f"configurations_array{LENGTH}.npy"), configurations)
+np.save(os.path.join(file_path, f"energy_per_spin_dimension{LENGTH}.npy"), energy_per_spin)
+np.save(os.path.join(file_path, f"magnetisation_per_spin_dimension{LENGTH}.npy"), magnetisation_per_spin)

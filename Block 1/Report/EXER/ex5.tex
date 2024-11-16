@@ -19,8 +19,9 @@ $$
 Where the symbol $\sum_{\langle \bar{r_i}\bar{r_j} \rangle}$ implies that the sum is done only over the nearest neighbors. In our simulation 
 we'll consider for simplicity $J=1$. \\
 
-We report also, given that this model can be solved exactly (Onsager), the result for the critical temperature and the expected magnetisation in function
-of the temperature. \\
+In the case of the square lattice, this model can be solved exactly (Onsager). \\
+The result for the critical temperature and the expected magnetisation in function
+of the temperature are reported in the following.
 We have that the magnetization has the following function:
 
 $$
@@ -30,7 +31,6 @@ M =
 0 &T \geq T_c    
 \end{cases}
 $$
-
 
 Where holds for the critical temperature the relation:
 
@@ -53,7 +53,7 @@ where the algorithm to perform a single spin flip and decide to accept it or not
         \State \((i, j) \sim \text{U}(0, \text{length})\)
         \State \(\text{neighbor\_sum} \gets \sum \left( \text{old\_configuration}[\text{neighbor}] \; \text{for each neighbor in} \; \text{neighbors\_list}[(i, j)] \right)\)
         \State \(\Delta E \gets 2J \times \text{old\_configuration}[i, j] \times \text{neighbor\_sum}\)
-        \State \(\text{new\_configuration} \gets \text{copy of old\_configuration}\)
+        \State \(\text{new\_configuration} \gets \text{old\_configuration}\)
         \State \(\text{new\_configuration}[i, j] \gets -\text{old\_configuration}[i, j]\) \Comment{Flip the spin at \((i, j)\)}
         \If{\(\Delta E \leq 0\)}
             \State \textbf{Return} \(\text{new\_configuration}\)
@@ -71,4 +71,52 @@ where the algorithm to perform a single spin flip and decide to accept it or not
 
 Notice that in order to reduce the computation time a neighbor list for each atom, considering the periodic boundary condition, 
 is evaluated using an hash table at the start of the program, so that the algorithm can use it as input. This can be implemented
- easily in Python using a dictionary.
+ easily in Python using a dictionary. \\
+In our simulation we'll define 1 Monte Carlo timestep as the number of steps in which we perform $N$ local spin flip moves. \\
+
+\paragraph{Thermalization} Given that we're starting from a random configuration we'll need some time before reaching the thermal equilibrium, 
+i.e. the system we'll need to evolve for a certain number of Monte Carlo timesteps that we'll call $\tau_{eq}$ before we start to evaluate any mean observable. \\
+This process is called thermalization and is a fundamental part in any simulation of this kind. \\
+There are different recipes to find $\tau_{eq}$ for a given system, either qualitative or quantitative. One possible way can be to plot the
+observables of interest against time and see qualitatively when they tend to stabilize. One can, on top of this, introduce a quantitative criterion,
+say that the variance per observable must be less than a predetermined value $\alpha$. This approach, even if simple, has a clear caveat : it establish a lower
+bound for the observables time series but not an upper bound. \\
+Another approach is to evaluate at this stage the autocorrelation time for each observable. If the process is stationary or weakly stationary this number is 
+well defined through the time series ($C_O(s, s+t) = C_O=(0, t)\ \forall s$ for these kind of processes). Then we can use this number as a discard criterion 
+(the common recipe is $\tau_{eq} \simeq 20 \tau$, see \cite{Sokal1997}) but moreover we can use it in establishing an upper bound for the simulation. \\
+We'll discuss in detail in the autocorrelation paragraph that errors for correlated measures are of the order $\sim (\frac{\tau}{N})^{1/2}$, so in order to 
+achieve $1 \%$ accuracy for our measurements or better, $N > 10000\tau$ . \\
+We will use the second approach. \\
+
+A point of interest is that, technically, there is no need to discard any data. The initial data (biased estimation) leads to a systematic error $\sim \frac{\tau}{N}$,
+while the statistical errors will be of the order $\sim (\frac{\tau}{N})^{1/2}$, which is larger. In practice, given that the systematic error can be big, 
+and we can let it be 0 with no cost, we discard the initial transient. \\ 
+
+We then start the thermalization process with a warmup run where the maximum number of iterations is not the final one, and plot for each temperature and for 
+each square lattice the 2 observables of interest (energy and magnetisation per spin) against the simulation time. If an observable stabilize to a constant value (apart from the statistical noise) 
+we assume that from there on the process is stationary. 
+Suppose instead that the 2 observables did not stabilized, for example this happens near criticality for the magnetisation due to the critical slowing down 
+phenomenon, then if the other is stable, we can hypothesize that the magnetisation is weakly stationary. \\
+In order to prove this (approximatively) we numerically see if has constant mean, constant variance, and constant autocorrelation time in a certain tolerance 
+range. Then from this we have our autocorrelation time and proceed as specified before. \\
+A technical note here: the implementation of this procedure, while straightforward, is extremely susceptible to numerical instability, 
+so in the code a proof of concept version is presented and used, beacuse its optimization is behind the scope of this analysis. \\
+We attach in the report an example for just 2 temperature values for the square lattice of side 50 in figure \ref{lec5:thermalization}, in order to avoid cluttering, 
+the rest of the images can be found in the folder attached to the report.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{FIG/exercise_5_images/thermalization_temp0.50T_c_dimension50.png} \hspace{0.5cm}
+    \includegraphics[width=0.45\textwidth]{FIG/exercise_5_images/thermalization_temp1.05T_c_dimension50.png}
+    \caption{Warmup run for $T=0.5\ T_c$ and $T=1.05\ T_c$ respectively for the square lattice of side 50.
+    In the first figure we are away from criticality and both observables stabilize fast. In this setting we can see that 
+    both observables stabilize to a constant value, so they can be considered stationary. In this situation }
+    \label{lec5:thermalization}
+\end{figure}
+
+\paragraph{Autocorrelation} In Monte Carlo simulations, successive samples for each observable are often correlated due to the nature of the sampling algorithm. \\
+How much they are correlated is described by the autocorrelation function which can be showed that for large $t$ goes to 0 as an exponential:
+
+$$ C_O(T) \sim e^{-t/\tau^O_{int}} $$
+
+Where $\tau^O_{int}$ is called integrated correlation time.
