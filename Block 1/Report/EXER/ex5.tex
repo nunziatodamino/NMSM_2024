@@ -85,8 +85,9 @@ Another approach is to evaluate at this stage the autocorrelation time for each 
 well defined through the time series ($C_O(s, s+t) = C_O=(0, t)\ \forall s$ for these kind of processes). Then we can use this number as a discard criterion 
 (the common recipe is $\tau_{eq} \simeq 20 \tau$, see \cite{Sokal1997}) but moreover we can use it in establishing an upper bound for the simulation. \\
 We'll discuss in detail in the autocorrelation paragraph that errors for correlated measures are of the order $\sim (\frac{\tau}{N})^{1/2}$, so in order to 
-achieve $1 \%$ accuracy for our measurements or better, $N > 10000\tau$ . \\
-We will use the second approach. \\
+achieve, for example, $1 \%$ accuracy for our measurements or better, $N > 10000\tau$ . \\
+In our simulation, in order to find a tradeoff between computation time and accuracy, we choose, where possible, $t_{max} = 1000\tau$, leading
+to an accuracy of $\sim 3 \%$. Where the accuracy is worse, due to a longer $\tau$, the fact is expictly stated. \\
 
 A point of interest is that, technically, there is no need to discard any data. The initial data (biased estimation) leads to a systematic error $\sim \frac{\tau}{N}$,
 while the statistical errors will be of the order $\sim (\frac{\tau}{N})^{1/2}$, which is larger. In practice, given that the systematic error can be big, 

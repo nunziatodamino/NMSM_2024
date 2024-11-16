@@ -1,4 +1,5 @@
 import numpy as np
+from numba import njit
 from statsmodels.tsa.stattools import acf
 
 J = 1
@@ -16,6 +17,17 @@ def neighbors_list_square_pbc(length):
             neighbors_list[(i, j)] = neighbors           
     return neighbors_list
 
+@njit
+def neighbors_list_square_pbc_opt(length):
+    neighbors_list = np.zeros((length, length, 4, 2), dtype=np.int32)
+    for i in range(length):
+        for j in range(length):
+            neighbors_list[i, j, 0] = ((i - 1) % length, j)  # Up
+            neighbors_list[i, j, 1] = ((i + 1) % length, j)  # Down
+            neighbors_list[i, j, 2] = (i, (j - 1) % length)  # Left
+            neighbors_list[i, j, 3] = (i, (j + 1) % length)  # Right
+    return neighbors_list
+
 def system_energy(configuration, neighbors_list):
     energy = 0 
     for (i, j), neighbors in neighbors_list.items():
@@ -23,6 +35,35 @@ def system_energy(configuration, neighbors_list):
             neighbor_i, neighbor_j = neighbor
             energy -= J * configuration[i][j] * configuration[neighbor_i][neighbor_j]
     return energy / 2
+
+@njit
+def system_energy_opt(configuration, neighbors_list, length):
+    energy = 0.0
+    for i in range(length):
+        for j in range(length):
+            for k in range(4):  # 4 neighbors
+                neighbor = neighbors_list[i, j, k]
+                neighbor_i, neighbor_j = neighbor[0], neighbor[1]
+                energy -= J * configuration[i, j] * configuration[neighbor_i, neighbor_j]
+    return energy / 2.0
+
+@njit
+def metropolis_spin_flip_dynamics_opt(old_configuration, neighbors_list, length, beta):
+    i = np.random.randint(0, length)
+    j = np.random.randint(0, length)
+
+    # Calculate neighbor sum
+    neighbor_sum = 0
+    for k in range(4):  # 4 neighbors
+        neighbor = neighbors_list[i, j, k]
+        neighbor_sum += old_configuration[neighbor[0], neighbor[1]]
+
+    delta_energy = 2 * J * old_configuration[i, j] * neighbor_sum
+    new_configuration = np.copy(old_configuration)
+    if delta_energy <= 0 or np.random.random() <= np.exp(-beta * delta_energy):
+        new_configuration[i, j] = -old_configuration[i, j]  # Spin flip
+    return new_configuration
+
 
 def metropolis_spin_flip_dynamics(old_configuration, neighbors_list, length, beta):
     """

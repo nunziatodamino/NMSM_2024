@@ -1,8 +1,6 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
-from statsmodels.tsa.stattools import acf
 import ising_2d as ising
 
 plt.rcParams.update({'font.size': 18}) # global font parameter for plots
@@ -15,7 +13,7 @@ exercise_folder = "FIG/exercise_5_images"
 ########################################
 
 # Model parameters
-LENGTH = 50
+LENGTH = 25
 CRITICAL_TEMP = 2 / np.log(1 + np.sqrt(2))
 BETA_CRITICAL = 1 / CRITICAL_TEMP
 TEMP_MULT = (0.5, 0.95, 1.05, 2.5)
@@ -43,19 +41,22 @@ entire_path = os.path.join(report_path, exercise_folder, image_name)
 plt.savefig(entire_path)
 plt.close()
 
-neighbors_list = ising.neighbors_list_square_pbc(LENGTH) # the neighbor list is configuration independent and can be evaluated at the start of the procedure.   
+neighbors_list = ising.neighbors_list_square_pbc_opt(LENGTH) # the neighbor list is configuration independent and can be evaluated at the start of the procedure.   
 
 MC_TIMESTEPS = 100000
 TIMESTEPS = LENGTH * LENGTH
 
-configurations = np.zeros((len(BETA_LIST), MC_TIMESTEPS, LENGTH, LENGTH))
+#configurations = np.zeros((len(BETA_LIST), MC_TIMESTEPS, LENGTH, LENGTH))
+energy_per_spin = np.zeros((len(BETA_LIST), MC_TIMESTEPS))
+magnetisation_per_spin = np.zeros((len(BETA_LIST), MC_TIMESTEPS))
 config = initial_configuration  
 
-for i, beta in enumerate(BETA_LIST):
+for temp, beta in enumerate(BETA_LIST):
     for mc_step in range(MC_TIMESTEPS):
         for _ in range(TIMESTEPS):
-            config = ising.metropolis_spin_flip_dynamics(config, neighbors_list, LENGTH, beta)
-        configurations[i, mc_step] = config  
+            config = ising.metropolis_spin_flip_dynamics_opt(config, neighbors_list, LENGTH, beta)
+        energy_per_spin[temp, mc_step] = ising.system_energy_opt(config, neighbors_list, LENGTH) / (LENGTH * LENGTH)
+        magnetisation_per_spin[temp, mc_step] = np.sum(config) / (LENGTH * LENGTH)
 
 # # Plot the final configuration 
 # cmap = mcolors.ListedColormap(["blue", "red"])
@@ -71,13 +72,6 @@ for i, beta in enumerate(BETA_LIST):
 # Thermalization
 
 time = np.arange(0, MC_TIMESTEPS, 1)
-energy_per_spin = np.zeros((len(BETA_LIST), MC_TIMESTEPS))
-magnetisation_per_spin = np.zeros((len(BETA_LIST), MC_TIMESTEPS))
-
-for j, beta in enumerate(BETA_LIST):
-    for i in range(MC_TIMESTEPS):
-        energy_per_spin[j,i] = ising.system_energy(configurations[j,i], neighbors_list) / (LENGTH * LENGTH)
-        magnetisation_per_spin[j,i] = np.sum(configurations[j,i]) / (LENGTH * LENGTH)
     
 for j, beta in enumerate(BETA_LIST):
     plt.figure(figsize=(10, 10))
@@ -95,6 +89,6 @@ for j, beta in enumerate(BETA_LIST):
 np.save(os.path.join(file_path, f"critical_temp.npy"), CRITICAL_TEMP)
 np.save(os.path.join(file_path, f"beta_list.npy"), BETA_LIST)
 np.save(os.path.join(file_path, f"mc_timesteps.npy"), MC_TIMESTEPS)
-np.save(os.path.join(file_path, f"configurations_array{LENGTH}.npy"), configurations)
+#np.save(os.path.join(file_path, f"configurations_array{LENGTH}.npy"), configurations)
 np.save(os.path.join(file_path, f"energy_per_spin_dimension{LENGTH}.npy"), energy_per_spin)
 np.save(os.path.join(file_path, f"magnetisation_per_spin_dimension{LENGTH}.npy"), magnetisation_per_spin)
