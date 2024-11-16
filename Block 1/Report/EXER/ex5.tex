@@ -102,13 +102,12 @@ In order to prove this (approximatively) we numerically see if has constant mean
 range. Then from this we have our autocorrelation time and proceed as specified before. \\
 A technical note here: the implementation of this procedure, while straightforward, is extremely susceptible to numerical instability, 
 so in the code a proof of concept version is presented and used, beacuse its optimization is behind the scope of this analysis. \\
-We attach in the report an example for just 2 temperature values for the square lattice of side 50 in figure \ref{lec5:thermalization}, in order to avoid cluttering, 
-the rest of the images can be found in the folder attached to the report.
+We attach in the report an example for just 2 temperature values for the square lattice of side 50 in figure \ref{lec5:thermalization}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.45\textwidth]{FIG/exercise_5_images/thermalization_temp0.50T_c_dimension50.png} \hspace{0.5cm}
-    \includegraphics[width=0.45\textwidth]{FIG/exercise_5_images/thermalization_temp1.05T_c_dimension50.png}
+    \includegraphics[width=0.45\textwidth]{FIG/exercise_5_images/warmup_observables_temp0.25T_c_dimension50.png} \hspace{0.5cm}
+    \includegraphics[width=0.45\textwidth]{FIG/exercise_5_images/warmup_observables_temp1.05T_c_dimension50.png}
     \caption{Warmup run for $T=0.5\ T_c$ and $T=1.05\ T_c$ respectively for the square lattice of side 50.
     In the first figure we are away from criticality and both observables stabilize fast. In this setting we can see that 
     both observables stabilize to a constant value, so they can be considered stationary. In this situation }

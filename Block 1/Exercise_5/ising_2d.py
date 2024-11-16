@@ -22,10 +22,10 @@ def neighbors_list_square_pbc_opt(length):
     neighbors_list = np.zeros((length, length, 4, 2), dtype=np.int32)
     for i in range(length):
         for j in range(length):
-            neighbors_list[i, j, 0] = ((i - 1) % length, j)  # Up
-            neighbors_list[i, j, 1] = ((i + 1) % length, j)  # Down
-            neighbors_list[i, j, 2] = (i, (j - 1) % length)  # Left
-            neighbors_list[i, j, 3] = (i, (j + 1) % length)  # Right
+            neighbors_list[i, j, 0] = ((i - 1) % length, j)  
+            neighbors_list[i, j, 1] = ((i + 1) % length, j)  
+            neighbors_list[i, j, 2] = (i, (j - 1) % length)  
+            neighbors_list[i, j, 3] = (i, (j + 1) % length)  
     return neighbors_list
 
 def system_energy(configuration, neighbors_list):
@@ -52,7 +52,6 @@ def metropolis_spin_flip_dynamics_opt(old_configuration, neighbors_list, length,
     i = np.random.randint(0, length)
     j = np.random.randint(0, length)
 
-    # Calculate neighbor sum
     neighbor_sum = 0
     for k in range(4):  # 4 neighbors
         neighbor = neighbors_list[i, j, k]

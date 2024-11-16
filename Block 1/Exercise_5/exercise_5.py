@@ -13,7 +13,7 @@ exercise_folder = "FIG/exercise_5_images"
 ########################################
 
 # Model parameters
-LENGTH = 25
+LENGTH = 50
 CRITICAL_TEMP = 2 / np.log(1 + np.sqrt(2))
 BETA_CRITICAL = 1 / CRITICAL_TEMP
 TEMP_MULT = (0.5, 0.95, 1.05, 2.5)
