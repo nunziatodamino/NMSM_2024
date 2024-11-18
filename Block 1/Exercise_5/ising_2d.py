@@ -122,7 +122,7 @@ def error_observable_equilibrium(observable, t_equilibrium, t_max):
     return np.sqrt(variance_observable_equilibrium(observable, t_equilibrium, t_max) / (t_max - t_equilibrium))
 
 def variance_observable_corr_equilibrium(observable, t_equilibrium, t_max, tau):
-    tmp = (1 + 2 * tau)/(t_max - t_equilibrium) * np.sum(observable[t_equilibrium : t_max]**2)
+    tmp = (2 * tau)/(t_max - t_equilibrium) * np.sum(observable[t_equilibrium : t_max]**2)
     return tmp - mean_value_observable_equilibrium(observable, t_equilibrium, t_max)**2
 
 def error_observable_corr_equilibrium(observable, t_equilibrium, t_max, tau):

@@ -25,23 +25,23 @@ At T = 2.5 T_c, for a square lattice of side 50, tau magnetisation autocorrelati
 -----------------------------------------------------------------------------------------------------------------------------------
 --------------- Observables evaluation
 -----------------------------------------------------------------------------------------------------------------------------------
-At T = 0.5 T_c, for a square lattice of side 50, energy = -1.9924196984924627 +- 0.009587055740952744
-At T = 0.5 T_c, for a square lattice of side 50, magnetisation = 0.998039911557789 +- 0.004846278575740255
+At T = 0.5 T_c, for a square lattice of side 50, energy = -1.9924196984924627 +- 0.007212110280366517
+At T = 0.5 T_c, for a square lattice of side 50, magnetisation = 0.998039911557789 +- 0.003670900006737615
 At T = 0.5 T_c, for a square lattice of side 50, heat capacity = 0.00010200765550827384
 At T = 0.5 T_c, for a square lattice of side 50, magnetic susceptibility = 0.003961271651069804
 -----------------------------------------------------------------------------------------------------------------------------------
-At T = 0.9500000000000001 T_c, for a square lattice of side 50, energy = -1.6023696276703963 +- 0.024410100690032452
-At T = 0.9500000000000001 T_c, for a square lattice of side 50, magnetisation = 0.8285075727365206 +- 0.03313979520161014
+At T = 0.9500000000000001 T_c, for a square lattice of side 50, energy = -1.6023696276703963 +- 0.023868606987561446
+At T = 0.9500000000000001 T_c, for a square lattice of side 50, magnetisation = 0.8285075727365206 +- 0.033033919505942616
 At T = 0.9500000000000001 T_c, for a square lattice of side 50, heat capacity = 0.002471740625543208
 At T = 0.9500000000000001 T_c, for a square lattice of side 50, magnetic susceptibility = 2.6481682832433084
 -----------------------------------------------------------------------------------------------------------------------------------
-At T = 1.05 T_c, for a square lattice of side 50, energy = -1.226921252173913 +- 0.027657185070125365
-At T = 1.05 T_c, for a square lattice of side 50, magnetisation = 0.028913417391304343 +- 0.026517172527635902
+At T = 1.05 T_c, for a square lattice of side 50, energy = -1.226921252173913 +- 0.02735920032246471
+At T = 1.05 T_c, for a square lattice of side 50, magnetisation = 0.028913417391304343 +- 0.026500685145945366
 At T = 1.05 T_c, for a square lattice of side 50, heat capacity = 0.0026451365604632255
 At T = 1.05 T_c, for a square lattice of side 50, magnetic susceptibility = 83.50340552909408
 -----------------------------------------------------------------------------------------------------------------------------------
-At T = 2.5 T_c, for a square lattice of side 50, energy = -0.3715175987993997 +- 0.0012715226227278172
-At T = 2.5 T_c, for a square lattice of side 50, magnetisation = 7.491745872936448e-06 +- 0.00020666161941748518
+At T = 2.5 T_c, for a square lattice of side 50, energy = -0.3715175987993997 +- 0.0004758740341427665
+At T = 2.5 T_c, for a square lattice of side 50, magnetisation = 7.491745872936448e-06 +- 0.00018152611167504535
 At T = 2.5 T_c, for a square lattice of side 50, heat capacity = 0.0001498442354996854
 At T = 2.5 T_c, for a square lattice of side 50, magnetic susceptibility = 0.4297761161324962
 -----------------------------------------------------------------------------------------------------------------------------------
