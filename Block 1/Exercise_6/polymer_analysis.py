@@ -2,6 +2,7 @@ import os
 import numpy as np
 #import pandas as pd                        # decomment if you want to see data using the dataframe
 #from tabulate import tabulate 
+import matplotlib.pyplot as plt
 from statsmodels.tsa.stattools import acf
 from scipy.optimize import curve_fit
 import polymer as polymer
@@ -12,17 +13,10 @@ file_path = "/home/nunziato-damino/Documents/Github/NMSM_2024/Block 1/Exercise_6
 exercise_folder = "FIG/exercise_6_images"
 ########################################
 
-#t_equilibrium = 60000
-#time_max = np.load(os.path.join(file_path, "time_max.npy"))
-beta_list = np.load(os.path.join(file_path, "beta_list.npy"))
-
-#energy_evolution_results = np.load(os.path.join(file_path, "energy_series.npy"))
-#ee2_results = np.load(os.path.join(file_path, "ee2_series.npy"))
-#end_height_results = np.load(os.path.join(file_path, "end2height_series.npy"))
-#gyr_rad_results = np.load(os.path.join(file_path, "gyr_radius_series.npy"))
-
 time_max = 1000000
 t_equilibrium = 300000
+beta_list = np.load(os.path.join(file_path, "beta_list.npy"))
+
 energy_evolution_results = np.load(os.path.join(file_path, "mmc_energy_series.npy"))
 ee2_results = np.load(os.path.join(file_path, "mmc_ee2_series.npy"))
 end_height_results = np.load(os.path.join(file_path, "mmc_end2height_series.npy"))
@@ -46,6 +40,9 @@ mean_gyr_rad = np.zeros(len(beta_list))
 energy_variance = np.zeros(len(beta_list))
 energy_variance_corr = np.zeros(len(beta_list))
 
+heat_capacity = np.zeros(len(beta_list))
+error_heat_capacity = np.zeros(len(beta_list))
+
 error_energy = np.zeros(len(beta_list))
 error_ee2 = np.zeros(len(beta_list))
 error_end_height = np.zeros(len(beta_list))
@@ -61,6 +58,7 @@ def exponential_decay(t, tau):
     return np.exp(-t / tau)
 
 time_lags = np.arange(time_max - t_equilibrium)
+
 
 for i, beta in enumerate(beta_list):
     
@@ -99,28 +97,73 @@ for i, beta in enumerate(beta_list):
     
     #print(f"at beta = {beta}, energy_var = {energy_variance[i]}, energy_var_corr = {energy_variance_corr[i]} ")
     # LaTeX table print
-    print("\\hline")
-    print(f"${beta:.2f}$ & "
-          f"${tau_energy_autocorr[i]:.2f} \\pm {tau_fit_energy_error[i]:.2f}$ & "
-          f"${tau_ee2_autocorr[i]:.2f} \\pm {tau_fit_ee2_error[i]:.2f}$ & "
-          f"${tau_endheight_autocorr[i]:.2f} \\pm {tau_fit_endheight_error[i]:.2f}$ & "
-          f"${tau_gyr_rad_autocorr[i]:.2f} \\pm {tau_fit_gyr_rad_error[i]:.2f}$ & "
-          f"${mean_energy[i]:.2f} \\pm {error_energy[i]:.2f}$ & "
-          f"${mean_ee2[i]:.2f} \\pm {error_ee2[i]:.2f}$ & "
-          f"${mean_end_height[i]:.2f} \\pm {error_end_height[i]:.2f}$ & "
-          f"${mean_gyr_rad[i]:.2f} \\pm {error_gyr_rad[i]:.2f}$ \\\\")
+    #print("\\hline")
+    #print(f"${beta:.2f}$ & "
+          #f"${tau_energy_autocorr[i]:.2f} \\pm {tau_fit_energy_error[i]:.2f}$ & "
+          #f"${tau_ee2_autocorr[i]:.2f} \\pm {tau_fit_ee2_error[i]:.2f}$ & "
+          #f"${tau_endheight_autocorr[i]:.2f} \\pm {tau_fit_endheight_error[i]:.2f}$ & "
+          #f"${tau_gyr_rad_autocorr[i]:.2f} \\pm {tau_fit_gyr_rad_error[i]:.2f}$ & "
+          #f"${mean_energy[i]:.2f} \\pm {error_energy[i]:.2f}$ & "
+          #f"${mean_ee2[i]:.2f} \\pm {error_ee2[i]:.2f}$ & "
+          #f"${mean_end_height[i]:.2f} \\pm {error_end_height[i]:.2f}$ & "
+          #f"${mean_gyr_rad[i]:.2f} \\pm {error_gyr_rad[i]:.2f}$ \\\\")
 
-#data = {
-#    "$\\beta$": [f"${beta:.2f}$" for beta in beta_list],
-#    "$\\tau_{\\text{Energy}}$": [f"${tau:.2f} \\pm {err:.2f}$" for tau, err in zip(tau_energy_autocorr, tau_fit_energy_error)],
-#    "$\\tau_{ee2}$": [f"${tau:.2f} \\pm {err:.2f}$" for tau, err in zip(tau_ee2_autocorr, tau_fit_ee2_error)],
-#    "$\\tau_{\\text{End Height}}$": [f"${tau:.2f} \\pm {err:.2f}$" for tau, err in zip(tau_endheight_autocorr, tau_fit_endheight_error)],
-#    "$\\tau_{\\text{Gyr Rad}}$": [f"${tau:.2f} \\pm {err:.2f}$" for tau, err in zip(tau_gyr_rad_autocorr, tau_fit_gyr_rad_error)],
-#    "$\\text{Energy}$": [f"${mean:.2f} \\pm {err:.2f}$" for mean, err in zip(mean_energy, error_energy)],
-#    "$\\text{ee2}$": [f"${mean:.2f} \\pm {err:.2f}$" for mean, err in zip(mean_ee2, error_ee2)],
-#    "$\\text{End Height}$": [f"${mean:.2f} \\pm {err:.2f}$" for mean, err in zip(mean_end_height, error_end_height)],
-#    "$\\text{Gyr Rad}$": [f"${mean:.2f} \\pm {err:.2f}$" for mean, err in zip(mean_gyr_rad, error_gyr_rad)],
-#}
+heat_capacity[0] = 0 
+error_heat_capacity[0] = 0  
+block_size = 80
 
-#df = pd.DataFrame(data)
-#print(tabulate(df, headers='keys', tablefmt='grid', showindex=False))
+for i in range(1, len(beta_list)):
+    heat_capacity[i], error_heat_capacity[i] = polymer.block_averaging_heat_capacity( energy_evolution_results[i], t_equilibrium, time_max, block_size, 1 / beta_list[i])
+    
+#plots
+plt.rcParams.update({'font.size': 18}) # global font parameter for plots
+
+plt.figure(figsize=(15, 12))
+plt.errorbar(beta_list, mean_energy, yerr=error_energy, fmt='o', capsize=5)
+plt.xlabel(r"$\beta$ (Inverse Temperature)")
+plt.ylabel(r"Mean Energy ($\langle E \rangle$)")
+plt.title(r"Mean Energy vs. $\beta$")
+image_name = f"energy_mmc.png"
+entire_path = os.path.join(report_path, exercise_folder, image_name)
+plt.savefig(entire_path)
+plt.close()
+
+plt.figure(figsize=(15, 12))
+plt.errorbar(beta_list, mean_gyr_rad, yerr=error_gyr_rad, fmt='o', capsize=5)
+plt.xlabel(r"$\beta$ (Inverse Temperature)")
+plt.ylabel(r"Mean gyration radius ($\langle r_{gys} \rangle$)")
+plt.title(r"Mean gyration radius vs. $\beta$")
+image_name = f"gyr_rad_mmc.png"
+entire_path = os.path.join(report_path, exercise_folder, image_name)
+plt.savefig(entire_path)
+plt.close()
+
+plt.figure(figsize=(15, 12))
+plt.errorbar(beta_list, mean_end_height, yerr=error_end_height, fmt='o', capsize=5)
+plt.xlabel(r"$\beta$ (Inverse Temperature)")
+plt.ylabel(r"Mean end height ($\langle y_N \rangle$)")
+plt.title(r"Mean end height vs. $\beta$")
+image_name = f"end_height_mmc.png"
+entire_path = os.path.join(report_path, exercise_folder, image_name)
+plt.savefig(entire_path)
+plt.close()
+
+plt.figure(figsize=(15, 12))
+plt.errorbar(beta_list, mean_ee2, yerr=error_ee2, fmt='o', capsize=5)
+plt.xlabel(r"$\beta$ (Inverse Temperature)")
+plt.ylabel(r"Mean end to end distance ($\langle |r_N|^2 \rangle$)")
+plt.title(r"Mean end to end vs. $\beta$")
+image_name = f"endtoend_mmc.png"
+entire_path = os.path.join(report_path, exercise_folder, image_name)
+plt.savefig(entire_path)
+plt.close()
+
+plt.figure(figsize=(15, 12))
+plt.errorbar(beta_list, heat_capacity, yerr=error_heat_capacity, fmt='o', capsize=5)
+plt.xlabel(r"$\beta$ (Inverse Temperature)")
+plt.ylabel(r"Heat capacity ($C_V$)")
+plt.title(r"Heat capacity vs. $\beta$")
+image_name = f"heat_capacity_mmc.png"
+entire_path = os.path.join(report_path, exercise_folder, image_name)
+plt.savefig(entire_path)
+plt.close()

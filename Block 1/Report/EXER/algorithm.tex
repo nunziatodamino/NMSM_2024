@@ -1,12 +1,14 @@
 \chapter*{Appendix : algorithms}
 
+The notation on this appendix (tries to) follow the pseudo-code convention in algorithms in \cite{knuth97}.
+
 \begin{algorithm}
     \caption{Inversion Sampling Algorithm}
     \begin{algorithmic}[1]
     \State \( S \leftarrow \emptyset \)
     \State \( \text{count} \leftarrow 0 \)
     \While{count < N}
-        \State Sample \( U \sim \text{Uniform}(0, 1) \) \Comment{Generate a uniform random number}
+        \State Sample \( U \sim \text{Uniform}(0, 1) \) 
         \State Compute \( X \leftarrow F^{-1}(U) \) \Comment{Apply the inverse CDF to transform \( U \)}
         \State Append \( X \) to \( S \)
         \State \( \text{count} \leftarrow \text{count} + 1 \)
@@ -61,4 +63,24 @@ in not choosing an high value of $N$ for this solution. If a big number of sampl
     \State \textbf{Return} \( \mu / N \) 
     \end{algorithmic}
     \label{importance_sampling}
+\end{algorithm}
+
+\begin{algorithm}
+    \caption{Block Averaging Algorithm}
+    \begin{algorithmic}[1]
+    \State \( S \leftarrow \{X_1, X_2, \dots, X_N\} \) \Comment{Set of \( N \) samples}
+    \State Divide \( S \) into \( M \) blocks, each containing \( L \) samples \Comment{Where \( N = M \times L \)}
+    \State \( B \leftarrow \emptyset \) \Comment{List to store block averages}
+    \For{each block \( i \) from 1 to \( M \)}
+        \State Compute the block mean: \( \bar{X}_i \leftarrow \frac{1}{L} \sum_{j=1}^{L} X_{(i-1)L + j} \)
+        \State Append \( \bar{X}_i \) to \( B \)
+    \EndFor
+    \State Compute the overall block average: \( \bar{X}_{\text{block}} \leftarrow \frac{1}{M} \sum_{i=1}^{M} \bar{X}_i \)
+    \State Compute the variance of the block means:
+    \[
+    \hat{\sigma}^2_{\text{block}} \leftarrow \frac{1}{M-1} \sum_{i=1}^{M} (\bar{X}_i - \bar{X}_{\text{block}})^2
+    \]
+    \State \textbf{Return} \( \bar{X}_{\text{block}} \) , \( error_{\bar{X}_{\text{block}}} \leftarrow  \sqrt{\hat{\sigma}^2_{\text{block}} / M } \)
+    \end{algorithmic}
+    \label{block_averaging}
 \end{algorithm}

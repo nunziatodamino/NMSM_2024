@@ -22,7 +22,7 @@ def polymer_displacement(configuration):
             shift_conf[i][1]=configuration[i][1] + np.random.normal(0, sigma)
         MAX_ANGLE = np.pi / 6 # Pivot rotation move
         angle = np.random.uniform(-MAX_ANGLE, MAX_ANGLE)
-        pivot = np.random.randint(0, n_monomers)  # Ensure pivot is an integer index
+        pivot = np.random.randint(0, n_monomers) 
         new_conf = shift_conf   
         for i in range(pivot, n_monomers): # Apply rotation around the pivot point
             dx = shift_conf[i][0] - shift_conf[pivot][0]
@@ -80,7 +80,6 @@ def mmc_swap (old_configuration : np.ndarray, new_configuration : np.ndarray, be
     elif np.random.random() > np.exp(- delta_beta * delta_energy ) : return False
     return True         
 
-
 @numba.njit
 def thermalization(monomers_initial_conf: np.ndarray, time_max : np.int32, beta : np.float64) -> (np.ndarray,np.ndarray,np.ndarray) :
     moves=np.zeros((time_max, n_monomers, 2))
@@ -102,45 +101,23 @@ def thermalization(monomers_initial_conf: np.ndarray, time_max : np.int32, beta 
         gyr_radius_list[i] = gyration_radius(moves[i])
     return ee2, end_heigth, energy_list, gyr_radius_list, moves
 
-#@numba.njit
-#def evolution(monomers_initial_conf: np.ndarray, time_max : np.int32, beta : np.float64) -> (np.ndarray,np.ndarray,np.ndarray) :
-#    moves=np.zeros((2, n_monomers, 2))
-#    moves[0]=monomers_initial_conf
-#    ee2=np.zeros((time_max))
-#    energy_list=np.zeros((time_max))
-#    end_heigth=np.zeros((time_max))
-#   gyr_radius_list = np.zeros((time_max))
-#    for i in range(1, time_max):
-#        moves[1] = polymer_displacement(moves[0])
-#        if not metropolis(moves[0],moves[1], beta): moves[1] = moves[0]
-#        ee2[i] = end2end_distance_squared(moves[1])
-#        end_heigth[i]=moves[1,n_monomers-1,1]
-#        energy_list[i]=energy(moves[1])
-#        gyr_radius_list[i] = gyration_radius(moves[1])
-#        moves[0]=moves[1]
-#    return ee2, end_heigth, energy_list, gyr_radius_list, moves[1]
-
 @numba.njit
 def evolution(monomers_initial_conf: np.ndarray, time_max: np.int32, beta: np.float64):
-    moves = monomers_initial_conf.copy()  # Start with the initial configuration
+    moves = monomers_initial_conf.copy() 
     ee2 = np.zeros(time_max)
     energy_list = np.zeros(time_max)
     end_heigth = np.zeros(time_max)
     gyr_radius_list = np.zeros(time_max)
-
     for i in range(1, time_max):
-        proposed_move = polymer_displacement(moves)  # Generate a new move
+        proposed_move = polymer_displacement(moves)
         if metropolis(moves, proposed_move, beta):
-            moves[:] = proposed_move  # Accept the move
-        # Compute metrics
+            moves[:] = proposed_move
         ee2[i] = end2end_distance_squared(moves)
-        end_heigth[i] = moves[-1, 1]  # Last monomer's height
+        end_heigth[i] = moves[-1, 1]  
         energy_list[i] = energy(moves)
         gyr_radius_list[i] = gyration_radius(moves)
 
     return ee2, end_heigth, energy_list, gyr_radius_list, moves
-
-
 
 def mean_value_observable_equilibrium(observable, t_equilibrium, t_max):
     return 1/(t_max - t_equilibrium) * np.sum(observable[t_equilibrium : t_max])
@@ -161,3 +138,17 @@ def error_observable_corr_equilibrium(observable, t_equilibrium, t_max, tau):
 
 def heat_capacity(energy_variance, temperature):
     return energy_variance / temperature**2
+
+def block_averaging_heat_capacity(energies, t_equilibrium, t_max , block_size, temperature):
+    energies=energies[t_equilibrium:t_max]
+    n_data = len(energies)
+    n_blocks = n_data // block_size
+    energies = energies[:n_blocks * block_size] # trim 
+    blocks = energies.reshape(n_blocks, block_size)
+    avg_e = np.mean(blocks, axis=1)
+    avg_e2 = np.mean(blocks**2, axis=1)
+    cv_blocks = (avg_e2 - avg_e**2) / temperature**2
+    mean_cv = np.mean(cv_blocks)
+    std_cv = np.std(cv_blocks, ddof=1)  
+    error_cv = std_cv / np.sqrt(n_blocks)
+    return mean_cv, error_cv

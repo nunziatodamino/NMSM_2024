@@ -128,17 +128,7 @@ def variance_observable_corr_equilibrium(observable, t_equilibrium, t_max, tau):
 def error_observable_corr_equilibrium(observable, t_equilibrium, t_max, tau):
     return np.sqrt(variance_observable_corr_equilibrium(observable, t_equilibrium, t_max, tau) / (t_max - t_equilibrium))
 
-def heat_capacity(energy_variance, temperature):
-    return energy_variance / temperature**2
-
-def magnetic_susceptibility( length , beta, magnetisation_per_spin_variance):
-    return length * length * beta * magnetisation_per_spin_variance
-
-def normalized_autocorrelation_function(observable):
-    acf = np.correlate(observable, observable, mode = "full")
-    return acf/acf[0]
-
-def auto_correlation_wrt(distribution, time_max):    
+def auto_correlation_opt(distribution, time_max):    
     auto_corr = np.zeros(time_max)
     shifted_distribution = distribution.copy()
     shifted_distribution[1:] = distribution[:-1] # creates shift by 1
@@ -152,31 +142,36 @@ def auto_correlation_wrt(distribution, time_max):
         c3 = np.sum(shifted_distribution[counter:]) 
         prefactor = 1 / (time_max - counter)
         auto_corr[t] = prefactor * ( c1 - c2 * c3 ) 
-        counter +=1
-    
+        counter +=1    
     return auto_corr/auto_corr[0]  
 
-def is_weakly_stationary(observable, window_size=4000, acc_threshold=0.1):
-    
-    means = []
-    variances = []
-    autocorrelations = []
+def block_averaging_heat_capacity(energies, t_equilibrium, t_max , block_size, temperature):
+    energies=energies[t_equilibrium:t_max]
+    n_data = len(energies)
+    n_blocks = n_data // block_size
+    energies = energies[:n_blocks * block_size] # trim if something goes wrong
+    blocks = energies.reshape(n_blocks, block_size)
+    avg_e = np.mean(blocks, axis=1)
+    avg_e2 = np.mean(blocks**2, axis=1)
+    cv_blocks = (avg_e2 - avg_e**2) / temperature**2
+    mean_cv = np.mean(cv_blocks)
+    std_cv = np.std(cv_blocks, ddof=1)  
+    error_cv = std_cv / np.sqrt(n_blocks)
+    return mean_cv, error_cv
 
-    for i in range(0, len(observable), window_size):
-        chunk = observable[i:i+window_size]
-        if len(chunk) < window_size: 
-            continue
-        means.append(np.mean(chunk))
-        variances.append(np.var(chunk))
-        autocorrelations.append(np.mean(acf(chunk, nlags=10)))  
-        
-    def relative_change(data):
-        return (max(data) - min(data)) / np.mean(data)  
+def magnetic_susceptibility( length , beta, magnetisation_per_spin_variance):
+    return length * length * beta * magnetisation_per_spin_variance
 
-    mean_change = relative_change(means)
-    variance_change = relative_change(variances)
-    acf_change = relative_change(autocorrelations)
-
-    if mean_change < acc_threshold and variance_change < acc_threshold and acf_change < acc_threshold:
-        return True
-    return False
+def block_averaging_magnetic_susc(magnetisation, t_equilibrium, t_max , block_size, beta):
+    magnetisation=magnetisation[t_equilibrium:t_max]
+    n_data = len(magnetisation)
+    n_blocks = n_data // block_size
+    magnetisation = magnetisation[:n_blocks * block_size] # trim if something goes wrong 
+    blocks = magnetisation.reshape(n_blocks, block_size)
+    avg_m = np.mean(blocks, axis=1)
+    avg_m2 = np.mean(blocks**2, axis=1)
+    chi_m_blocks = (avg_m2 - avg_m**2) * beta
+    mean_chi_m = np.mean(chi_m_blocks)
+    std_chi_m = np.std(chi_m_blocks, ddof=1)  
+    error_chi_m = std_chi_m / np.sqrt(n_blocks)
+    return mean_chi_m, error_chi_m

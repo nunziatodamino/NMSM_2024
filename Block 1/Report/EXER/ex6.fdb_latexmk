@@ -1,0 +1,16 @@
+# Fdb version 4
+["pdflatex"] 1732208278 "/home/nunziato-damino/Documents/Github/NMSM_2024/Block 1/Report/EXER/ex6.tex" "ex6.pdf" "ex6" 1732208278 2
+  "/etc/texmf/web2c/texmf.cnf" 1730382086 475 c0e671620eb5563b2130f56340a5fde8 ""
+  "/home/nunziato-damino/Documents/Github/NMSM_2024/Block 1/Report/EXER/ex6.tex" 1732208278 9624 c211d93727aba5eeb34b6147f820e050 ""
+  "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
+  "/usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmbx10.tfm" 1136768653 1328 c834bbb027764024c09d3d2bf908b5f0 ""
+  "/usr/share/texlive/texmf-dist/web2c/texmf.cnf" 1693172360 40357 c95f5d5e031b5c7040b426833c11f2e0 ""
+  "/usr/share/texmf/web2c/texmf.cnf" 1693172360 40357 c95f5d5e031b5c7040b426833c11f2e0 ""
+  "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1730382118 7909135 48d618ec1d1a62c60af1823f81555af3 ""
+  "ex6.aux" 1732208278 32 3985256e7290058c681f74d7a3565a19 "pdflatex"
+  "ex6.tex" 1732208278 9624 c211d93727aba5eeb34b6147f820e050 ""
+  (generated)
+  "ex6.aux"
+  "ex6.log"
+  "ex6.pdf"
+  (rewritten before read)

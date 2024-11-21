@@ -46,8 +46,7 @@ We report our data in table \ref{pre_mmc} and the evolution of the observables j
 
 First we can clearly see the existence of 2 regimes from figure \ref{lec6:polymer_evolution_pre_mmc}: one of low $\beta$ (high temperature), in which
 the grafted polymer floats freely and is not absorbed, and one of high $\beta$ (low temperature), in which the polymer is completely absorbed. \\
-The $\beta_c$ is the one in which the energy exhibits the highest variance, which is in our case $\beta_c \simeq 1.79$. Note that when we say highest variance, we mean the 
-one not corrected by the autocorrelation time. This because the absorption mechanism, in the region $\beta \geq \beta_c$ leads by its nature to an high correlation time. \\
+The $\beta_c$ is the one in which the energy exhibits the highest variance, which is in our case $\beta_c \simeq 1.79$.\\ We observe that the absorption mechanism, in the region $\beta \geq \beta_c$ leads by its nature to an high correlation time. \\
 This can be explained intuitively by the fact that if a move make the last monomer "attaches" to the absorbing wall, then the system goes in a metastable state where it tries to 
 "detach" and "reattaches" better. Quantitatively this can be seen by the gyration radius that that in this temperature regime stays for long periods in the "clamped" configuration
 and then suddently detaches. \\
@@ -79,4 +78,78 @@ The run is performed with $t = 10^6$ total steps, the result are reported in tab
 
 We have a reduction of the autocorrelation time for values of $\beta$ where we expect with high probability the presence of metastable states, as expected \cite{OrlandoBrando}. The only outlier is $\beta = 4.00$ where we 
 find an higher $\tau$ than the previous attempts. This can be due to the low decorrelation time we setted in order to achieve a tradeoff between number of swaps and total length of the simulation.
-An ideal simulation would be to propose $\tau_{decorrelation} \simeq 100000$ an make simulations of the order of $10^8-10^9$ total steps, but this is outside the scope of this report.
+In an ideal simulation we would propose $\tau_{decorrelation} \simeq 100000$ and make simulations of the order of $10^8-10^9$ total steps to see if this problem persists, but this is outside the scope of this report. \\
+Finally we can plot each observable against the beta values. We add to the already discussed observables the evaluation of the heat capacity done via block averaging, in order 
+to address to problem with the high correlation time in the $\beta > \beta_c$ region. The algorithm for block averaging is reported in  
+We can observe the plot in figures \ref{end_height_mmc}, \ref{end_to end_mmc}, \ref{energy_mmc}, \ref{gyr_rad_mmc} and \ref{heat_capacity_mmc}
+
+\begin{figure}[h!]
+    \centering
+    % First row: two images
+    \begin{minipage}[b]{0.45\textwidth} 
+        \centering
+        \includegraphics[width=\textwidth]{FIG/exercise_6_images/end_height_mmc.png}
+        \caption{End height as a function of $\beta$ for a polymer of length $N = 20$}
+        \label{end_height_mmc}
+    \end{minipage}
+    \hspace{0.05\textwidth} % Horizontal space between images
+    \begin{minipage}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{FIG/exercise_6_images/endtoend_mmc.png}
+        \caption{End to end distance as a function of $\beta$ for a polymer of length $N = 20$}
+        \label{end_to end_mmc}
+    \end{minipage}
+
+    \vspace{0.5cm} % Vertical space between rows
+    
+    % Second row: two images
+    \begin{minipage}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{FIG/exercise_6_images/energy_mmc.png}
+        \caption{Energy as a function of $\beta$ for a polymer of length $N = 20$}
+        \label{energy_mmc}
+    \end{minipage}
+    \hspace{0.05\textwidth} % Horizontal space between images
+    \begin{minipage}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{FIG/exercise_6_images/gyr_rad_mmc.png}
+        \caption{Gyration radius as a function of $\beta$ for a polymer of length $N = 20$}
+        \label{gyr_rad_mmc}
+    \end{minipage}
+    
+    \vspace{0.5cm} % Vertical space before the last image
+    
+    % Third row: one image
+    \begin{minipage}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{FIG/exercise_6_images/heat_capacity_mmc.png}
+        \caption{Heat capacity as a function of $\beta$ for a polymer of length $N = 20$}
+        \label{heat_capacity_mmc}
+    \end{minipage}
+\end{figure}
+
+In all plots, we observe the signature of the critical temperature at approximately $\beta_c \simeq 1.79$.
+
+\begin{itemize}
+    \item \textbf{Energy (Fig. \ref{energy_mmc})}: The plot clearly shows a transition from the floating state, characterized by a 
+    near-zero energy, to the totally absorbed state, where the energy approaches $-20$ for our specific polymer. 
+    The critical temperature $\beta_c$ corresponds to the inflection point of this curve, marking the transition between these 
+    two phases.
+    
+    \item \textbf{End height (Fig. \ref{end_height_mmc})}: In the floating state, the polymer maintains a non-zero height, roughly 
+    at half its maximum height. In contrast, the totally absorbed state is marked by a mean height close to zero. The critical 
+    temperature $\beta_c$ is again identified as the point where the concavity of the curve changes.
+
+    \item \textbf{End to end distance (Fig. \ref{end_to end_mmc})}: In the floating state, the polymer due to its constant movement 
+    maintains an end to end distance again roughly close to at half its maximum height. In contrast, in the totally absorbed state the polymer 
+    is completely stretched on the absorbing wall, leading to an end to end distance roughly close to the polymer length. 
+    Again the critical temperature shows the same propoerties of the other graphs.
+
+    \item \textbf{Gyration radius (Fig. \ref{gyr_rad_mmc})}: In the floating state, the polymer due to its constant movement looks like it's
+    "clamped", so its gyration radius its lower than the absorbed phase, where is totally stretched. 
+    Again the critical temperature shows the same properties.
+
+    \item \textbf{Heat capacity (Fig. \ref{heat_capacity_mmc})}: In this graph, given that we are implictly plotting the energy variance, we should find 
+    that the $\beta_c$ presents the maximum heat capacity. The observation is consistent with all the other graphs.
+
+\end{itemize}

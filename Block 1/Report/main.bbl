@@ -1,5 +1,10 @@
 \begin{thebibliography}{1}
 
+\bibitem{knuth97}
+Donald~E. Knuth.
+\newblock {\em The Art of Computer Programming, Vol. 1: Fundamental Algorithms}.
+\newblock Addison-Wesley, Reading, Mass., third edition, 1997.
+
 \bibitem{Marinari-1992}
 G~Marinari, E;~Parisi.
 \newblock Simulated tempering: A new monte carlo scheme.
