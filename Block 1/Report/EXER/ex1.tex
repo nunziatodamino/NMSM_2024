@@ -34,24 +34,26 @@ We obtain for this ellipsoid:
 $$\langle V \rangle_2 \simeq 1.571 \pm 0.015$$
 
 \begin{wrapfigure}{H}{0.5\textwidth}
+  \vspace{-20pt}
   \centering
   \includegraphics[width=0.33\textwidth]{FIG/exercise_0_images/first_and_second_ellipsoid_distribution.png}
 \caption{Volume distribution comparison between the 2 ellipsoids}
 \label{lec1:first_and_second_ellipsoid}
 \end{wrapfigure}
 
-Which confirms our prediction on the error. One can see also graphically this by compating the 2 volume distributions and see in figure \ref{lec1:first_and_second_ellipsoid} that the one with the
+Which confirms our prediction on the error. One can see also graphically this by comparing the 2 volume distributions and see in figure \ref{lec1:first_and_second_ellipsoid} that the one with the
 smaller integration box is narrower. \\
 Moreover, given that the same volume can be evaluate analitically, we can study the deviation of the estimate from the analytical value. \\
 In figure \ref{lec1:deviation_comparison} we report for each of the 2 simulations the deviation from the analytical value, i.e $\Delta f = \mid f_{th}-\langle f \rangle \mid $ as a function
-of the number of iterations. \\
+of the number of iterations.
 
-\begin{figure}[H]
+\begin{figure}[h]
   \centering
   \includegraphics[width=0.7\textwidth]{FIG/exercise_0_images/relative_error_trend.png}
   \caption{Comparison between the relative deviations for the 2 ellipsoids and the expected theroretical trend}
   \label{lec1:deviation_comparison}
   \end{figure}
+
 
 Notice that, as discussed before, even if having a bigger number of iterations has a net effect of diminishing the error, the bigger variance in 
 the case of the first ellipsoid makes the deviations bigger respect to the second ellipsoid. \\
@@ -78,7 +80,7 @@ $$ F^{-1}_1(y) = \sqrt{\ln\left(\frac{1}{1-y}\right)} \qquad F^{-1}_2(y)= \sqrt[
 
 For both $y \in (0,1]$.
 
-We report in the following the obtained graphs:
+In order to implement this we use algorithm \ref{inversion}. We report in the following the obtained graphs:
 
 \begin{figure}[H]
 \centering

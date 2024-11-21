@@ -2,7 +2,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 from statsmodels.tsa.stattools import acf
-import polymer_mmc as polymer
+import polymer as polymer
 
 ########################################
 report_path = "/home/nunziato-damino/Documents/Github/NMSM_2024/Block 1/Report"

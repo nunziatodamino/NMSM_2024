@@ -1,6 +1,6 @@
 \chapter*{Lecture 2: Rejection method}
 
-The rejection sampling method is useful when our pdf is not easily invertible, and so the inversion method cannot be applied. \\
+The rejection sampling method is useful when our pdf is not easily invertible, (or not invertible analytically) and so the inversion method cannot be applied. \\
 Suppose to have as pdf:
 
 $$ \rho(x) = A_f \exp\left( -8 \left( \frac{x^2}{2}+\frac{x^4}{4} \right) \right) $$
@@ -36,7 +36,7 @@ For our exercise, we can choose as candidate density $\mathcal{N}(0,\frac{1}{2})
 
 Then the sampling is done with algorithm \ref{rejection}. 
 One can show graphically that the sample is good by plotted the properly binned random variables obtained by the process together with the 
-target density, as showed in figure \ref{chapter2_rej_variables}
+target density, as showed in figure \ref{chapter2_rej_variables}:
 
 \begin{figure}[t!]
 \centering

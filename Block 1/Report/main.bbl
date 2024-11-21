@@ -1,8 +1,18 @@
 \begin{thebibliography}{1}
 
+\bibitem{Marinari-1992}
+G~Marinari, E;~Parisi.
+\newblock Simulated tempering: A new monte carlo scheme.
+\newblock {\em EPL (Europhysics Letters)}, 19:451--458, 1992.
+
 \bibitem{Sokal1997}
 A.~Sokal.
 \newblock {\em Monte Carlo Methods in Statistical Mechanics: Foundations and New Algorithms}, pages 131--192.
 \newblock Springer US, Boston, MA, 1997.
+
+\bibitem{OrlandoBrando}
+M.~C. Tesi, E.~J. Janse~van Rensburg, E.~Orlandini, and S.~G. Whittington.
+\newblock {Monte Carlo study of the interacting self-avoiding walk model in three dimensions}.
+\newblock {\em Journal of Statistical Physics}, 82(1-2):155--181, January 1996.
 
 \end{thebibliography}

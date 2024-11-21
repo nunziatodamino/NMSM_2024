@@ -1,3 +1,82 @@
-
 \chapter*{Lecture 6: Polymer MMC}
 
+We want in this exercise simulate the absorption of a grafted polymer due to an absorbing hard wall. We will use in a first 
+istance a regular Monte Carlo based on the Metropolis filter and secondly we will use the parallel tempering method, also known as 
+multiple Markov chain (MMC) method.
+
+\subsection*{Introduction}
+
+We want to recreate on a 2D plane the condition typical of a SAW (self avoiding walk) model,  without the restriction that the monomers have to 
+occupy a lattice point. \\
+This can be achieved easily if in the displacement function the conditions of non-compenetration, bond length preservation and the hard wall constraint are respected. \\
+
+A technical note here: the main way here in which these conditions can be implemented is via some if statement, which are notorious for slowing the routine 
+(they create branches in the assembly instructions). For this reason the displacement function scales badly with number of monomers $N$, and for this reason we choose $N=20$, which is a relatively small number 
+when considering polymeric chains. An optimization improvement that can be proposed is to use a technique called branchless programming, rewriting
+these statements using logical operators. Note that this is not always faster because, if the compiler optimization are turned on , the compiler can
+optimize the assembly instruction better than the programmer. So one should check the assembly instruction to check. This optimization was not performed in this code 
+because outside of the scope of the analysis. \\
+
+The choice of the possible trial displacements is at discretion of the algorithm designer, the only constraint is that the underlying Markov 
+chain must be ergodic. One possible way to achieve this is to choose a trial displacement that is symmetric so that after a trial move that makes 
+the system goes from $\CC \to \CC'$ there is a non zero probability that the system can go from $\CC' \to \CC$. \\
+Specifically we choose as a move to perform $N$ local gaussian shift of each monomers and one pivot rotation around a 
+randomly choosen monomer (excluding the last one) of an angle also choosen from a gaussian distribution. \\
+The displacement function is extremely dependent on the mean and the variance of these 2 distribution, specifically its performance can 
+vary of orders of magnitude if the parameters are selected incorrectly. 
+We choosed to have small parameters and to investigate longer periods of time. The rationale is that one does small moves and doesn't reach 
+the equilibrium as fast as in the situation of more sudden moves, but when the equilibrium is reached the small moves leads to less rejections
+in the geometry constraint part, and in total to a way faster move.
+
+\subsection*{Monte Carlo evolution with Metropolis filter}
+Having decided how a trial move is defined for our system, we select a set of inverse temperature $\beta_k$ and for each of them we evaluate for $t = 100000$ timesteps
+we evaluate the energy, the end to end distance, the end to height distance and the gyration ratio, with the relative error corrected by the
+autocorrelation time $\tau$. In order to correctly evaluate $\tau$ for each observable we begin by discard $\tau_{equilibrium}$ and 
+once the $\tau$ are found we redefine our discard time.\\
+First a warmup run is performed to estimate $\tau$ and to prime our intuition on the system, and then we perform a final run with $t_{max} = 10^6$ and $\tau_{equilibrium} = 300000$.
+We choose such an high discard time because moves for high $\beta$ , i.e. in the absorption phase, are extremely correlated.
+We report our data in table \ref{pre_mmc} and the evolution of the observables just for selected values of the inverse temperatures in figure \ref{lec6:polymer_evolution_pre_mmc}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{FIG/exercise_6_images/observables_polymer_summary.png}
+    \caption{Observables evolution in time for selected values of $\beta$}
+    \label{lec6:polymer_evolution_pre_mmc}
+\end{figure}
+
+First we can clearly see the existence of 2 regimes from figure \ref{lec6:polymer_evolution_pre_mmc}: one of low $\beta$ (high temperature), in which
+the grafted polymer floats freely and is not absorbed, and one of high $\beta$ (low temperature), in which the polymer is completely absorbed. \\
+The $\beta_c$ is the one in which the energy exhibits the highest variance, which is in our case $\beta_c \simeq 1.79$. Note that when we say highest variance, we mean the 
+one not corrected by the autocorrelation time. This because the absorption mechanism, in the region $\beta \geq \beta_c$ leads by its nature to an high correlation time. \\
+This can be explained intuitively by the fact that if a move make the last monomer "attaches" to the absorbing wall, then the system goes in a metastable state where it tries to 
+"detach" and "reattaches" better. Quantitatively this can be seen by the gyration radius that that in this temperature regime stays for long periods in the "clamped" configuration
+and then suddently detaches. \\
+Also this implies that for this system is very difficult to establish a poor/good solvent limit in terms of temperatures, contrarely as what is seen typically in a SAW simulation \cite{OrlandoBrando}, because of the existence 
+of these metastable states that increases the autocorrelation time, and thus the error.
+
+\subsection{Parallel tempering method}
+Now we explain why we choose this specific set of $\beta_k$ in the first place. We want to perform a parallel tempering simulation, so is 
+extremely important that the energy histograms of neighbouring beta present a non negligible overlap \cite{Marinari-1992} between them. \\
+We choose this overlap to be $\gtrapprox 20 \%$. Note that in the low $\beta$ region we achieve this easily, while in the high $\beta$ region 
+this is difficult to achieve for the existence of the discussed metastable states. This is why just choosed some $\beta$ in this regime and more 
+spaced out than the ones in the low beta regime, to achieve our overlap constraint. \\
+We plot in figure --- the energy histogram overlap. \\
+
+In the parallel tempering algorithm one must choose a decorrelation time $\tau_{decorrelation}$ after which the chain swap is attempted.
+Ideally one should choose the maximum of the set of of all correlation times for all the observables, in our case $\tau_{decorrelation} \simeq 100000$, to ensure that 
+every observable is decorrelated. Instead we opted for $\tau_{decorrelation} \simeq 25000$, given that just 1 chain has $\tau \sim \tau_{decorrelation}$, while the 3 chains have $\tau \sim \tau_{decorrelation}/2$ 
+Given that the chain to swap is choosen uniformly, the probability that we have 2 runs without encountering the high $\tau$ chains is $\left(1-\frac{4}{24}\right)^2 \sim 70 \% $ 
+so that there is enough time on average for the system to decorrelate.
+We preferred a smaller decorrelation time to attempt more swaps through the run. \\
+The run is performed with $t = 10^6$ total steps, the result are reported in table \ref{mmc}, and the plot for selected $\beta$ for all the observables is in figure \\
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{FIG/exercise_6_images/observables_mmc_polymer_summary.png}
+    \caption{Observables evolution in time for selected values of $\beta$ for the parallel tempering run}
+    \label{lec6:polymer_evolution_mmc}
+\end{figure}
+
+We have a reduction of the autocorrelation time for values of $\beta$ where we expect with high probability the presence of metastable states, as expected \cite{OrlandoBrando}. The only outlier is $\beta = 4.00$ where we 
+find an higher $\tau$ than the previous attempts. This can be due to the low decorrelation time we setted in order to achieve a tradeoff between number of swaps and total length of the simulation.
+An ideal simulation would be to propose $\tau_{decorrelation} \simeq 100000$ an make simulations of the order of $10^8-10^9$ total steps, but this is outside the scope of this report.

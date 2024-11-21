@@ -1,6 +1,23 @@
 \chapter*{Appendix : algorithms}
 
 \begin{algorithm}
+    \caption{Inversion Sampling Algorithm}
+    \begin{algorithmic}[1]
+    \State \( S \leftarrow \emptyset \)
+    \State \( \text{count} \leftarrow 0 \)
+    \While{count < N}
+        \State Sample \( U \sim \text{Uniform}(0, 1) \) \Comment{Generate a uniform random number}
+        \State Compute \( X \leftarrow F^{-1}(U) \) \Comment{Apply the inverse CDF to transform \( U \)}
+        \State Append \( X \) to \( S \)
+        \State \( \text{count} \leftarrow \text{count} + 1 \)
+    \EndWhile
+    \State \textbf{Return} \( S \)
+    \end{algorithmic}
+    \label{inversion}
+\end{algorithm}
+
+
+\begin{algorithm}
     \caption{Rejection Sampling Algorithm}
     \begin{algorithmic}[1]
     \State \( S \leftarrow \emptyset \)
