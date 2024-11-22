@@ -328,7 +328,6 @@ INPUT ./FIG/exercise_3_images/crude_mc.png
 INPUT ./FIG/exercise_3_images/crude_mc.png
 INPUT ./FIG/exercise_3_images/crude_mc.png
 INPUT ./FIG/exercise_3_images/crude_mc.png
-INPUT /usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecbx1095.tfm
 INPUT ./FIG/exercise_3_images/choice_sampling_function.png
 INPUT ./FIG/exercise_3_images/choice_sampling_function.png
 INPUT ./FIG/exercise_3_images/choice_sampling_function.png
@@ -359,6 +358,7 @@ INPUT ./EXER/ex4.tex
 INPUT ./EXER/ex4.tex
 INPUT ./EXER/ex4.tex
 INPUT EXER/ex4.tex
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecbx1095.tfm
 INPUT ./FIG/exercise_4_images/Exercise 4_part1.png
 INPUT ./FIG/exercise_4_images/Exercise 4_part1.png
 INPUT ./FIG/exercise_4_images/Exercise 4_part1.png

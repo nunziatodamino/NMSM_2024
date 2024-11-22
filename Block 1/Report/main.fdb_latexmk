@@ -1,13 +1,13 @@
 # Fdb version 4
-["bibtex main"] 1732285899 "main.aux" "main.bbl" "main" 1732285902 0
+["bibtex main"] 1732287990 "main.aux" "main.bbl" "main" 1732287994 0
   "./biblio.bib" 1732267200 3067 445d2d7c33ee7bbb6e524d5c20258af9 ""
   "/usr/share/texlive/texmf-dist/bibtex/bst/base/plain.bst" 1292289607 20613 bd3fbfa9f64872b81ac57a0dd2ed855f ""
-  "main.aux" 1732285902 12313 b2769d4201b795ed6c7a57480d95039e "pdflatex"
+  "main.aux" 1732287994 12222 c6c405df41f17f35f40c8a29e14c17e9 "pdflatex"
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1732285899 "/home/nunziato-damino/Documents/Github/NMSM_2024/Block 1/Report/main.tex" "main.pdf" "main" 1732285902 0
+["pdflatex"] 1732287990 "/home/nunziato-damino/Documents/Github/NMSM_2024/Block 1/Report/main.tex" "main.pdf" "main" 1732287994 0
   "/etc/texmf/web2c/texmf.cnf" 1730382086 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/home/nunziato-damino/Documents/Github/NMSM_2024/Block 1/Report/main.tex" 1732179808 1624 82e8fbb6480b9d6cb656579114d96c88 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -187,7 +187,7 @@
   "EXER/data_tables.tex" 1732226291 13427 b02db3ee39b11f22d0bcc67719460251 ""
   "EXER/ex1.tex" 1732285895 4944 c897237d718512309419d4a7925681ba ""
   "EXER/ex2.tex" 1732197859 2744 1facd36ee628921d1890381f5725b190 ""
-  "EXER/ex3.tex" 1732200171 6212 c88b5c663f7c9fad8d99c1069addbb49 ""
+  "EXER/ex3.tex" 1732287987 6215 b11ca55e4143736a9d86e32e887ac2eb ""
   "EXER/ex4.tex" 1732282299 4313 c21618f007605647dfdf99d8385b781f ""
   "EXER/ex5.tex" 1732276084 12063 df2bfea2ce02104e436a7178f4a22546 ""
   "EXER/ex6.tex" 1732210906 12237 2930c0767f50476aadd5d8640b4c4b01 ""
@@ -220,9 +220,9 @@
   "FIG/exercise_7_images/gillespiexy_volume100.0.png" 1731570654 117799 4f142355d10a03efa2f5bb66a6a2c4fb ""
   "FIG/exercise_7_images/gillespiexy_volume1000.0.png" 1731570773 73940 4ccf18e7ebfd866ab53202a75a84db6f ""
   "FIG/exercise_7_images/gillespiexy_volume10000.0.png" 1731570857 63705 d922d65b46458386c5ccf6a486a5af73 ""
-  "main.aux" 1732285902 12313 b2769d4201b795ed6c7a57480d95039e "pdflatex"
-  "main.bbl" 1732285899 1220 8e5072b84474cf3c8af94a252e58ad29 "bibtex main"
-  "main.out" 1732285902 624 a87c0f8cacda13f5c8773cfd4fa7cb24 "pdflatex"
+  "main.aux" 1732287994 12222 c6c405df41f17f35f40c8a29e14c17e9 "pdflatex"
+  "main.bbl" 1732287990 1220 8e5072b84474cf3c8af94a252e58ad29 "bibtex main"
+  "main.out" 1732287994 624 a87c0f8cacda13f5c8773cfd4fa7cb24 "pdflatex"
   "main.tex" 1732179808 1624 82e8fbb6480b9d6cb656579114d96c88 ""
   (generated)
   "main.aux"
