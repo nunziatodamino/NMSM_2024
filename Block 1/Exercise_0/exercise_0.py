@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import ellipsoid_mc as mc
 import numpy as np
 
-# paths for saving images in report
 ########################################
 report_path = "/home/nunziato-damino/Documents/Github/NMSM_2024/Block 1/Report"
 exercise_folder = "FIG/exercise_0_images"

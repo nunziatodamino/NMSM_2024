@@ -11,18 +11,33 @@ is not possible to reach any other state).
     \label{chapter4:part1}
 \end{figure}
 
+Moreover on chain A each state is periodic of period 3. In chain B state 1 is aperiodic and transient, state 2 is absorbing and states 3,4,5 are periodic of period 3.
+
 \paragraph*{Part 2}
 
 Suppose to have the Markov chain with the following stochastic matrix:
 
 $$ P =
-\begin{Vmatrix} 
+\begin{pmatrix} 
 \frac{1}{2} & \frac{1}{3} & \frac{1}{6} \\
 \frac{3}{4} & 0 & \frac{1}{4} \\
 0 & 1 & 0 \\
-\end{Vmatrix}
+\end{pmatrix}
 $$
-One can show with the corresponding digraph that is irreducible and aperiodic (spend some extra word).
+One can show with the corresponding digraph in figure \ref{chapter4:part2} that is irreducible. \\
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{FIG/exercise_4_images/Exercise 4_part2.png}
+    \caption{Stochastic matrixes with relative digraph representation}
+    \label{chapter4:part2}
+\end{figure}
+
+Moreover, given that state 1 is aperiodic, we can imply that the whole chain is aperiodic. \\
+
+Now suppose to start the process in state 1, and that we want to evaluate the probability that it is in state 3 after two steps. \\
+This can be easily accomplished by evaluating $P^2$ and then selecting from this matrix the element $P^2_{13} = \frac{1}{6}$.
+
 Now we evaluate the stochastic matrix in the limit $n \to +\infty$ in 2 ways, first by using the analytical approach and the by computation trying to estimate it.
 First we evaluate the invariant distribution:
 
@@ -43,30 +58,26 @@ $$
 The limiting stochastic matrix will have for each row the invariant distribution:
 
 $$ P^{\infty} =
-\begin{Vmatrix} 
+\begin{pmatrix} 
 \frac{1}{2} & \frac{1}{3} & \frac{1}{6} \\
 \frac{1}{2} & \frac{1}{3} & \frac{1}{6} \\
 \frac{1}{2} & \frac{1}{3} & \frac{1}{6} \\
-\end{Vmatrix}
+\end{pmatrix}
 $$
 
-Now we should obtain the same result after many steps:
+We obtain the same result in the submitted program.
 
 \paragraph*{Balls and boxes}
 
-
-
 We can solve this exercise using a Markov chain approach.
-Called $a_i$ the state in which there are $i$ red balls in box A there can be just 3 possible states.
-Our chain is then represent by the following digraph:
-
--------- INSERT DIGRAPH ----------
-
+Called $a_i$ the state in which there are $i$ red balls in box A there can be just 3 possible states (0,1,2 balls).
 So we need to evaluate the transition probabilities. In general, for a given state $i$:
 
-- $a_i \to a_{i+1}$ = $\mathbb{P}$(red extraction in B) and $\mathbb{P}$(white extraction in A)
-- $a_i \to a_{i-1}$ = $\mathbb{P}$(red extraction in A) and $\mathbb{P}$(white extraction in B)
-- $a_i \to a_{i}$ = ($\mathbb{P}$(red extraction in B) and $\mathbb{P}$(red extraction in A)) or ($\mathbb{P}$(white extraction in B) and $\mathbb{P}$(white extraction in A))
+\begin{itemize}
+\item  $a_i \to a_{i+1}$ = $\mathbb{P}$(red extraction in B) and $\mathbb{P}$(white extraction in A)
+\item  $a_i \to a_{i-1}$ = $\mathbb{P}$(red extraction in A) and $\mathbb{P}$(white extraction in B)
+\item  $a_i \to a_{i}$ = ($\mathbb{P}$(red extraction in B) and $\mathbb{P}$(red extraction in A)) or ($\mathbb{P}$(white extraction in B) and $\mathbb{P}$(white extraction in A))
+\end{itemize}
 
 Now we can proceed to evaluate these probabilities and then evaluate the transition matrix elements.
 In general one has, for a given state $i$:
@@ -76,11 +87,13 @@ $$ \mathbb{P}\text{(red extraction in B at state i)} = 1 - \frac{i}{3} =  \frac{
 We obtain the stochastic matrix
 
 $$ P =
-\begin{Vmatrix} 
-0 & 1 & 1 \\
+\begin{pmatrix} 
+0 & 1 & 0 \\
 \frac{1}{6} & \frac{1}{2} & \frac{1}{3} \\
 0 & \frac{2}{3} & \frac{1}{3}
-\end{Vmatrix}
+\end{pmatrix}
 $$
 
-Which is a stochastic matric because all rows sums up to 1.
+Which is a stochastic matrix because all rows sums up to 1. \\
+Now the ansatz is the same as before. To evaluate the occurrence probability of state $a_2$ after 3 events we consider the element $P^3_{13}$ (note that our indexes are shifted by 1). \\
+We obtain $P^3_{13} \simeq 0.28$, while in the limit of many events $P^{\infty}_{13} = 0.3$

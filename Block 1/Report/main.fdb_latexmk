@@ -1,13 +1,13 @@
 # Fdb version 4
-["bibtex main"] 1732224423 "main.aux" "main.bbl" "main" 1732224426 0
-  "./biblio.bib" 1732211788 2175 a9b4f0d90b05b6f0cc762fda17a8bc2d ""
+["bibtex main"] 1732285899 "main.aux" "main.bbl" "main" 1732285902 0
+  "./biblio.bib" 1732267200 3067 445d2d7c33ee7bbb6e524d5c20258af9 ""
   "/usr/share/texlive/texmf-dist/bibtex/bst/base/plain.bst" 1292289607 20613 bd3fbfa9f64872b81ac57a0dd2ed855f ""
-  "main.aux" 1732224426 12711 3098411c1d9d94c9583f0714ff7da85b "pdflatex"
+  "main.aux" 1732285902 12313 b2769d4201b795ed6c7a57480d95039e "pdflatex"
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1732224423 "/home/nunziato-damino/Documents/Github/NMSM_2024/Block 1/Report/main.tex" "main.pdf" "main" 1732224426 0
+["pdflatex"] 1732285899 "/home/nunziato-damino/Documents/Github/NMSM_2024/Block 1/Report/main.tex" "main.pdf" "main" 1732285902 0
   "/etc/texmf/web2c/texmf.cnf" 1730382086 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/home/nunziato-damino/Documents/Github/NMSM_2024/Block 1/Report/main.tex" 1732179808 1624 82e8fbb6480b9d6cb656579114d96c88 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -184,12 +184,12 @@
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1730382102 4643645 d2d1d8b8ba87ed005f4aaf1ce646a79e ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1730382118 7909135 48d618ec1d1a62c60af1823f81555af3 ""
   "EXER/algorithm.tex" 1732211872 4224 6164d2433fc72aeac0c6ab1803347f6d ""
-  "EXER/data_tables.tex" 1732224384 13865 54c386c3a89dc02e59363bd8bc0c06bb ""
-  "EXER/ex1.tex" 1732197591 4941 a9cf5cf0fcb8c120267c0b91424f4ddb ""
+  "EXER/data_tables.tex" 1732226291 13427 b02db3ee39b11f22d0bcc67719460251 ""
+  "EXER/ex1.tex" 1732285895 4944 c897237d718512309419d4a7925681ba ""
   "EXER/ex2.tex" 1732197859 2744 1facd36ee628921d1890381f5725b190 ""
   "EXER/ex3.tex" 1732200171 6212 c88b5c663f7c9fad8d99c1069addbb49 ""
-  "EXER/ex4.tex" 1731161484 3318 034a382a30039cc3419fc10dcc7072ca ""
-  "EXER/ex5.tex" 1732224420 9095 b8bae2bd1ec2275c209455fd9b5e1dad ""
+  "EXER/ex4.tex" 1732282299 4313 c21618f007605647dfdf99d8385b781f ""
+  "EXER/ex5.tex" 1732276084 12063 df2bfea2ce02104e436a7178f4a22546 ""
   "EXER/ex6.tex" 1732210906 12237 2930c0767f50476aadd5d8640b4c4b01 ""
   "EXER/ex7.tex" 1732176975 3936 3899f6a2bb06b1361190271f3e179929 ""
   "FIG/exercise_0_images/first_and_second_ellipsoid_distribution.png" 1731511381 27130 fd70eef4df71e7054cdcfd3923185332 ""
@@ -206,8 +206,7 @@
   "FIG/exercise_3_images/distribution_consideration.png" 1731512327 57075 acbcef8890b9846822ac9531f6a0a1f9 ""
   "FIG/exercise_3_images/distribution_crude_mc_ex2.png" 1731512325 22671 3a2c6ef0ea33ff33f2a3766a5c1fd3e8 ""
   "FIG/exercise_4_images/Exercise 4_part1.png" 1731160180 289442 5b7594b8032a6e6f750f2e4c79a0ce80 ""
-  "FIG/exercise_5_images/warmup_observables_temp0.25T_c_dimension50.png" 1731756487 35441 2463d9d0041089b333d700da4792b498 ""
-  "FIG/exercise_5_images/warmup_observables_temp1.05T_c_dimension50.png" 1731756487 75337 445e07549d3ad73e361afa7e164d4340 ""
+  "FIG/exercise_4_images/Exercise 4_part2.png" 1732279974 149895 174e1bb895903566aaf55bd12d4dc2a6 ""
   "FIG/exercise_6_images/end_height_mmc.png" 1732207526 46584 68e6347ec8873ac1d1798c1e7785ad82 ""
   "FIG/exercise_6_images/endtoend_mmc.png" 1732207526 53175 61bfd38a9985ea7f8dbe1486fb312e78 ""
   "FIG/exercise_6_images/energy_mmc.png" 1732207526 42545 cf27323ce6942f96872707fe9cb34f60 ""
@@ -221,9 +220,9 @@
   "FIG/exercise_7_images/gillespiexy_volume100.0.png" 1731570654 117799 4f142355d10a03efa2f5bb66a6a2c4fb ""
   "FIG/exercise_7_images/gillespiexy_volume1000.0.png" 1731570773 73940 4ccf18e7ebfd866ab53202a75a84db6f ""
   "FIG/exercise_7_images/gillespiexy_volume10000.0.png" 1731570857 63705 d922d65b46458386c5ccf6a486a5af73 ""
-  "main.aux" 1732224426 12711 3098411c1d9d94c9583f0714ff7da85b "pdflatex"
-  "main.bbl" 1732224423 854 c4cb6215ab4d165f4412a533365b3f0d "bibtex main"
-  "main.out" 1732224426 181 c2dc872e92446895d84fdb09e605571a "pdflatex"
+  "main.aux" 1732285902 12313 b2769d4201b795ed6c7a57480d95039e "pdflatex"
+  "main.bbl" 1732285899 1220 8e5072b84474cf3c8af94a252e58ad29 "bibtex main"
+  "main.out" 1732285902 624 a87c0f8cacda13f5c8773cfd4fa7cb24 "pdflatex"
   "main.tex" 1732179808 1624 82e8fbb6480b9d6cb656579114d96c88 ""
   (generated)
   "main.aux"

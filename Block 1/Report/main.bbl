@@ -10,6 +10,11 @@ G~Marinari, E;~Parisi.
 \newblock Simulated tempering: A new monte carlo scheme.
 \newblock {\em EPL (Europhysics Letters)}, 19:451--458, 1992.
 
+\bibitem{Onsager-1944}
+Lars Onsager.
+\newblock Crystal statistics. i. a two-dimensional model with an order-disorder transition.
+\newblock {\em Physical Review (Series I)}, 65:117--149, 1944.
+
 \bibitem{Sokal1997}
 A.~Sokal.
 \newblock {\em Monte Carlo Methods in Statistical Mechanics: Foundations and New Algorithms}, pages 131--192.
@@ -19,5 +24,10 @@ A.~Sokal.
 M.~C. Tesi, E.~J. Janse~van Rensburg, E.~Orlandini, and S.~G. Whittington.
 \newblock {Monte Carlo study of the interacting self-avoiding walk model in three dimensions}.
 \newblock {\em Journal of Statistical Physics}, 82(1-2):155--181, January 1996.
+
+\bibitem{Weigel-2010}
+Wolfhard Weigel, Martin;~Janke.
+\newblock Error estimation and reduction with cross correlations.
+\newblock {\em Physical Review E}, 81:066701, 2010.
 
 \end{thebibliography}

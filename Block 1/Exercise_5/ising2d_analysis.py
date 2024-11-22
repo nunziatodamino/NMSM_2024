@@ -36,7 +36,7 @@ LENGTH = 100
 
 #t_equilibrium_list = [ 2000, 2000, 2500, 50 ] # LENGTH = 25 
 #t_equilibrium_list = [ 500, 1700, 8000, 50 ] # LENGTH = 50 
-t_equilibrium_list = [ 2500, 500, 500, 50 ] # LENGTH = 100 
+t_equilibrium_list = [ 10000, 10000, 10000, 10000 ] # LENGTH = 100 
 
 energy = np.zeros(len(BETA_LIST))
 error_energy = np.zeros(len(BETA_LIST))
@@ -56,8 +56,6 @@ tau_energy_autocorrelation = np.zeros(len(BETA_LIST))
 tau_magnetisation_autocorrelation = np.zeros(len(BETA_LIST))
 
 # autocorrelation study
-
-
 
 def exponential_decay(t, tau):
     return np.exp(-t / tau)

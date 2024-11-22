@@ -6,6 +6,8 @@ see in the following. \\
 In this exercise we'll simulate the 2D Ising model on a square lattice, using the Glauber dynamics (local spin flip) and the Metropolis algorithm
 for the configuration evolution. We'll then evaluate typical system observables at equilibrium for different temperatures and different system sizes.
 
+\subsection{Introduction}
+
 We recall briefly some fundamental theoretical facts about the Ising model that we'll use through the simulation.
 We begin considering a generic lattice where we place $N$ spins of the type $\sigma_i  = \pm 1$. If one fixes an origin on the lattice, and consider
 from this the set of positions $\{\bar{r}_0, \bar{r}_1, \dots \bar{r}_{N-1}\}$ of the other lattice points, then is possible 
@@ -19,7 +21,7 @@ $$
 Where the symbol $\sum_{\langle \bar{r_i}\bar{r_j} \rangle}$ implies that the sum is done only over the nearest neighbors. In our simulation 
 we'll consider for simplicity $J=1$. \\
 
-In the case of the square lattice, this model can be solved exactly (Onsager). \\
+In the case of the square lattice, this model can be solved exactly in the limit of an infinite lattice \cite{Onsager-1944}. \\
 The result for the critical temperature and the expected magnetisation in function
 of the temperature are reported in the following.
 We have that the magnetization has the following function:
@@ -74,7 +76,8 @@ is evaluated using an hash table at the start of the program, so that the algori
  easily in Python using a dictionary. \\
 In our simulation we'll define 1 Monte Carlo timestep as the number of steps in which we perform $N$ local spin flip moves. \\
 
-\paragraph{Thermalization} Given that we're starting from a random configuration we'll need some time before reaching the thermal equilibrium, 
+\subsection{Warm-up run} 
+Given that we're starting from a random configuration we'll need some time before reaching the thermal equilibrium, 
 i.e. the system we'll need to evolve for a certain number of Monte Carlo timesteps that we'll call $\tau_{eq}$ before we start to evaluate any mean observable. \\
 This process is called thermalization and is a fundamental part in any simulation of this kind. \\
 There are different recipes to find $\tau_{eq}$ for a given system, either qualitative or quantitative. One possible way can be to plot the
@@ -82,46 +85,74 @@ observables of interest against time and see qualitatively when they tend to sta
 say that the variance per observable must be less than a predetermined value $\alpha$. This approach, even if simple, has a clear caveat : it establish a lower
 bound for the observables time series but not an upper bound. \\
 Another approach is to evaluate at this stage the autocorrelation time for each observable. If the process is stationary or weakly stationary this number is 
-well defined through the time series ($C_O(s, s+t) = C_O=(0, t)\ \forall s$ for these kind of processes). Then we can use this number as a discard criterion 
+well defined through the time series ($C_O(s, s+t) = C_O=(0, t)\ \forall s, \forall O$ for these kind of processes). Then we can use this number as a discard criterion 
 (the common recipe is $\tau_{eq} \simeq 20 \tau$, see \cite{Sokal1997}) but moreover we can use it in establishing an upper bound for the simulation. \\
 We'll discuss in detail in the autocorrelation paragraph that errors for correlated measures are of the order $\sim (\frac{\tau}{N})^{1/2}$, so in order to 
-achieve, for example, $1 \%$ accuracy for our measurements or better, $N > 10000\tau$ . \\
-In our simulation, in order to find a tradeoff between computation time and accuracy, we choose, where possible, $t_{max} = 1000\tau$, leading
-to an accuracy of $\sim 3 \%$. Where the accuracy is worse, due to a longer $\tau$, the fact is expictly stated. \\
+achieve, for example, an error of the order $ \sim 0.01$ for our measurements or better, $N > 10000\tau$ . \\
 
 A point of interest is that, technically, there is no need to discard any data. The initial data (biased estimation) leads to a systematic error $\sim \frac{\tau}{N}$,
 while the statistical errors will be of the order $\sim (\frac{\tau}{N})^{1/2}$, which is larger. In practice, given that the systematic error can be big, 
 and we can let it be 0 with no cost, we discard the initial transient. \\ 
 
 We then start the thermalization process with a warmup run where the maximum number of iterations is not the final one, and plot for each temperature and for 
-each square lattice the 2 observables of interest (energy and magnetisation per spin) against the simulation time. If an observable stabilize to a constant value (apart from the statistical noise) 
-we assume that from there on the process is stationary. 
-Suppose instead that the 2 observables did not stabilized, for example this happens near criticality for the magnetisation due to the critical slowing down 
-phenomenon, then if the other is stable, we can hypothesize that the magnetisation is weakly stationary. \\
-In order to prove this (approximatively) we numerically see if has constant mean, constant variance, and constant autocorrelation time in a certain tolerance 
-range. Then from this we have our autocorrelation time and proceed as specified before. \\
-A technical note here: the implementation of this procedure, while straightforward, is extremely susceptible to numerical instability, 
-so in the code a proof of concept version is presented and used, beacuse its optimization is behind the scope of this analysis. \\
-We attach in the report an example for just 2 temperature values for the square lattice of side 50 in figure \ref{lec5:thermalization}.
+each square lattice the 2 observables of interest (energy and magnetisation per spin) against the simulation time. \\
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.45\textwidth]{FIG/exercise_5_images/warmup_observables_temp0.25T_c_dimension50.png} \hspace{0.5cm}
-    \includegraphics[width=0.45\textwidth]{FIG/exercise_5_images/warmup_observables_temp1.05T_c_dimension50.png}
-    \caption{Warmup run for $T=0.5\ T_c$ and $T=1.05\ T_c$ respectively for the square lattice of side 50.
-    In the first figure we are away from criticality and both observables stabilize fast. In this setting we can see that 
-    both observables stabilize to a constant value, so they can be considered stationary. In this situation }
-    \label{lec5:thermalization}
-\end{figure}
+Here we have 2 possible roads: the quantitative one, i.e. if an observable stabilize to a constant value (apart from the statistical noise) 
+we assume that from there on the process is stationary, or the quantitative one, i.e. to effectively prove that the time series is, from some $\tau_{equilibrium}$ on ,
+stationary or weakly stationary. \\
+In order to prove this we can naively see numerically if the time series has constant mean, constant variance, and constant autocorrelation time in a certain tolerance 
+range. While the implementation of this procedure is straightforward, is extremely susceptible to numerical instability, 
+so in the code just a proof of concept version is presented, because its optimization is behind the scope of this analysis. \\
+If one want to use a more robust and reliable way to prove this, then an Augmented Dickey-Fuller (ADF) test should be performed on the time series. \\
+Due to time limitation, we opted this time for the qualitative approach. \\
 
-\paragraph{Autocorrelation} In Monte Carlo simulations, successive samples for each observable are often correlated due to the nature of the sampling algorithm. \\
+Once the time series are evaluated for each lattice, we discard the initial transient and evaluate for each observable the autocorrelation time, and then take the maximum value between the 2.
+These $\tau$, that are of the same order of the final $\tau$ values reported in the tables \ref{lec5:results_side25}, \ref{lec5:results_side50}, \ref{lec5:results_side100} where used 
+to estimate how much the final simulation could run, i.e. the final upper bound. 
+
+\subsection{Autocorrelation} In Monte Carlo simulations, successive samples for each observable are often correlated due to the nature of the sampling algorithm. \\
 How much they are correlated is described by the autocorrelation function which can be showed that for large $t$ goes to 0 as an exponential:
 
-$$ C_O(T) \sim e^{-t/\tau^O_{int}} $$
+$$ C_O(T) \sim e^{-t/\tau^O_{exp}} $$
 
-Where $\tau^O_{int}$ is called integrated correlation time.
+Where $\tau^O_{exp}$ is called autocorrelation time. \\
+In literature \cite{Weigel-2010} one can also find the definition of the so called integrated autocorrelation correlation time:
+
+$$ \tau^O_{int} = \frac{1}{2} + \sum_{t=1}^N \frac{C_O(t)}{C_O(0)} $$
+
+This definition makes $\tau^O_{exp} \sim \tau^O_{int}$, and moreover one can prove \cite{Weigel-2010} that one is the upper bound of the other, specifically $\tau^O_{int} \leq \tau^O_{exp}$. \\
+In the case of correlated data one should correct the variance by the number of uncorrelated data \cite{Weigel-2010} :
+
+$$ \sigma^2(O)_{corr} = \frac{\sigma^2(O)}{\frac{N}{2 \tau_{int}^O}} $$
+
+In our analysis, even if we recognize that these 2 times technically play different roles in the analysis, we just evaluate $\tau^O_{exp}$, and take this as an overestimate of $\tau^O_{int}$. So, from now on $\tau^O_{int} \sim \tau^O_{exp} \equiv \tau_{O}$
+
+\subsection{Simulation}
+
+In our simulation, we found correlation times of different orders of magnitude, as seen in tables \ref{lec5:results_side25}, \ref{lec5:results_side50}, \ref{lec5:results_side100}, where 
+we have an higher correlation time when we are near the critical temperature for each dimension of the square lattice, due to the critical slowing down phenomenon. \\
+In order to find a tradeoff between computation time and accuracy, we choose, $t_{max} = 10^5$ . This is a good choice in general but leads in the worst case scenario, i.e. $\tau \sim 400$ , to 
+a $t_{max} = 250 \tau$ and subsequently to an error $\sim (\frac{\tau}{t_{max}})^{1/2}$ of the order of $0.2$, which for us is terrible giving that we're estimating quantities of 
+the same order. \\
+In order to mitigate this one should propose a simulation of the order $t_{max} = 10^6 - 10^9$ , to be safe. \\
+
+We now comment the results obtained in tables \ref{lec5:results_side25}, \ref{lec5:results_side50}, \ref{lec5:results_side100}. Note that all observables are evaluated 
+per spin and the heat capacity $C_V$ and the magnetic susceptibility $\chi_M$ are evaluated via block averaging (\ref{block_averaging}) to be able to estimate their errors. 
+
+\begin{itemize}
+    \item \textbf{Magnetisation per spin} : We see for each dimension a transition from a completly magnetized state to a non-magnetized one. \\ In the neighborhood of the critical temperature for each dimension the lower bound (0.95\ $T_c$)
+    is consistent with the theoretical prediction and the upper bound $(1.05 T_c)$ can be considered consistent given the premises on the large error made at the start of the paragraph.
+
+    \item \textbf{Energy per spin}: We have that the lowest energy state for the square lattice Ising model is $E = -2JN$ (all spins up) , while if all the spins are random $(T \to +\infty)$, we have $E \simeq 0$. We see clearly 
+    this trend respected for all dimensions.
+
+    \item \textbf{Heat capacity per spin}: We see that we obtain a result that is almost invariant by the choice of the dimension. This may seems an error at first but we recall that we are 
+    analyzing a finite size Ising model, and this has the effect to shift the $T_c$ from the theoretical results when the dimensions changes. \\
+    To have a proper description of the system further measure at different temperatures should be taken.
+    
+    \item \textbf{Magnetic susceptibility per spin}: The same consideration discussed for the heat capacity applies also to this observable.
 
 
-....
+\end{itemize}
 
 
