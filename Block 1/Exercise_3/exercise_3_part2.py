@@ -2,10 +2,8 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats as stats
-import numba
 import importance_sampling as mc
 
-# paths for saving images in report
 ########################################
 report_path = "/home/nunziato-damino/Documents/Github/NMSM_2024/Block 1/Report"
 exercise_folder = "FIG/exercise_3_images"

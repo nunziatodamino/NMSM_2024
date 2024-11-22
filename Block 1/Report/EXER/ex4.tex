@@ -1,6 +1,6 @@
 \chapter*{Lecture 4: Markov chains}
 
-\paragraph{Part 1} We report the stochastic matrixes with the relative digraphs in figure \ref{chapter4:part1}. \\
+\subsection*{Part 1} We report the stochastic matrixes with the relative digraphs in figure \ref{chapter4:part1}. \\
 One can prove from the digraph representation that chain $A$ is irreducible, while chain $B$ is not (for example in chain $B$ from state 2 
 is not possible to reach any other state).
 
@@ -13,7 +13,7 @@ is not possible to reach any other state).
 
 Moreover on chain A each state is periodic of period 3. In chain B state 1 is aperiodic and transient, state 2 is absorbing and states 3,4,5 are periodic of period 3.
 
-\paragraph*{Part 2}
+\subsection*{Part 2}
 
 Suppose to have the Markov chain with the following stochastic matrix:
 
@@ -67,7 +67,7 @@ $$
 
 We obtain the same result in the submitted program.
 
-\paragraph*{Balls and boxes}
+\subsection*{Balls and boxes}
 
 We can solve this exercise using a Markov chain approach.
 Called $a_i$ the state in which there are $i$ red balls in box A there can be just 3 possible states (0,1,2 balls).
@@ -84,7 +84,7 @@ In general one has, for a given state $i$:
 $$ \mathbb{P}\text{(red extraction in A at state i)} = \frac{i}{2} \qquad \mathbb{P}\text{(white extraction in A at state i)} = 1- \frac{i}{2} = \frac{2-i}{2} $$
 $$ \mathbb{P}\text{(red extraction in B at state i)} = 1 - \frac{i}{3} =  \frac{3-i}{3} \qquad \mathbb{P}\text{(white extraction in B at state i)} = \frac{i}{3} $$
 
-We obtain the stochastic matrix
+Given this considerations we obtain the stochastic matrix:
 
 $$ P =
 \begin{pmatrix} 
