@@ -14,9 +14,9 @@ def inversion(cdf_inverse: Callable[[float], float], number_sampled_points: int)
 
 def rejection_from_normal(target_distribution, c, mean, sigma, number_sampled_points):
     '''
-    Samples a tuple of random variables using the rejection method from a probability density function stored 
-    in an array called target_distribution, using as a candidate distribution the normal distribution with c satisfying 
-    the inequality \rho <= c N(x)
+    Samples a tuple of random variables using the rejection method from a probability density function \rho(x) stored 
+    in an array called target_distribution, using as a candidate distribution the normal distribution N(x) with c satisfying 
+    the inequality \rho(x) <= c N(x)
     '''
     counter = 0
     accepted_variables = np.zeros(number_sampled_points)

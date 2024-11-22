@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import Exercise_2.distribution_sampling as sampling
+import distribution_sampling as sampling
 
 plt.rcParams.update({'font.size': 18})
 
