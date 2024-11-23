@@ -15,6 +15,12 @@ monomer_radius = polymer.monomer_radius
 energy_threshold = polymer.energy_threshold
 c = polymer.c
 
+beta_list = np.load(os.path.join(file_path, "beta_list.npy"))
+energy_evolution_results = np.load(os.path.join(file_path, "mega_energy_series.npy"))
+ee2_results = np.load(os.path.join(file_path, "mega_ee2_series.npy"))
+end_height_results = np.load(os.path.join(file_path, "mega_end2height_series.npy"))
+gyr_rad_results = np.load(os.path.join(file_path, "mega_gyr_radius_series.npy"))
+
 #initial configuration (vertical stick)
 monomers_initial_conf=np.zeros((n_monomers,2))
 bond = 1.15
@@ -39,8 +45,8 @@ ax.axhline(y=energy_threshold, color='purple', linestyle=':', linewidth=1.5, lab
 ax.set_xlabel("X-axis", fontsize=12, labelpad=10, color='darkblue')
 ax.set_ylabel("Y-axis", fontsize=12, labelpad=10, color='darkblue')
 ax.set_title("Initial Polymer Configuration", fontsize=14, color='darkblue', pad=15)
-
-plt.show()
+#plt.show()
+plt.close()
 
 # A move series example
 total_moves=15
@@ -70,5 +76,27 @@ ax.axhline(y=energy_threshold, color='purple', linestyle=':', linewidth=1.5, lab
 ax.set_xlabel("X-axis", fontsize=12, labelpad=10, color='darkblue')
 ax.set_ylabel("Y-axis", fontsize=12, labelpad=10, color='darkblue')
 ax.set_title(f"Move Configuration after {total_moves} Moves", fontsize=14, color='darkblue', pad=15)
+#plt.show()
+plt.close()
 
-plt.show()
+#Energy histogram
+plt.figure(figsize=(9, 6))
+bins = np.arange(-n_monomers, 0, 0.5)
+colors = plt.cm.tab10.colors 
+bar_width = 0.1  
+for i, beta in enumerate(beta_list):
+    hist, bin_edges = np.histogram(energy_evolution_results[i], bins=bins)
+    hist = hist / hist.sum()     
+    bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
+    offset = (i - len(beta_list) / 2) * bar_width  
+    for j, center in enumerate(bin_centers):
+        plt.vlines(center + offset, 0, hist[j], color=colors[i % len(colors)], 
+                   label=f'beta={beta:.2f}' if j == 0 else None, alpha=0.8)
+plt.xlabel("Energy")
+plt.ylabel("Normalized Frequency")
+plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))  
+plt.tight_layout() 
+image_name = "energy_histogram.png"
+entire_path = os.path.join(report_path, exercise_folder, image_name)
+plt.savefig(entire_path)
+plt.close()

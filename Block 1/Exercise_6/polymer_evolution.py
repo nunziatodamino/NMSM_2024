@@ -40,7 +40,6 @@ for k, beta in enumerate(beta_list):
     ee2_results[k], end_height_results[k], energy_evolution_results[k], gyr_radius_results[k], moves_beta[k] = polymer.thermalization(monomers_initial_conf, time_max, beta)
     print(f"siamo alla fine del {k+1}° beta")
 
-
 # Observables plot
 time = np.arange(0, time_max, 1)
 selected_indices = np.linspace(0, len(beta_list) - 1, 10, dtype=int)
@@ -62,18 +61,6 @@ plt.subplots_adjust(left=0.05, right=0.95, top=0.92, bottom=0.1, wspace=0.1, hsp
 image_name = "observables_polymer_summary.png"
 entire_path = os.path.join(report_path, exercise_folder, image_name)
 plt.suptitle("Evolution of observables for selected beta values", fontsize=25)
-plt.savefig(entire_path)
-plt.close()
-
-# Energy histogram
-for i, beta in enumerate(beta_list):
-    bins = np.arange(-n_monomers, 0, 0.5)
-    plt.figure(figsize = (9, 6))
-    plt.hist(energy_evolution_results[i], bins=bins, density=True, alpha=0.4, label=f'beta={beta_list[i]}')
-plt.xlabel("Energy")
-plt.ylabel("Normalised frequency")
-image_name = f"energy_histogram.png"
-entire_path = os.path.join(report_path, exercise_folder, image_name)
 plt.savefig(entire_path)
 plt.close()
 

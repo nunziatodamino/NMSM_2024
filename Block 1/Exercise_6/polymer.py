@@ -12,6 +12,17 @@ energy_threshold = 0.5
 
 @numba.njit
 def polymer_displacement(configuration):
+    '''
+    Takes in input a configuration (np.ndarray(n_monomers, 2)) and output a configuration of the same type after the following
+    operations are performed:
+    - N local gaussian shift for each monomer
+    - 1 pivot rotation around a uniformly selected monomer
+    Then the following checks are done:
+    - bond length constraint
+    - non compenetration
+    - hard wall constrain
+    If the function passes all the checks then outputs the configuration, if not restarts
+    '''
     sigma = monomer_radius / 8
     shift_conf = np.zeros((n_monomers,2))
     valid_configuration = False
@@ -49,10 +60,16 @@ def polymer_displacement(configuration):
 
 @numba.njit(cache=True)
 def end2end_distance_squared (configuration : np.ndarray) -> np.float64:
+    '''
+    Evaluates the end to end distance of the polymer which position coordinates are stored in the configuration array
+    '''
     return np.sqrt((configuration[-1][0]- configuration[0][0])**2+(configuration[-1][1]- configuration[0][1])**2)
 
 @numba.njit(cache=True)
 def energy (configuration : np.ndarray) -> np.float64:
+    '''
+    Evaluates the energy of the polymer considering an absorbing wall, which position coordinates are stored in the configuration array
+    '''
     energy = 0
     for point in configuration:
         if point[1]<energy_threshold: energy-=epsilon_energy
@@ -60,6 +77,9 @@ def energy (configuration : np.ndarray) -> np.float64:
 
 @numba.njit(cache=True)
 def gyration_radius (configuration : np.ndarray) -> np.float64:
+    '''
+    Evaluates the gyration radius of a polymer which position coordinates are stored in the configuration array
+    '''
     total_sum = 0 
     for point in configuration:
         total_sum += point[0]**2 + point[1]**2
@@ -67,6 +87,9 @@ def gyration_radius (configuration : np.ndarray) -> np.float64:
 
 @numba.njit(cache=True)
 def metropolis (old_configuration : np.ndarray, new_configuration : np.ndarray, beta : float) -> bool:
+    '''
+    Metropolis filter
+    '''
     delta_Energy=energy(new_configuration)-energy(old_configuration)
     if delta_Energy <= 0: return True
     elif np.random.random() > np.exp(- beta * delta_Energy ) : return False
@@ -74,6 +97,9 @@ def metropolis (old_configuration : np.ndarray, new_configuration : np.ndarray, 
 
 @numba.njit(cache=True)
 def mmc_swap (old_configuration : np.ndarray, new_configuration : np.ndarray, beta_list : np.ndarray , k_selected : np.int32 ) -> bool:
+    '''
+    Multiple Markov chain (MMC) swap mechanism
+    '''
     delta_energy= energy(new_configuration)-energy(old_configuration)
     delta_beta = beta_list[k_selected + 1] - beta_list[k_selected]
     if delta_energy <= 0: return True
@@ -82,6 +108,11 @@ def mmc_swap (old_configuration : np.ndarray, new_configuration : np.ndarray, be
 
 @numba.njit
 def thermalization(monomers_initial_conf: np.ndarray, time_max : np.int32, beta : np.float64) -> (np.ndarray,np.ndarray,np.ndarray) :
+    '''
+    ATTENTION : MEMORY INTENSIVE
+    Makes one move and accept/refuse it with the metropolis filter. 
+    Also evaluates the observables energy, end to end, gyration radius and end height
+    '''
     moves=np.zeros((time_max, n_monomers, 2))
     moves[0]=monomers_initial_conf
     ee2=np.zeros((time_max))
@@ -103,6 +134,11 @@ def thermalization(monomers_initial_conf: np.ndarray, time_max : np.int32, beta 
 
 @numba.njit
 def evolution(monomers_initial_conf: np.ndarray, time_max: np.int32, beta: np.float64):
+    '''
+    Makes one move and accept/refuse it with the metropolis filter. 
+    Also evaluates the observables energy, end to end, gyration radius and end height
+    Optimized function for memory.
+    '''
     moves = monomers_initial_conf.copy() 
     ee2 = np.zeros(time_max)
     energy_list = np.zeros(time_max)
@@ -120,30 +156,50 @@ def evolution(monomers_initial_conf: np.ndarray, time_max: np.int32, beta: np.fl
     return ee2, end_heigth, energy_list, gyr_radius_list, moves
 
 def mean_value_observable_equilibrium(observable, t_equilibrium, t_max):
+    '''
+    Evaluates the mean of an observable time series long t_max , discarding the first t_equilibrium values
+    '''
     return 1/(t_max - t_equilibrium) * np.sum(observable[t_equilibrium : t_max])
 
 def variance_observable_equilibrium(observable, t_equilibrium, t_max):
+    '''
+    Evaluates the variance of an observable time series long t_max , discarding the first t_equilibrium values
+    '''
     tmp = 1/(t_max - t_equilibrium) * np.sum(observable[t_equilibrium : t_max]**2)
     return tmp - mean_value_observable_equilibrium(observable, t_equilibrium, t_max)**2
 
 def error_observable_equilibrium(observable, t_equilibrium, t_max):
+    '''
+    Evaluates the error of an observable time series long t_max , discarding the first t_equilibrium values
+    '''
     return np.sqrt(variance_observable_equilibrium(observable, t_equilibrium, t_max) / (t_max - t_equilibrium))
 
 def variance_observable_corr_equilibrium(observable, t_equilibrium, t_max, tau):
+    '''
+    Evaluates the variance of an observable time series long t_max , discarding the first t_equilibrium values,
+    considering the data are correlated, so the correlation time tau must be supplied.
+    '''
     tmp = (2 * tau)/(t_max - t_equilibrium) * np.sum(observable[t_equilibrium : t_max]**2)
     return tmp - mean_value_observable_equilibrium(observable, t_equilibrium, t_max)**2
 
 def error_observable_corr_equilibrium(observable, t_equilibrium, t_max, tau):
+    '''
+    Evaluates the error of an observable time series long t_max , discarding the first t_equilibrium values,
+    considering the data are correlated, so the correlation time tau must be supplied.
+    '''
     return np.sqrt(variance_observable_corr_equilibrium(observable, t_equilibrium, t_max, tau) / (t_max - t_equilibrium))
 
-def heat_capacity(energy_variance, temperature):
-    return energy_variance / temperature**2
-
 def block_averaging_heat_capacity(energies, t_equilibrium, t_max , block_size, temperature):
+    '''
+    Evaluates the heat capacity via the block averaging technique. Takes the energy time series long t_max,
+    discardes the first t_equilibrium values, and then performs the block averaging where each bloch has lenght 
+    block_size.
+    The temperature value is used to evaluate the heat capacity.
+    '''
     energies=energies[t_equilibrium:t_max]
     n_data = len(energies)
     n_blocks = n_data // block_size
-    energies = energies[:n_blocks * block_size] # trim 
+    energies = energies[:n_blocks * block_size] # trim if something goes wrong
     blocks = energies.reshape(n_blocks, block_size)
     avg_e = np.mean(blocks, axis=1)
     avg_e2 = np.mean(blocks**2, axis=1)
@@ -152,3 +208,4 @@ def block_averaging_heat_capacity(energies, t_equilibrium, t_max , block_size, t
     std_cv = np.std(cv_blocks, ddof=1)  
     error_cv = std_cv / np.sqrt(n_blocks)
     return mean_cv, error_cv
+

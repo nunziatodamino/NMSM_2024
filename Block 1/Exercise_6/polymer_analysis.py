@@ -1,7 +1,5 @@
 import os
 import numpy as np
-#import pandas as pd                        # decomment if you want to see data using the dataframe
-#from tabulate import tabulate 
 import matplotlib.pyplot as plt
 from statsmodels.tsa.stattools import acf
 from scipy.optimize import curve_fit

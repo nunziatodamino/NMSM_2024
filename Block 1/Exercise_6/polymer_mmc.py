@@ -16,7 +16,7 @@ beta_list = np.load(os.path.join(file_path, "beta_list.npy"))
 
 moves_initial = np.load(os.path.join(file_path, f"final_conf.npy"))
 
-b_block = 25000 # maximum tau in k series
+b_block = 25000 
 time_max = 40 * b_block
 time_series = range(b_block, time_max + 1, b_block)
 
@@ -30,7 +30,7 @@ initial_conf = np.zeros((len(beta_list), 1 , polymer.n_monomers, 2))
 initial_conf = moves_initial[: , 0]
 
 for i, time in enumerate(time_series):
-    print(f"time : {time}...")
+    #print(f"time : {time}...")
     for k, beta in enumerate(beta_list):
         start_idx = i * b_block
         end_idx = (i + 1) * b_block

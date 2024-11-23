@@ -1,17 +1,12 @@
-
 import os
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
 from statsmodels.tsa.stattools import acf
 from scipy.optimize import curve_fit
-from statsmodels.graphics.tsaplots import plot_acf
 import ising_2d as ising
 
 plt.rcParams.update({'font.size': 18}) # global font parameter for plots
 
-# paths for saving images in report
 ########################################
 report_path = "/home/nunziato-damino/Documents/Github/NMSM_2024/Block 1/Report"
 file_path = "/home/nunziato-damino/Documents/Github/NMSM_2024/Block 1/Exercise_5"
@@ -54,8 +49,6 @@ energy_autocorrelation = np.empty(len(BETA_LIST), dtype=object)
 magnetisation_autocorrelation = np.empty(len(BETA_LIST), dtype=object)
 tau_energy_autocorrelation = np.zeros(len(BETA_LIST))
 tau_magnetisation_autocorrelation = np.zeros(len(BETA_LIST))
-
-# autocorrelation study
 
 def exponential_decay(t, tau):
     return np.exp(-t / tau)
@@ -123,16 +116,4 @@ for j, beta in enumerate(BETA_LIST):
     plt.close()
     #plt.show()
 
-data_dict = {
-    "Beta": BETA_LIST,
-    "Energy": energy,
-    "Error in Energy": error_energy,
-    "Tau Energy Autocorrelation": tau_energy_autocorrelation,
-    "Magnetisation": magnetisation,
-    "Error in Magnetisation": error_magnetisation,
-    "Tau Magnetisation Autocorrelation": tau_magnetisation_autocorrelation,
-    "Heat Capacity per spin": heat_capacity,
-    "Error in Heat Capacity": error_heat_capacity,
-    "Magnetic Susceptibility per spin": magnetic_suscept,
-    "Error in Magnetic Susceptibility": error_magnetic_suscept
-}
+

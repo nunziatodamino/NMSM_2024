@@ -1,11 +1,8 @@
 \chapter*{Lecture 5: Ising 2D}
 
-The Ising model is, by earsay, the undisputed king of the Monte Carlo simulations. Its simplicity, combined with the richness of its behavior, 
-makes it an ideal playground for testing and developing important computational techniques as the Metropolis algorithm, that we will 
-see in the following. \\
-In this exercise we'll simulate the 2D Ising model on a square lattice, using the Glauber dynamics (local spin flip) and the Metropolis algorithm
-for the configuration evolution. We'll then evaluate typical system observables at equilibrium for different temperatures and different system sizes.
+The Ising model is often regarded as the undisputed benchmark for Monte Carlo simulations. Its straightforward nature, paired with its complex and diverse behavior, makes it an excellent platform for testing and developing critical computational techniques like the Metropolis algorithm, which we will explore shortly.
 
+In this exercise, we will simulate the 2D Ising model on a square lattice using Glauber dynamics (local spin flips) and the Metropolis algorithm to evolve the system configuration. We will then calculate key system observables at equilibrium across various temperatures and system sizes.
 \subsection{Introduction}
 
 We recall briefly some fundamental theoretical facts about the Ising model that we'll use through the simulation.
@@ -72,7 +69,7 @@ where the algorithm to perform a single spin flip and decide to accept it or not
 \end{algorithm}
 
 Notice that in order to reduce the computation time a neighbor list for each atom, considering the periodic boundary condition, 
-is evaluated using an hash table at the start of the program, so that the algorithm can use it as input. This can be implemented
+is evaluated using an hash table at the start of the program, so that the algorithm can use it as an input. This can be implemented
  easily in Python using a dictionary. \\
 In our simulation we'll define 1 Monte Carlo timestep as the number of steps in which we perform $N$ local spin flip moves. \\
 
@@ -98,7 +95,7 @@ We then start the thermalization process with a warmup run where the maximum num
 each square lattice the 2 observables of interest (energy and magnetisation per spin) against the simulation time. \\
 
 Here we have 2 possible roads: the quantitative one, i.e. if an observable stabilize to a constant value (apart from the statistical noise) 
-we assume that from there on the process is stationary, or the quantitative one, i.e. to effectively prove that the time series is, from some $\tau_{equilibrium}$ on ,
+we assume that from there on the process is stationary, or the quantitative one, i.e. to effectively prove that the time series is, from some $\tau_{eq}$ on ,
 stationary or weakly stationary. \\
 In order to prove this we can naively see numerically if the time series has constant mean, constant variance, and constant autocorrelation time in a certain tolerance 
 range. While the implementation of this procedure is straightforward, is extremely susceptible to numerical instability, 
@@ -108,7 +105,7 @@ Due to time limitation, we opted this time for the qualitative approach. \\
 
 Once the time series are evaluated for each lattice, we discard the initial transient and evaluate for each observable the autocorrelation time, and then take the maximum value between the 2.
 These $\tau$, that are of the same order of the final $\tau$ values reported in the tables \ref{lec5:results_side25}, \ref{lec5:results_side50}, \ref{lec5:results_side100} where used 
-to estimate how much the final simulation could run, i.e. the final upper bound. 
+to estimate how much the final simulation could run, i.e. the final upper bound and to tune for each temperature the minimum $\tau_{eq}$ possible
 
 \subsection{Autocorrelation} In Monte Carlo simulations, successive samples for each observable are often correlated due to the nature of the sampling algorithm. \\
 How much they are correlated is described by the autocorrelation function which can be showed that for large $t$ goes to 0 as an exponential:
@@ -118,9 +115,9 @@ $$ C_O(T) \sim e^{-t/\tau^O_{exp}} $$
 Where $\tau^O_{exp}$ is called autocorrelation time. \\
 In literature \cite{Weigel-2010} one can also find the definition of the so called integrated autocorrelation correlation time:
 
-$$ \tau^O_{int} = \frac{1}{2} + \sum_{t=1}^N \frac{C_O(t)}{C_O(0)} $$
+$$ \tau^O_{int} \equiv \frac{1}{2} + \sum_{t=1}^N \frac{C_O(t)}{C_O(0)} $$
 
-This definition makes $\tau^O_{exp} \sim \tau^O_{int}$, and moreover one can prove \cite{Weigel-2010} that one is the upper bound of the other, specifically $\tau^O_{int} \leq \tau^O_{exp}$. \\
+This definition, i.e. the factor $\frac{1}{2}$, is a matter of convention \cite{Sokal1997} that makes $\tau^O_{exp} \sim \tau^O_{int}$, and moreover one can prove \cite{Weigel-2010} that one is the upper bound of the other, specifically $\tau^O_{int} \leq \tau^O_{exp}$. \\
 In the case of correlated data one should correct the variance by the number of uncorrelated data \cite{Weigel-2010} :
 
 $$ \sigma^2(O)_{corr} = \frac{\sigma^2(O)}{\frac{N}{2 \tau_{int}^O}} $$

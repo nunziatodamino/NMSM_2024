@@ -5,7 +5,6 @@ import ising_2d as ising
 
 plt.rcParams.update({'font.size': 18}) # global font parameter for plots
 
-# paths for saving images in report
 ########################################
 report_path = "/home/nunziato-damino/Documents/Github/NMSM_2024/Block 1/Report"
 file_path = "/home/nunziato-damino/Documents/Github/NMSM_2024/Block 1/Exercise_5"
@@ -68,8 +67,6 @@ for temp, beta in enumerate(BETA_LIST):
 # cbar.ax.set_yticklabels(["Spin Down", "Spin Up"]) 
 # plt.title("Spin Configuration")
 # plt.show()
-
-# Thermalization
 
 time = np.arange(0, MC_TIMESTEPS, 1)
     
