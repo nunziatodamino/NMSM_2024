@@ -51,26 +51,46 @@ $$
 
 Notice that these equations introduces the finite size of the system via a volume $\Omega$. 
 We study in the following the effects on evolution for different volumes ($\Omega = 10^2, 10^3, 10^4$) , given $a = 2$, $b = 5$.  \\
+We can simulate these kind of systems using the Gillespie algorithm :
+
+\begin{algorithm}
+    \caption{Gillespie Algorithm}
+    \begin{algorithmic}[1]
+    \State Initialize \( t \leftarrow 0 \) 
+    \State Initialize system state \( \CC_0 \)
+    \While{\( t < T_{\text{max}} \)}
+        \State \( \lambda_C \leftarrow \sum w_i \) \Comment{Calculate total escape rate}
+        \State Sample \( \tau \sim p_{\CC}(\tau) \) \Comment{Sample residence time}
+        \State \( t \leftarrow t + \tau \) 
+        \State Sample reaction \( j \) with probability \( \frac{w_j}{\lambda_C} \) 
+        \State Update system state \( \CC \) according to reaction \( j \)
+    \EndWhile
+    \State \textbf{Return} time series and configurations
+    \end{algorithmic}
+    \label{gillespie}
+\end{algorithm}
+
+
 We report in figure \ref{lec7:moleculesxy_comparison} the molecules orbits for the different volumes.
 
-\begin{figure}[t!]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.33\textwidth]{FIG/exercise_7_images/gillespiexy_volume100.0.png} \hspace{0.5cm}
-    \includegraphics[width=0.33\textwidth]{FIG/exercise_7_images/gillespiexy_volume1000.0.png} \hspace{0.5cm}
-    \includegraphics[width=0.33\textwidth]{FIG/exercise_7_images/gillespiexy_volume10000.0.png}
+    \includegraphics[width=0.3\textwidth]{FIG/exercise_7_images/gillespiexy_volume100.0.png} \hspace{0.5cm}
+    \includegraphics[width=0.3\textwidth]{FIG/exercise_7_images/gillespiexy_volume1000.0.png} \hspace{0.5cm}
+    \includegraphics[width=0.3\textwidth]{FIG/exercise_7_images/gillespiexy_volume10000.0.png}
     \caption{Comparison between the molecules graphs for different volumes}
     \label{lec7:moleculesxy_comparison}
 \end{figure}
 
-As expected we can see we have a limit cycle for each volume, and moreover we expect an oscillatory, described by picture \ref{lec7:moleculesxyevolution_comparison}.
+As expected we can see we have a limit cycle for each volume, and moreover we expect an oscillatory behaviour, described by figure \ref{lec7:moleculesxyevolution_comparison}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\textwidth]{FIG/exercise_7_images/gillespiexy_time_volume100.0.png} 
+    \includegraphics[width=0.8\textwidth]{FIG/exercise_7_images/gillespiexy_time_volume100.0.png} 
     \vfill
-    \includegraphics[width=0.6\textwidth]{FIG/exercise_7_images/gillespiexy_time_volume1000.0.png} 
+    \includegraphics[width=0.8\textwidth]{FIG/exercise_7_images/gillespiexy_time_volume1000.0.png} 
     \vfill
-    \includegraphics[width=0.6\textwidth]{FIG/exercise_7_images/gillespiexy_time_volume10000.0.png}
+    \includegraphics[width=0.8\textwidth]{FIG/exercise_7_images/gillespiexy_time_volume10000.0.png}
     \caption{Comparison between the molecules graphs for different volumes}
     \label{lec7:moleculesxyevolution_comparison}
 \end{figure}

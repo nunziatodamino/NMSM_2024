@@ -13,7 +13,7 @@ energy_threshold = 0.5
 @numba.njit
 def polymer_displacement(configuration):
     '''
-    Takes in input a configuration (np.ndarray(n_monomers, 2)) and output a configuration of the same type after the following
+    Takes as input a configuration (np.ndarray(n_monomers, 2)) and output a configuration of the same type after the following
     operations are performed:
     - N local gaussian shift for each monomer
     - 1 pivot rotation around a uniformly selected monomer

@@ -1,15 +1,15 @@
 # Fdb version 4
-["bibtex main"] 1732352847 "main.aux" "main.bbl" "main" 1732353475 0
+["bibtex main"] 1732356355 "main.aux" "main.bbl" "main" 1732356627 0
   "./biblio.bib" 1732267200 3067 445d2d7c33ee7bbb6e524d5c20258af9 ""
   "/usr/share/texlive/texmf-dist/bibtex/bst/base/plain.bst" 1292289607 20613 bd3fbfa9f64872b81ac57a0dd2ed855f ""
-  "main.aux" 1732353475 12426 41c3f03e8000799f78c0c8bb2c8658f1 "pdflatex"
+  "main.aux" 1732356627 12633 d6aa674657c0158c4f9ae71e81dca736 "pdflatex"
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1732353472 "/home/nunziato-damino/Documents/Github/NMSM_2024/Block 1/Report/main.tex" "main.pdf" "main" 1732353475 0
+["pdflatex"] 1732356624 "/home/nunziato-damino/Documents/Github/NMSM_2024/Block 1/Report/main.tex" "main.pdf" "main" 1732356627 0
   "/etc/texmf/web2c/texmf.cnf" 1730382086 475 c0e671620eb5563b2130f56340a5fde8 ""
-  "/home/nunziato-damino/Documents/Github/NMSM_2024/Block 1/Report/main.tex" 1732179808 1624 82e8fbb6480b9d6cb656579114d96c88 ""
+  "/home/nunziato-damino/Documents/Github/NMSM_2024/Block 1/Report/main.tex" 1732356624 1630 5fa390b10733b68cfb9f872f513f988b ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecbx1095.tfm" 1136768653 3584 21b378cca2e40816b0e6d74a4dc98f04 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecbx1200.tfm" 1136768653 3584 402da0b29eafbad07963b1224b222f18 ""
@@ -191,7 +191,7 @@
   "EXER/ex4.tex" 1732288760 4344 96db5b419f4bb1f731f620ba68163439 ""
   "EXER/ex5.tex" 1732289889 12214 466015a022f8650f0373f7928b67b761 ""
   "EXER/ex6.tex" 1732353472 12920 ec4f48972180da6e97847c3611b3b5e1 ""
-  "EXER/ex7.tex" 1732176975 3936 3899f6a2bb06b1361190271f3e179929 ""
+  "EXER/ex7.tex" 1732356387 4730 da263a2b7b630c6aaaed27c379cc5114 ""
   "FIG/exercise_0_images/first_and_second_ellipsoid_distribution.png" 1731511381 27130 fd70eef4df71e7054cdcfd3923185332 ""
   "FIG/exercise_0_images/first_ellipsoid_distribution.png" 1731511381 24323 a4b9aa0b8748a275aef3de22c555298b ""
   "FIG/exercise_0_images/relative_error_trend.png" 1731511382 79475 25b541b089dbbedd31eda32d5940d0df ""
@@ -221,10 +221,10 @@
   "FIG/exercise_7_images/gillespiexy_volume100.0.png" 1731570654 117799 4f142355d10a03efa2f5bb66a6a2c4fb ""
   "FIG/exercise_7_images/gillespiexy_volume1000.0.png" 1731570773 73940 4ccf18e7ebfd866ab53202a75a84db6f ""
   "FIG/exercise_7_images/gillespiexy_volume10000.0.png" 1731570857 63705 d922d65b46458386c5ccf6a486a5af73 ""
-  "main.aux" 1732353475 12426 41c3f03e8000799f78c0c8bb2c8658f1 "pdflatex"
-  "main.bbl" 1732352847 1220 8e5072b84474cf3c8af94a252e58ad29 "bibtex main"
-  "main.out" 1732353475 624 a87c0f8cacda13f5c8773cfd4fa7cb24 "pdflatex"
-  "main.tex" 1732179808 1624 82e8fbb6480b9d6cb656579114d96c88 ""
+  "main.aux" 1732356627 12633 d6aa674657c0158c4f9ae71e81dca736 "pdflatex"
+  "main.bbl" 1732356355 1220 8e5072b84474cf3c8af94a252e58ad29 "bibtex main"
+  "main.out" 1732356627 624 a87c0f8cacda13f5c8773cfd4fa7cb24 "pdflatex"
+  "main.tex" 1732356624 1630 5fa390b10733b68cfb9f872f513f988b ""
   (generated)
   "main.aux"
   "main.log"
