@@ -82,18 +82,17 @@ $$ \int_{\mathbb{R}} f(x) \mathcal{N}(0,1) = \frac{1}{\sqrt{2 \pi }} \sqrt{\pi} 
 Instead of going through the analytical route, one can think to evaluate it by using a crude Monte Carlo method, by sampling respect the normal distribution, 
 i.e. by evaluating $\langle f(x) \rangle_{\mathcal{N}(0,1)}$. \\
 We obtain:
-
-$$ \langle f(x) \rangle_{\mathcal{N}(0,1)} = 0.0743 \pm 0.0048 $$
-
-As also shown in the picture \ref{crude_mc_integral2}.
-
 \begin{wrapfigure}{r}{0.5\textwidth}
-  \vspace{-25pt}
   \centering
   \includegraphics[width=0.33\textwidth]{FIG/exercise_3_images/distribution_crude_mc_ex2.png}
 \caption{Monte Carlo distribution for the evaluation of $\langle f(x) \rangle_{\mathcal{N}(0,1)}$}
 \label{crude_mc_integral2}
 \end{wrapfigure}
+$$ \langle f(x) \rangle_{\mathcal{N}(0,1)} = 0.0743 \pm 0.0048 $$
+
+As also shown in the picture \ref{crude_mc_integral2}.
+
+
 
 If, as proposed by the exercise, we now try to evaluate the same integral by the importance sampling 
 method using as sampling function the uniform distribution $U(-8, -1)$ for 1000 iterations, we will see nothing. \\

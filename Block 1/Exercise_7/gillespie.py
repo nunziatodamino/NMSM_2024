@@ -8,6 +8,9 @@ B = 5
 
 @numba.njit
 def transition_rate_vector(configuration):
+    '''
+    Specific transition rates for the cyrcadian cycle
+    '''
     transition_rate_1 = A * VOLUME
     def transition_rate_2(x):
         return x    
@@ -20,14 +23,23 @@ def transition_rate_vector(configuration):
 
 @numba.njit
 def escape_rate(configuration):
+    '''
+    Evaluation of the escape rate
+    '''
     return np.sum(transition_rate_vector(configuration))
 
 @numba.njit
 def residence_time_cdf_inverse(configuration, cdf):
+    '''
+    CDF of the residence time PDF
+    '''
     return 1 / escape_rate(configuration) * np.log(1 / cdf)
 
 @numba.njit
 def jump_function(old_configuration):
+    '''
+    Makes the transition between one state to another according to probability w_j/escape_rate
+    '''
     rate_vector = transition_rate_vector(old_configuration)
     cumulative_sum = np.cumsum(rate_vector)
     rand = np.random.uniform(0, escape_rate(old_configuration))
@@ -47,6 +59,9 @@ def jump_function(old_configuration):
     return new_configuration
 
 def algorithm(initial_configuration, time_max):
+    '''
+    Implementation of the Gillespie algorithm
+    '''
     time_total = 0
     time_series = []
     configurations = [] 
