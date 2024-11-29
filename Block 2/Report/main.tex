@@ -1,0 +1,83 @@
+%\documentclass{article}
+%\usepackage{graphicx} % Required for inserting images
+
+%\documentclass[11pt,twoside]{book}
+
+\documentclass[11pt, twoside]{book}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+    
+\usepackage[svgnames,hyperref]{xcolor} 
+\usepackage{epsfig,graphicx}
+%\usepackage[mono=false]{libertine} % new linux font, ignore mono
+
+%\bibliographystyle{ieeetr}
+
+%\usepackage{luatex85}
+
+%\renewcommand{\baselinestretch}{1.05}
+\usepackage{amsmath,amsthm,amssymb,mathrsfs,amsfonts,dsfont}
+\usepackage{tabularx}
+
+\usepackage{multicol} % two-col ToC
+\usepackage{bm}
+\usepackage{imakeidx} % before hyperref
+\usepackage{hyperref}
+% link colors settings
+\hypersetup{
+    colorlinks=true,
+    citecolor=magenta,
+    linkcolor=blue,
+    filecolor=green,
+    urlcolor=cyan,
+    % hypertexnames=false,
+}
+%\usepackage[capitalise]{cleveref}
+%\usepackage{subcaption}
+%\usepackage{enumitem}
+\usepackage{mathtools}
+\usepackage{subfiles}
+\usepackage{physics}
+
+% adjust margin
+\usepackage[margin=2.3cm]{geometry}
+\headheight13.6pt
+
+% figures inside text
+\usepackage{wrapfig}
+
+
+\newcommand{\CC}{\mathcal{C}}
+
+
+\title{Exercises NMSM 2024-2025}
+\author{Name Surname - 0123456}
+\date{October 2024}
+
+\begin{document}
+
+
+\setcounter{chapter}{1}
+\title{\bf \huge Exercises NMSM 2024-2025}
+\author{\bf \large Name Surname \\ matr. 0123456}
+\date{\today}
+
+
+\maketitle
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\frontmatter
+
+
+%\mainmatter
+\input{EXER/ex1}
+\input{EXER/ex2}
+
+
+%\setcounter{chapter}{5}
+
+
+
+
+
+\end{document}
