@@ -35,7 +35,7 @@ def partition_function_recursion(beta_list : np.ndarray, energy_list : np.ndarra
     """
     beta_len = len(beta_list)
     partition_function = np.ones(beta_len)
-    new_partition_function = np.ones(beta_len)
+    new_partition_function = np.zeros(beta_len)
     total_iterations = energy_list.shape[1]
     acceptance = 1
     threshold = 1e-3
@@ -56,27 +56,32 @@ def partition_function_recursion(beta_list : np.ndarray, energy_list : np.ndarra
     return new_partition_function
 
 @numba.njit
-def partition_function_evaluation(beta_list : np.ndarray, beta_range : np.ndarray,  energy_list : np.ndarray, partition_function_selected_beta : np.ndarray) -> np.ndarray:
+def partition_function_evaluation(beta_list : np.ndarray, step : np.float32,  energy_list : np.ndarray, partition_function_selected_beta : np.ndarray) -> np.ndarray:
     """
-    Naive evaluation of the partition function in the MHM method for a beta mesh. 
+    Naive evaluation of the partition function in the MHM method for a beta mesh.
+    Exponential correction for stability 
     """
-    new_partition_function = np.ones(len(beta_range))
-    total_iterations = energy_list.shape[1]
+    beta_range = np.arange(beta_list[0], beta_list[-1] + step, step)
+    new_partition_function = np.zeros(len(beta_range))
+    total_iterations_log = np.log(energy_list.shape[1])
     for k, beta in enumerate(beta_range):
         for energies in energy_list.flatten():
             tmp1 = 0
+            tmp2 = np.zeros(len(beta_list))
             for j, beta_j in enumerate(beta_list):
-                exp_weight = np.exp((beta - beta_j) * energies )
-                tmp1 += exp_weight / partition_function_selected_beta[j]  
-            new_partition_function[k] += 1 / (total_iterations  * tmp1 )            
+                tmp2[j] = (beta - beta_j) * energies - np.log(partition_function_selected_beta[j]) + total_iterations_log
+            tmp3 = max(tmp2)
+            tmp1 = np.exp(tmp3) * np.sum(np.exp(tmp2 - tmp3))  
+            new_partition_function[k] += 1 / tmp1             
     return new_partition_function
 
 @numba.njit
-def energy_evaluation(beta_list : np.ndarray, beta_range : np.ndarray, energy_list : np.ndarray, partition_function_selected_beta : np.ndarray, general_partition_function : np.ndarray) -> np.ndarray:
+def energy_evaluation(beta_list : np.ndarray, step : np.float32, energy_list : np.ndarray, partition_function_selected_beta : np.ndarray, general_partition_function : np.ndarray) -> np.ndarray:
     """
     Naive evaluation of the mean energy in the MHM method for a beta mesh.
     """
-    observables = np.ones(len(beta_range))
+    beta_range = np.arange(beta_list[0], beta_list[-1] + step, step)
+    observables = np.zeros(len(beta_range))
     total_iterations = energy_list.shape[1]
     for k , beta in enumerate(beta_range):
         for energies in energy_list.flatten():
@@ -85,16 +90,17 @@ def energy_evaluation(beta_list : np.ndarray, beta_range : np.ndarray, energy_li
                 exp_weight = np.exp((beta - beta_j) * energies )
                 tmp1 += exp_weight / partition_function_selected_beta[j]  
             observables[k] += energies / (total_iterations  * tmp1) 
-    return observables / general_partition_function
+        observables[k] = observables[k] / general_partition_function[k]    
+    return observables
 
-STEP = 0.5
-beta_range = np.arange(beta_list[0], beta_list[-1] + STEP, STEP)
+STEP = 0.05
 
 part = partition_function_recursion(beta_list, energy_results)
 print(part)
-gen_part = partition_function_evaluation(beta_list, beta_range, energy_results, part)
+gen_part = partition_function_evaluation(beta_list, STEP, energy_results, part)
 print(gen_part)
-mean_energy = energy_evaluation(beta_list, beta_range, energy_results, part, gen_part)
+mean_energy = energy_evaluation(beta_list, STEP, energy_results, part, gen_part)
 
+beta_range = np.arange(beta_list[0], beta_list[-1] + STEP, STEP)
 plt.plot(beta_range, mean_energy)
 plt.show()
