@@ -1,5 +1,7 @@
+import os
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 import numba
 
 # PARAMETERS
@@ -18,24 +20,22 @@ def lennard_jones_potential(epsilon: float, sigma: float, distance_squared: floa
     """
     Computes the Lennard-Jones potential for a given squared distance.
     """
-    inv_r2 = sigma ** 2 / distance_squared
-    inv_r6 = inv_r2 ** 3
-    inv_r12 = inv_r6 ** 2
-    return 4 * epsilon * (inv_r12 - inv_r6)
+    inv_r2 = (sigma ** 2) / distance_squared
+    prefactor = 4 * epsilon 
+    return prefactor * (inv_r2 ** 6 - inv_r2 ** 3)
 
 @numba.njit
 def energy_tail_correction(number_density : float, sigma : float, sigma_cut : float) -> float:
     r = sigma / sigma_cut
     r_3 = r ** 3
     r_9 = r_3 ** 3
-    return (8 / 3) * np.pi * number_density * ( (1 / 3) * r_9 - r_3 )
+    return (8 / 3) * np.pi * number_density * ( ((1 / 3) * r_9) - r_3 )
 
 @numba.njit
 def pressure_tail_correction(number_density : float, sigma : float, sigma_cut : float) -> float:
     r = sigma / sigma_cut
-    r_3 = r ** 3
-    r_9 = r_3 ** 3    
-    return (16 / 3) * np.pi * number_density**2 * ( (2 / 3) * r_9 - r_3 )    
+    prefactor = (16 / 3) * np.pi * (number_density ** 2)     
+    return  prefactor * ( ((2 / 3) * (r ** 9)) - (r ** 3) )    
 
 @numba.njit
 def position_PBC(position : float, box_length : float) -> float:
@@ -46,89 +46,56 @@ def distance_PBC(distance : float, box_length : float) -> float:
     return distance - np.round(distance / box_length) * box_length
 
 @numba.njit
-def energy_particle(number_density : float, n_particles : int, box_size : float, beta : float, \
-           epsilon : float, sigma : float, sigma_cut : float, position : np.ndarray, i_random : int) -> float:
+def energy_particle(n_particles : int, box_size : float, epsilon : float, \
+                    sigma : float, sigma_cut : float, position : np.ndarray, i_random : int) -> float:
     '''
-    Evaluates the energy of a single particle in a LJ (Lennard - Jones) system
+    Evaluates the potential energy of a single particle in a LJ (Lennard - Jones) system
     '''
-    #def kinetic_energy_particle(beta : float) -> float:
-    #    return (3 / 2) / beta
-
-    def potential_energy_particle(position : np.ndarray, i_random : int, box_size : float, n_particles : int, \
-                         number_density : float, sigma : float, sigma_cut : float, epsilon : float) -> float :
-        total_potential_energy = 0.0
-        sigma_cut_squared = sigma_cut ** 2
-        for j in range(n_particles):
-            if j != i_random:
-                delta = position[i_random] - position[j]
-                delta -= box_size * np.round(delta / box_size)
-                distance_squared = np.sum(delta ** 2, dtype = np.float64)
-                if distance_squared < sigma_cut_squared:
-                    total_potential_energy += lennard_jones_potential(epsilon, sigma, distance_squared)
-        total_potential_energy += energy_tail_correction(number_density, sigma, sigma_cut)
-        return total_potential_energy
-
-    #kin_energy = kinetic_energy_particle(beta)
-    pot_energy = potential_energy_particle(position, i_random, box_size, n_particles, number_density, sigma, sigma_cut, epsilon)
-    return pot_energy
+    total_potential_energy = 0.0
+    sigma_cut_squared = sigma_cut ** 2
+    for j in range(n_particles):
+        if j != i_random:
+            delta_x = position[i_random][0] - position[j][0]
+            delta_x -= box_size * np.round(delta_x / box_size)
+            delta_y = position[i_random][1] - position[j][1]
+            delta_y -= box_size * np.round(delta_y / box_size)    
+            delta_z = position[i_random][2] - position[j][2]
+            delta_z -= box_size * np.round(delta_z / box_size)
+            distance_squared = delta_x**2 +delta_y**2 +delta_z**2
+            if distance_squared < sigma_cut_squared:
+                total_potential_energy += lennard_jones_potential(epsilon, sigma, distance_squared)
+    #total_potential_energy += energy_tail_correction(number_density, sigma, sigma_cut)
+    return total_potential_energy
 
 @numba.njit
-def energy(number_density : float, n_particles : int, box_size : float, beta : float, \
-           epsilon : float, sigma : float, sigma_cut : float, position : np.ndarray) -> float:
-    '''
-    Evaluates the energy of a LJ (Lennard - Jones) system
-    '''
-    def kinetic_energy(beta : float , n_particles : int) -> float:
-        return (3 / 2) * n_particles / beta
-
-    def potential_energy(position : np.ndarray, box_size : float, n_particles : int, \
-                         number_density : float, sigma : float, sigma_cut : float, epsilon : float) -> float :
-        total_potential_energy = 0.0
-        sigma_cut_squared = sigma_cut ** 2
-        for i in range(n_particles):
-            for j in range(i+1, n_particles):
-                delta = position[i] - position[j]
-                delta -= box_size * np.round(delta / box_size)
-                distance_squared = np.sum(delta ** 2, dtype = np.float64)
-                if distance_squared < sigma_cut_squared:
-                    total_potential_energy += lennard_jones_potential(epsilon, sigma, distance_squared)
-        total_potential_energy += n_particles * energy_tail_correction(number_density, sigma, sigma_cut)
-        return total_potential_energy
-
-    kin_energy = kinetic_energy(beta, n_particles)
-    pot_energy = potential_energy(position, box_size, n_particles, number_density, sigma, sigma_cut, epsilon)
-    return kin_energy + pot_energy
-
-@numba.njit
-def metropolis (old_configuration : np.ndarray, new_configuration : np.ndarray, i_random : int, \
-                beta : float, n_particles : int, number_density : float, box_size : float, sigma_cut : float) -> bool:
+def metropolis (delta_energy : float, beta : float) -> bool:
     '''
     Metropolis filter
     '''
-    delta_energy = energy_particle(number_density, n_particles, box_size, beta, EPSILON, SIGMA, sigma_cut, new_configuration, i_random) - \
-                   energy_particle(number_density, n_particles, box_size, beta, EPSILON, SIGMA, sigma_cut, old_configuration, i_random)
-    if delta_energy <= 0: return True
+    if delta_energy < 0: return True
     elif np.random.random() > np.exp(- beta * delta_energy ) : return False
     return True 
 
 @numba.njit
-def local_move(n_particles : int, number_density : float , box_size : float, \
+def local_move(n_particles : int, number_density : float , box_size : float, epsilon : float , sigma : float ,\
                 sigma_cut : float, beta: float , position : np.ndarray) -> tuple[bool, np.ndarray] :
     """
     Performs one local move : one particle is chosen at random and a uniform displacement between -d_max and d_max is performed.
     """
-    max_displacement = box_size / 100
+    max_displacement = box_size / 50
     old_position = position.copy()
-    new_position = position.copy()
     i_random = np.random.randint(0, n_particles)
-    new_position[i_random][0] += np.random.uniform(-max_displacement, max_displacement)
-    new_position[i_random][1] += np.random.uniform(-max_displacement, max_displacement)
-    new_position[i_random][2] += np.random.uniform(-max_displacement, max_displacement)
-    if metropolis(old_position, new_position, i_random, beta, n_particles, number_density, box_size, sigma_cut) :
-        new_position[i_random][0] = position_PBC(new_position[i_random][0], box_size)
-        new_position[i_random][1] = position_PBC(new_position[i_random][1], box_size)
-        new_position[i_random][2] = position_PBC(new_position[i_random][2], box_size)
-        return True, new_position
+    en_old = energy_particle(n_particles, box_size, epsilon, sigma, sigma_cut, old_position, i_random)
+    position[i_random][0] += np.random.uniform(-max_displacement, max_displacement)
+    position[i_random][1] += np.random.uniform(-max_displacement, max_displacement)
+    position[i_random][2] += np.random.uniform(-max_displacement, max_displacement)
+    en_new = energy_particle(n_particles, box_size, epsilon, sigma, sigma_cut, position, i_random)
+    delta_energy = en_new - en_old
+    if metropolis(delta_energy, beta) : 
+        position[i_random][0] -= box_size * np.floor(position[i_random][0] / box_size)
+        position[i_random][1] -= box_size * np.floor(position[i_random][1] / box_size)
+        position[i_random][2] -= box_size * np.floor(position[i_random][2] / box_size)
+        return True, position
     return False, old_position
 
 @numba.njit
@@ -146,33 +113,39 @@ def displacement_function(n_particles : int, number_density : float , box_size :
     return counter, new_position
 
 @numba.njit
-def pressure(number_density : float, box_size : float, temperature : float, \
-             epsilon : float, sigma : float, sigma_cut : float, position : np.ndarray) -> float:
-    
-    def virial(epsilon : float, sigma : float, distance_squared : float) -> float:
-        eps_48 = 48 * epsilon 
-        a = (sigma ** 2) / distance_squared
-        a_6 = a ** 3
-        a_12 = a_6 ** 2
-        return eps_48 * (a_12 - 0.5 * a_6)
+def virial(box_size: float, epsilon: float, sigma: float, sigma_cut: float, position: np.ndarray) -> float:
+    eps_48 = 48 * epsilon
+    sigma_squared = sigma ** 2
+    sigma_cut_squared = sigma_cut ** 2
+    total_virial = 0.0
+    N = len(position)
 
-    total_virial = 0
-    sigma_cut_squared = sigma_cut**2
-    N = len(position[0])
     for i in range(N):
         for j in range(i + 1, N):
-            delta = position[i] - position[j]
-            delta -= box_size * np.round(delta / box_size)
-            distance_squared = np.sum(delta ** 2, dtype = np.float64)
+            delta_x = position[i][0] - position[j][0]
+            delta_x -= box_size * np.rint(delta_x / box_size)
+            delta_y = position[i][1] - position[j][1]
+            delta_y -= box_size * np.rint(delta_y / box_size)
+            delta_z = position[i][2] - position[j][2]
+            delta_z -= box_size * np.rint(delta_z / box_size)
+            distance_squared = delta_x**2 + delta_y**2 + delta_z**2
             if distance_squared < sigma_cut_squared:
-                total_virial += virial(epsilon, sigma, distance_squared)
+                inv_r2 = sigma_squared / distance_squared
+                inv_r6 = inv_r2 ** 3
+                inv_r12 = inv_r6 ** 2
+                total_virial += inv_r12 - 0.5 * inv_r6
+    return eps_48 * total_virial           
+
+@numba.njit
+def pressure(number_density : float, box_size : float, temperature : float, \
+            sigma : float, sigma_cut : float, virial_mean : float) -> float:
     ideal_gas_term = number_density * temperature 
-    virial_term = total_virial / (3 * (box_size ** 3))
-    correction_term = N * pressure_tail_correction(number_density, sigma, sigma_cut)
+    virial_term = virial_mean / (3 * (box_size ** 3))
+    correction_term = pressure_tail_correction(number_density, sigma, sigma_cut)
     print(ideal_gas_term)
     print(virial_term)
     print(correction_term)
-    total_pressure =  ideal_gas_term + virial_term + correction_term
+    total_pressure = ideal_gas_term + virial_term + correction_term
     return total_pressure
     
 def plot_particles(position, box_size):
@@ -197,3 +170,83 @@ def plot_particles(position, box_size):
     plt.legend()
     plt.show()
 
+@numba.njit
+def energy(number_density : float, n_particles : int, box_size : float, \
+           epsilon : float, sigma : float, sigma_cut : float, position : np.ndarray) -> float:
+    '''
+    Evaluates the energy of a LJ (Lennard - Jones) system
+    '''
+    total_potential_energy = 0.0
+    sigma_cut_squared = sigma_cut ** 2
+    for i in range(n_particles):
+        for j in range(i+1, n_particles):
+            delta = position[i] - position[j]
+            delta -= box_size * np.round(delta / box_size)
+            distance_squared = np.sum(delta ** 2, dtype = np.float64)
+            if distance_squared < sigma_cut_squared:
+                total_potential_energy += lennard_jones_potential(epsilon, sigma, distance_squared)
+    total_potential_energy += n_particles * energy_tail_correction(number_density, sigma, sigma_cut)
+    return total_potential_energy
+
+
+# Function to create a GIF for particle positions in the cubic box
+def create_gif_for_positions(position_list, box_size, output_dir="gifs", interval=50, frames=200):
+    """
+    Creates a GIF showing the evolution of particle positions in the cubic box.
+
+    Parameters:
+        position_list (np.ndarray): Array of particle positions, shape (iterations, particle_number, 3).
+        box_size (float): Size of the cubic box.
+        output_dir (str): Directory to save the GIFs.
+        interval (int): Delay between frames in milliseconds.
+        frames (int): Number of frames in the GIF.
+    """
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    fig = plt.figure(figsize=(6, 6))
+    ax = fig.add_subplot(111, projection='3d')
+    ax.set_xlim([0, box_size])
+    ax.set_ylim([0, box_size])
+    ax.set_zlim([0, box_size])
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+
+    points = ax.scatter([], [], [], s=5, c='blue')
+
+    def update(frame):
+        current_positions = position_list[frame % len(position_list)]
+        points._offsets3d = (current_positions[:, 0], current_positions[:, 1], current_positions[:, 2])
+        ax.set_title(f"Frame {frame}")
+        return points,
+
+    anim = FuncAnimation(fig, update, frames=min(frames, len(position_list)), interval=interval, blit=False)
+    output_file = os.path.join(output_dir, f"simulation_positions_box_size_{box_size:.2f}.gif")
+    anim.save(output_file, writer="imagemagick")
+    print(f"Saved GIF: {output_file}")
+    plt.close()    
+
+@numba.njit
+def displacement_function_naive(n_particles : int, number_density : float , box_size : float , \
+                          sigma_cut : float , beta: float , position : np.ndarray) -> tuple[int,np.ndarray] :
+    """
+    Performs one Monte Carlo step : one particle is chosen at random and a uniform displacement between -d_max and d_max is performed.
+    This is repeated N times when N is the particle number.
+    """
+    max_displacement = box_size / 100
+    old_position = position.copy()
+    new_position = position.copy()
+    counter = 0
+    for i in range(n_particles):
+        new_position[i][0] += np.random.uniform(-max_displacement, max_displacement)
+        new_position[i][1] += np.random.uniform(-max_displacement, max_displacement)
+        new_position[i][2] += np.random.uniform(-max_displacement, max_displacement)
+        new_position[i][0] -= box_size * np.floor(new_position[i][0] / box_size)
+        new_position[i][1] -= box_size * np.floor(new_position[i][1] / box_size)
+        new_position[i][2] -= box_size * np.floor(new_position[i][2] / box_size)
+        
+        if metropolis(old_position, new_position, i, beta, n_particles, number_density, box_size, sigma_cut) :
+            counter +=1
+            old_position = new_position.copy()
+    return counter, new_position
