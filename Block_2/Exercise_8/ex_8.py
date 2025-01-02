@@ -45,7 +45,7 @@ for n, box_size in enumerate(box_size_list):
     print(f"acceptance rate {(counter / (ITERATIONS * particle_number ) )* 100 } %")
     virial_mean = np.mean(virial_list[eq_step:])  
     pressure[n] = md.pressure(number_density_list[n], box_size, TEMPERATURE, SIGMA, sigma_cut, virial_mean)
-    #md.create_gif_for_positions(np.array(position_data), box_size, frames=1000)    
+    md.create_gif_for_positions(np.array(position_data), box_size, frames=1000)    
 
 #md.plot_particles(position_list, box_size_list[-1])
 data = np.loadtxt(file_path, delimiter=' ')
