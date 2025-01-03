@@ -1,29 +1,32 @@
+# 1) System initialization
+
 units       lj
 boundary    p p p
 atom_style  atomic
 
 variable box_size           equal 10
-variable volume equal ${box_size}*${box_size}*${box_size}
+variable volume             equal ${box_size}*${box_size}*${box_size}
 variable numberDensity      equal 0.2
-variable nParticles equal ${numberDensity}*${volume}
+variable nParticles         equal ${numberDensity}*${volume}
+
+# 1) NVE ensemble simulation
+
 variable initialCutOff      equal 2^(1.0/6.0)
 variable finalCutOff        equal 4.0
 variable step               equal 0.2
-
-
 variable cutOffInterval     equal ${finalCutOff}-${initialCutOff}
-variable nsteps             equal ceil(${cutOffInterval}/${step})
+variable nsteps             equal ceil(${cutOffInterval}/${step})+1
 
 label loop_start
-variable index loop 1 ${nsteps}
-variable r_cut equal ${initialCutOff}+(${index}-1)*${step} 
+variable index loop         1 ${nsteps}
+variable r_cut              equal floor((${initialCutOff}+(${index}-1)*${step})*100)/100 #manual rounding to second decimal place 
 
 print "Simulation for r_cut = ${r_cut}"
 
-variable region_name string simulation_box_${r_cut}
-region ${region_name}   block 0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+variable region_name string     simulation_box_${r_cut}
+region ${region_name} block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
 create_box 1 ${region_name}
-create_atoms 1 random ${nParticles} 234567 NULL overlap 1.3
+create_atoms                    1 random ${nParticles} 234567 NULL overlap 1.3
 
 mass        1 1.0
 velocity    all create 1.0 87242 mom yes dist gaussian
@@ -35,11 +38,26 @@ neighbor     0.3 bin
 neigh_modify delay 0 every 10 check yes
 
 thermo_style custom step pe ke etotal temp press density
-thermo 10000
+thermo       10000
 
-fix     1 all nve
-timestep 0.0005
-run 100000
+print "Equilibration" 
+
+fix         equilibration all nve
+timestep    0.001
+run         50000
+unfix       equilibration
+
+compute rdf_all all rdf 100  # 100 bins for g(r)
+variable rdf_file string rdf_${r_cut}.dat
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file ${rdf_file} mode vector
+
+print "Production" 
+
+fix         production all nve
+timestep    0.001
+run         150000
+unfix       production
+unfix       rdf_out
 clear
-next index
-jump SELF loop_start
+next        index
+jump        SELF loop_start
