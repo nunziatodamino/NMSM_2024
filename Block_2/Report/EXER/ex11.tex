@@ -1,0 +1,23 @@
+\chapter*{Exercise 11 : Langevin and Brownian dynamics}
+\subsection*{Pen \& Paper - Brownian time and length scales}
+We begin by considering the Langevin equation in the form:
+
+$$ m\ddot{\bar{x}} + m\gamma\dot{\bar{x}} + \sqrt{6 m \gamma k_BT} \bar{\xi}(t) = 0 $$
+
+In the particular case in which the particle is considered spherical, with a diameter $\sigma = 10^{-8}\ m$, has roughly the same density of water and diffuse in water, we have
+in the limit of low Reynolds number that $m\gamma = 3 \pi \eta \sigma$, where $\eta$ is the water viscosity.\\
+With the parameters considered we have:
+
+$$ m = \frac{4}{3}\pi \rho\frac{\sigma^3}{8} \sim 10^{-22}\ kg \qquad m\gamma = 3 \pi \eta \sigma \sim 10^{-10}\ kg \cdot s^{-1} $$
+
+So in this case we can neglect the inertial force and write:
+
+$$ m\gamma\dot{\bar{x}} + \sqrt{6 m \gamma k_BT} \bar{\xi}(t) = 0 $$
+
+Implying that we are in the diffusion regime. We can then simply estimate the time to diffuse in water over a distance equal to the particle diameter by :
+
+$$ \sigma ^ 2 = 6Dt = 6 \frac{k_BT}{3\pi\eta\sigma} t \qquad \iff \qquad t \sim 4 \cdot 10^{-7}\ s $$
+
+If we instead start our calculations considering $\tilde{\sigma} = 5 \ \mu m$, we have
+
+$$ \tilde{\sigma} ^ 2 = 6Dt = \qquad \iff \qquad t \sim 4 \cdot 10^{-1}\ s $$

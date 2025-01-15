@@ -142,9 +142,6 @@ def pressure(number_density : float, box_size : float, temperature : float, \
     ideal_gas_term = number_density * temperature 
     virial_term = virial_mean / (3 * (box_size ** 3))
     correction_term = pressure_tail_correction(number_density, sigma, sigma_cut)
-    print(ideal_gas_term)
-    print(virial_term)
-    print(correction_term)
     total_pressure = ideal_gas_term + virial_term + correction_term
     return total_pressure
     

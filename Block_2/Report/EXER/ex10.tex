@@ -1,0 +1,32 @@
+\chapter*{Exercise 10 : Interaction potentials \& thermostats}
+
+\subsection*{Pen \& Paper - Canonical fluctuactions}
+
+We want to prove that, in a canonical ensemble (NVT) : 
+
+$$ \frac{\sigma^2_{T_K}}{\braket{T_K}^2} = \frac{\braket{T^2_K}-\braket{T_K}^2}{\braket{T_K}^2}$$
+
+\paragraph{Proof} - From the equipartition theorem, in the NVT ensemble:
+
+$$ \braket{T_K} = \frac{2}{3Nk_B} \braket{E_K} \qquad \braket{T^2_K} = \left(\frac{2}{3Nk_B}\right)^2 \braket{E^2_K} $$
+
+So that the temperature variance can be written as :
+
+$$ \sigma^2_{T_K} = \braket{T^2_K}-\braket{T_K}^2 = \left(\frac{2}{3Nk_B}\right)^2 (\braket{E^2_K} - \braket{E_K}^2) $$
+
+Moreover we have that the energy variance can be written in the NVT ensemble as:
+
+$$ \sigma^2_{E_K} = \braket{E^2_K} - \braket{E_K}^2 = k_B T^2 C_V $$
+
+Also the heat capacity :
+
+$$ C_V = \frac{3}{2}k_B T $$
+
+Putting all together:
+
+$$ \sigma^2_{T_K} = \left(\frac{2}{3Nk_B}\right)^2 k_B T^2 \left(\frac{3}{2}k_B T \right) = \frac{2}{3N}T^2 $$
+
+Then one can evaluate the initial statement, in a NVT ensemble :
+
+$$ \frac{\sigma^2_{T_K}}{\braket{T_K}^2} = \frac{\frac{2}{3N}T^2}{T^2} = \frac{2}{3N}$$
+

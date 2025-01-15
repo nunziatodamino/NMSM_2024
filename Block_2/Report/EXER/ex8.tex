@@ -1,0 +1,44 @@
+\chapter*{Exercise 8: Off-lattice Monte Carlo simulations}
+
+\subsection*{Pen \& Paper - Reduced units}
+In order to convert from reduced units to SI units, specifically temperature and time, we simply do the conversion:
+
+$$ T^* = \frac{k_B T}{\varepsilon} \iff T = \frac{\varepsilon T^*}{k_B} \qquad t^* = \frac{t}{\tau} \iff t = \tau t^* \quad, \tau = \sqrt{\frac{\bar{m}\sigma^2}{\varepsilon}} = \sigma\sqrt{\frac{\bar{m}}{k_B} \frac{k_B}{\varepsilon}} $$
+
+Where $\sigma$, $\bar{m}$, $\varepsilon$ are respectively the reference unit for length, mass and energy for the system considered. \\
+
+If we consider a reduced temperature $ T^* = 2 $, then for Argon and Krypton : 
+
+$$ T_{\text{Ar}} = 239.6\ \text{K} \qquad  T_{\text{Kr}} = 328.0\ \text{K} $$
+
+Moreover, if we consider a timestep of $\Delta t = 0.001\tau$, we have respectively for Argon and Krypton:
+
+$$ \Delta t_{\text{Ar}} = 2.160\ \text{fs} \qquad  \Delta t_{\text{Kr}} = 2.650\ \text{fs} $$
+
+\subsection*{Numerical exercise}
+
+In this exercise we study a Lennard-Jones fluid using a Monte Carlo approach. \\
+The Monte Carlo simulation we want to implement is simple: we want to perform a Monte Carlo sweep consisting of $N$ local moves, where $N = 500$ is the number of particles in the system, where each local move consist in a uniform displacement of a particle chosen at random. \\
+Once a MC sweep is done, the new configuration is accepted or rejected using a Metropolis filter.
+A total of $ T = 10000 $ sweeps are performed and then the pressure is measured, discarding an appropriate amount of sweeps for equilibration. \\
+The displacement in the local move is chosen such that the acceptance rate of said filter is $\sim 50 \%$. \\
+
+We begin by making some general considerations. Having set for our simulation the reference unit for length and energy repsctively $\sigma = 1$ and $\varepsilon = 1$, the reduced units coincides with the SI units. \\
+One here has 2 choices in the code implementation: write a general code where each conversion between reduced and SI units is made, or to write a specific implementation for our system. \\
+Both approaches have their merits : the first makes the code more mantainable and expandible, but slower, the second makes it more efficient, but problem-specific. \\
+We choose for our implementation the second approach. \\
+
+Of particular interest are some optimization made during the simulation :
+\begin{itemize}
+    \item Given that we want to evaluate quantities in function of the number density $\rho$, we can either change the number of particle $N$ or the simulation box volume $V$. \\ 
+    While mathematically equivalent, given that most of the algorithms are dependent on $N$, is convenient to change $V$.
+    \item In the implementation of the PBC one has to pay particular attention in not using the standard \fbox{\texttt{round}} implementation in Python, which implement the so called banker's round.\\
+    One has instead to use the numpy function \fbox{\texttt{np.round}} (or even better \fbox{\texttt{np.rint}}) which implement the nearest integer round, the correct one and typical of C/Fortran.
+    \item In the Metropolis filter if we pursue a naive approach, i.e. we evaluate the energy difference of the system between the final and the initial configuration as is, we found ourselves an algorithm of time 
+    complexity $\mathcal{O}(N^2)$, where $N$ is the number of particle in the system. \\
+    If we observe instead that in one local move the only quantity that changes is the potential contribution of the displaced particle, we can cut the time complexity to $\mathcal{O}(N)$. \\
+    This also imply that the energy tail contribution in the context of the Metropolis filter is irrelevant.
+\end{itemize}
+
+
+
