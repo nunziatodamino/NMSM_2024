@@ -146,11 +146,8 @@ def force_evaluation(
 
     for c in range(cell_number):
         for neighbor in neighbor_list[c]:
-            #if neighbor == -1: continue
             i = head_list[c]
             while i != -1:
-                force_x_total = 0
-                force_y_total = 0
                 j = head_list[neighbor]
                 while j != -1:
                     if i < j:  
@@ -158,13 +155,13 @@ def force_evaluation(
                         dy = position_list[i][1] - position_list[j][1]
                         distance_sq = dx**2 + dy**2
                         ref_distance = radii_list[i] + radii_list[j]
-                        force_x_total += (force_constant / ref_distance**2) * dx * repulsive_potential(force_constant, distance_sq, ref_distance)
-                        force_y_total += (force_constant / ref_distance**2) * dy * repulsive_potential(force_constant, distance_sq, ref_distance)  
+                        force_x_list[i] +=  (dx / ref_distance**2) * repulsive_potential(force_constant, distance_sq, ref_distance)
+                        force_y_list[i] +=  (dy / ref_distance**2) * repulsive_potential(force_constant, distance_sq, ref_distance)  
                     j = cell_list[j]
                 i = cell_list[i]
-                force_x_list[i] = force_x_total
-                force_y_list[i] = force_y_total    
+                
     return force_x_list, force_y_list
+
 
 #@numba.njit
 def first_order_integrator_component(
@@ -207,6 +204,8 @@ def position_check(
     num_cells_per_dim = int(square_size / cell_length)
     cell_number = num_cells_per_dim ** 2
 
+    index_list = []
+
     for c in range(cell_number):
         for neighbor in neighbor_list[c]:
             i = head_list[c]
@@ -219,10 +218,12 @@ def position_check(
                         distance = np.sqrt(dx**2 + dy**2)
                         ref_distance = radii_list[i] + radii_list[j]
                         if distance < ref_distance : 
-                            return i, True
+                            if i not in index_list : index_list.append(i) # Due to overlapping i<j check is not sufficient
                     j = cell_list[j]
                 i = cell_list[i]
-    return -1, False
+    if index_list == [] : return [], False
+    return index_list, True
+
 
 def plt_particles(position, radii_list, particle_number, square_size):
     plt.figure(figsize=(8, 8))
@@ -240,4 +241,16 @@ def plt_particles(position, radii_list, particle_number, square_size):
     plt.ylabel("Y Position")
     plt.grid(True)
     plt.show()
-        
+
+@numba.njit
+def check_overlap(positions, radii_list):
+    n = len(positions)
+    for i in range(n):
+        for j in range(i + 1, n):
+            dx = positions[i][0] - positions[j][0]
+            dy = positions[i][1] - positions[j][1]
+            dist = np.sqrt(dx**2 + dy**2)
+            radii_sum = radii_list[i] + radii_list[j]
+            if dist < radii_sum:
+                return i, True
+    return -1, False    

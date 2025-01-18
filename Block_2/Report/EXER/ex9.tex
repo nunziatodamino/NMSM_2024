@@ -1,0 +1,35 @@
+\chapter*{Exercise 9: Integration schemes}
+
+The idea is to implement the velocity Verlet algorithm and the Gear predictor-correct algorithm of the 5th order specifically for the harmonic oscillator. \\
+One can find said algorithms in the Algorithm appendix. \\
+Before starting the quantitative analysis over these integration schemes, we start with a qualitative inspection against the analytical solution in figure \ref{ex9:schemes_comparison}. \\
+Note that the integration timestep is $\Delta t = 0.001$ and $omega = 0.1$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{FIG/ex9/integration_schemes_comparison.png}
+    \caption{Comparison between the analytical solution for position and velocity in an harmonic oscillator with the velocit Verlet and the Gear 5th order predictor-corrector integration scheme.}
+    \label{ex9:schemes_comparison}
+\end{figure}
+
+Is clear that the Gear predictor-correct algorithm of the 5th order presents for long integration time an effect of amplitude reduction and delay, while the velocity Verlet algorithm do not presents these problems. \\
+Now we study the energy conservation of the 2 algorithms. Again we plot the total energy of the system over time for inspection in figure \ref{ex9:energy_comparison} and for each algorithm we plot $\frac{E_{algo}(t) - E_0}{E_0}$ respectively in figure \ref{fig:side_by_side} for the velocity Verlet algorithm and the Gear predictor-correct algorithm of the 5th order. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{FIG/ex9/energy_comparison.png}
+    \caption{Comparison between the total energy in an harmonic oscillator and the energy evaluated with the velocity Verlet and the Gear 5th order predictor-corrector integration scheme.}
+    \label{ex9:energy_comparison}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{FIG/ex9/verlet_energy_dev.png}
+    \hspace{0.05\textwidth} % Adjust horizontal spacing between figures
+    \includegraphics[width=0.45\textwidth]{FIG/ex9/gear_energy_dev.png}
+    \caption{(Left) Relative energy deviation from the analytical value for the velocity Verlet integration scheme. (Right) Relative energy deviation from the analytical value for the Gear 5th order predictor-corrector integration scheme.}
+    \label{fig:side_by_side}
+\end{figure}
+
+From this analysis we conclude, as we expected, that the velocity Verlet algorithm is symplectic while the Gear predictor-corrector is not. \\
+Lastly we focus on the velocity Verlet to evaluate its stability for different values of $\omega$. We choose for each iteration a timestep $\Delta t= 0.01\omega^{-1}$ and obtain the following

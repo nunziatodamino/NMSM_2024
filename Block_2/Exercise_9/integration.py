@@ -5,24 +5,14 @@ from typing import Tuple
 def velocity_verlet(
     initial_position: float,
     initial_momentum: float,
-    force_function: Callable[[float], float],
+    force_function: Callable[[float, float], float],
     mass: float,
+    omega : float,
     timestep: float,
     total_time: int
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Implements the Velocity Verlet algorithm.
-
-    Args:
-        initial_position: Initial position of the particle.
-        initial_momentum: Initial momentum of the particle.
-        force_function: Callable that computes force as a function of position.
-        mass: Mass of the particle.
-        timestep: Time step for integration.
-        total_time: Total simulation time.
-
-    Returns:
-        A tuple of position and momentum arrays over time.
     """
     time = np.arange(0, total_time, timestep)
     position = np.zeros(len(time))
@@ -30,13 +20,12 @@ def velocity_verlet(
     force = np.zeros(len(time))
     position[0] = initial_position
     momentum[0] = initial_momentum
-    force[0] = force_function(position[0])
+    force[0] = force_function(omega, position[0])
     for t in range(1, len(time)):
-        position[t] = position[t - 1] + ((momentum[t - 1] / mass) * timestep) + 0.5 * force[t - 1] / (2 * mass) * timestep * timestep
-        force[t] = force_function(position[t])
-        momentum[t] = momentum[t - 1] + 0.5 * (1 / (2 * mass)) * (force[t - 1] + force[t]) * timestep
+        position[t] = position[t - 1] + ((momentum[t - 1] / mass) * timestep) + force[t - 1] / (2 * mass) * timestep * timestep
+        force[t] = force_function(omega, position[t])
+        momentum[t] = momentum[t - 1] + (1 / (2 * mass)) * (force[t - 1] + force[t]) * timestep
     return position, momentum    
-
 
 def gear_5th_order_predictor_corrector(
     timestep : float,
@@ -45,10 +34,13 @@ def gear_5th_order_predictor_corrector(
     initial_jerk : float,
     initial_snap : float,
     mass : float,
-    force_function : Callable[[float], float],
+    omega : float,
+    force_function : Callable[[float, float], float],
     total_time : int
 ) -> Tuple[np.ndarray, np.ndarray]:
-
+    """
+    Implements the Gear predictor-corrector algorithm of the 5th order
+    """
     gear0 = 19.0 / 120.0
     gear1 = 3.0 / 4.0
    #gear2 = 1
@@ -60,11 +52,6 @@ def gear_5th_order_predictor_corrector(
     c3 = c2 * timestep / 3.0
     c4 = c3 * timestep / 4.0
 
-    cr = gear0 * c2
-    cv = gear1 * c2 / c1
-    cb = gear3 * c2 / c3
-    cc = gear4 * c2 / c4
-
     time = np.arange(0, total_time, timestep)
     position_array = np.zeros(len(time))
     velocity_array = np.zeros(len(time))
@@ -74,7 +61,7 @@ def gear_5th_order_predictor_corrector(
 
     position_array[0] = initial_position
     velocity_array[0] = initial_momentum / mass
-    acceleration_array[0] = force_function(initial_position)
+    acceleration_array[0] = force_function(omega, initial_position)
     jerk_array[0] = initial_jerk
     snap_array[0] = initial_snap
     
@@ -85,14 +72,14 @@ def gear_5th_order_predictor_corrector(
         acceleration_array[t] = acceleration_array[t-1] + c1 * jerk_array[t-1] + c2 * snap_array[t-1]
         jerk_array[t] = jerk_array[t-1] + c1 * snap_array[t-1]
 
-        force = force_function(position_array[t])
+        force = force_function(omega, position_array[t])
         new_acceleration = force / mass
         correction = new_acceleration - acceleration_array[t]
 
-        position_array[t] += cr * correction
-        velocity_array[t] += cv * correction
+        position_array[t] += gear0 * correction
+        velocity_array[t] += gear1 * correction
         acceleration_array[t] = new_acceleration
-        jerk_array[t] += cb * correction
-        snap_array[t] += cc * correction
+        jerk_array[t] += gear3 * correction
+        snap_array[t] += gear4 * correction
 
     return position_array, velocity_array

@@ -40,5 +40,21 @@ Of particular interest are some optimization made during the simulation :
     This also imply that the energy tail contribution in the context of the Metropolis filter is irrelevant.
 \end{itemize}
 
+We now show the result of the simulation for $T^* = 0.9$ and $T^* = 2$ in figures \ref{ex8:t_comparison_09} and \ref{ex8:t_comparison_2} respectively, in comparison with the supplied data.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{FIG/ex8/pressure_numdensity_comparison_T09.png}
+    \caption{Comparison between the supplied data for the pressure-number density plot at $T^* = 0.9$}
+    \label{ex8:t_comparison_09}
+\end{figure}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{FIG/ex8/pressure_numdensity_comparison_T2.png}
+    \caption{Comparison between the supplied data for the pressure-number density plot at $T^* = 2$}
+    \label{ex8:t_comparison_2}
+\end{figure}
+
+Is clear the good agreement for the simulation with the data for $T^*=2$, above the critical temperature for a Lennard-Jones fluid, which is $T^* = 1.316$ \cite{johnson1993}, while it seems not good for $T^*=0.9$. \\
+This can be easily explained if we observe that in figure \ref{ex8:t_comparison_09} the horizontal line is the saturated vapor pressure, and our simulation points indicate the densities of the coexisting vapor and liquid phases. Over a broad density range, the simulated system is observed to be metastable and even exhibit negative pressure. This phenomenon arises because, in finite systems, the formation of a liquid-vapor interface incurs a significant free-energy cost. For sufficiently small systems, this cost can be so substantial that phase separation becomes unfavorable \cite{salsburg1962}. Consequently, these issues are most pronounced in small systems and in scenarios where the interfacial free energy is particularly large. For this reason, standard NVT-simulations are not recommended for determining the vapor-liquid coexistence curve or for studying any strong first-order phase transitions in small systems.

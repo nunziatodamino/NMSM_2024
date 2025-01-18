@@ -47,7 +47,8 @@ timestep    0.001
 run         50000
 unfix       equilibration
 
-compute rdf_all all rdf 100  # 100 bins for g(r)
+comm_modify cutoff 5.5
+compute rdf_all all rdf 200 cutoff 5  
 variable rdf_file string rdf_${r_cut}.dat
 fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file ${rdf_file} mode vector
 
