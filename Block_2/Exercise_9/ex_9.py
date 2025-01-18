@@ -40,15 +40,15 @@ plt.plot(time, position_verlet, label='Position Verlet')
 plt.plot(time, momentum_verlet / mass, label='Velocity Verlet (Momentum/Mass)')
 plt.plot(time, an_position, label='Analytical position')
 plt.plot(time, an_velocity, label='Analytical velocity ')
-plt.plot(time, position_gear, label='Gear 5th Position PC')
-plt.plot(time, velocity_gear, label='Gear 5th Velocity PC')
+plt.plot(time, position_gear, label='Gear 5th position PC')
+plt.plot(time, velocity_gear, label='Gear 5th velocity PC')
 plt.xlabel('Time')
 plt.ylabel('Position / Velocity')
 plt.legend()
 image_name = f"integration_schemes_comparison"
 full_path = os.path.join(image_path, image_name)
-#plt.savefig(full_path)
-#plt.show()
+plt.savefig(full_path)
+plt.show()
 plt.close()
 
 # Energy conservation
@@ -63,16 +63,16 @@ gear_diff = (energy_gear - analytical_energy) / analytical_energy
 time = np.arange(0, total_time, timestep)
 
 plt.figure(figsize=(12, 8))
-plt.plot(time, np.full_like(time, analytical_energy), label="Analytical Energy", linestyle='--', color='black')
-plt.plot(time, energy_verlet, label="Verlet Energy", color='blue')
-plt.plot(time, energy_gear, label="Gear Energy", color='green')
+plt.plot(time, np.full_like(time, analytical_energy), label="Analytical energy", linestyle='--', color='black')
+plt.plot(time, energy_verlet, label="Verlet energy", color='blue')
+plt.plot(time, energy_gear, label="Gear energy", color='green')
 plt.xlabel('Time')
 plt.ylabel('Energy')
 plt.legend()
 image_name = f"energy_comparison"
 full_path = os.path.join(image_path, image_name)
-#plt.savefig(full_path)
-#plt.show()
+plt.savefig(full_path)
+plt.show()
 plt.close()
 
 plt.figure(figsize=(10, 6))
@@ -82,8 +82,8 @@ plt.ylabel('Relative energy deviation')
 plt.legend()
 image_name = f"verlet_energy_dev"
 full_path = os.path.join(image_path, image_name)
-#plt.savefig(full_path)
-#plt.show()
+plt.savefig(full_path)
+plt.show()
 plt.close()
 
 plt.figure(figsize=(10, 6))
@@ -93,11 +93,11 @@ plt.ylabel('Relative energy deviation')
 plt.legend()
 image_name = f"gear_energy_dev"
 full_path = os.path.join(image_path, image_name)
-#plt.savefig(full_path)
-#plt.show()
+plt.savefig(full_path)
+plt.show()
 plt.close()
 
-# stability
+# stability analysis
 
 omega_list = [0.01, 1, 100] 
 for index, omega in enumerate(omega_list):
@@ -110,8 +110,8 @@ for index, omega in enumerate(omega_list):
     position_verlet, momentum_verlet = md.velocity_verlet(initial_position, initial_momentum, harmonic_force, mass, omega, timestep, total_time)
     dev_pos = position_verlet - an_position
     dev_vel = (momentum_verlet / mass) - an_velocity
-    plt.plot(time, dev_pos, label=f'Position Verlet deviation for {omega}')
-    plt.plot(time, dev_vel, label=f'Velocity Verlet deviation for {omega}')
+    plt.plot(time, dev_pos, label=f'Position Verlet deviation for $\\omega = {omega}$')
+    plt.plot(time, dev_vel, label=f'Velocity Verlet deviation for $\\omega = {omega}$')
     plt.xlabel('Time')
     plt.ylabel('Deviation')
     plt.legend()

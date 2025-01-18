@@ -1,13 +1,13 @@
 # Fdb version 4
-["bibtex main"] 1737190872.32473 "main.aux" "main.bbl" "main" 1737190873.30212 0
+["bibtex main"] 1737191995.6054 "main.aux" "main.bbl" "main" 1737192040.26589 0
   "./biblio.bib" 1737190858.78031 1251 4191477abf8cc4c2d93b6b0109509567 ""
   "/usr/share/texlive/texmf-dist/bibtex/bst/base/plain.bst" 1292289607 20613 bd3fbfa9f64872b81ac57a0dd2ed855f ""
-  "main.aux" 1737190873.10935 2831 492eecc1a13c127e1aa3028448010c42 "pdflatex"
+  "main.aux" 1737192040.05864 4280 df0079987ac8d7c8f0c37481ce58720f "pdflatex"
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1737190872.40705 "/home/nunziato-damino/Documents/Github/NMSM_2024/Block_2/Report/main.tex" "main.pdf" "main" 1737190873.30222 0
+["pdflatex"] 1737192039.20014 "/home/nunziato-damino/Documents/Github/NMSM_2024/Block_2/Report/main.tex" "main.pdf" "main" 1737192040.266 0
   "/etc/texmf/web2c/texmf.cnf" 1730382086.88477 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/home/nunziato-damino/Documents/Github/NMSM_2024/Block_2/Report/main.tex" 1737190566.52205 1545 c0de0a476400e9fa8ddd23b89e257879 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -181,16 +181,19 @@
   "EXER/ex12.tex" 1737128223.30884 0 d41d8cd98f00b204e9800998ecf8427e ""
   "EXER/ex13.tex" 1737128232.29688 0 d41d8cd98f00b204e9800998ecf8427e ""
   "EXER/ex8.tex" 1737190870.38235 5621 7027610d1f3f5064519aa5cf5f99a6ae ""
-  "EXER/ex9.tex" 1737151975.29054 2689 30da21831f1067202a85a4f7a06006b1 ""
+  "EXER/ex9.tex" 1737192039.10465 4009 17db4b4b5f5ab27fe5dd6f97fc1d0c2b ""
   "FIG/ex8/pressure_numdensity_comparison_T09.png" 1736124479.02136 34723 1b16930b9347f0930da548e608a2f6be ""
   "FIG/ex8/pressure_numdensity_comparison_T2.png" 1736117760.34044 33778 8dc04abc36a2f90081ddab72a8f28e77 ""
-  "FIG/ex9/energy_comparison.png" 1737138289.68056 53969 e371606a3d783b5cf513ee6e5622cda6 ""
-  "FIG/ex9/gear_energy_dev.png" 1737137681.71198 40619 19d063fb80e06af9f9ddacf22d715dba ""
-  "FIG/ex9/integration_schemes_comparison.png" 1737138283.30657 241420 aa7688443ed594a145997d655592f1d5 ""
-  "FIG/ex9/verlet_energy_dev.png" 1737137664.92977 91719 355816c1acdea3b89af3224ee41cd4a4 ""
-  "main.aux" 1737190873.10935 2831 492eecc1a13c127e1aa3028448010c42 "pdflatex"
-  "main.bbl" 1737190872.40135 429 5fa53fc337460c3210aeeb6f54e3f8f7 "bibtex main"
-  "main.out" 1737190872.73235 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+  "FIG/ex9/energy_comparison.png" 1737191382.31851 54527 9a176884dbd38421d2e493a8f1a2654d ""
+  "FIG/ex9/gear_energy_dev.png" 1737191388.79344 40619 19d063fb80e06af9f9ddacf22d715dba ""
+  "FIG/ex9/integration_schemes_comparison.png" 1737191373.17162 241617 0528de9b8a61c08ab452d19aa905bc1a ""
+  "FIG/ex9/stability_comparison_0.png" 1737191391.75241 39187 5d432b98281f867aecdebccfdba14238 ""
+  "FIG/ex9/stability_comparison_1.png" 1737191399.26332 115009 03f1a182d22303ad813bddc82335a3db ""
+  "FIG/ex9/stability_comparison_2.png" 1737191508.58995 25330 73e836c22d094b1894e8711fae652bb7 ""
+  "FIG/ex9/verlet_energy_dev.png" 1737191386.22347 91719 355816c1acdea3b89af3224ee41cd4a4 ""
+  "main.aux" 1737192040.05864 4280 df0079987ac8d7c8f0c37481ce58720f "pdflatex"
+  "main.bbl" 1737191995.6674 429 5fa53fc337460c3210aeeb6f54e3f8f7 "bibtex main"
+  "main.out" 1737192039.51665 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
   "main.tex" 1737190566.52205 1545 c0de0a476400e9fa8ddd23b89e257879 ""
   (generated)
   "main.aux"

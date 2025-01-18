@@ -3,7 +3,7 @@
 The idea is to implement the velocity Verlet algorithm and the Gear predictor-correct algorithm of the 5th order specifically for the harmonic oscillator. \\
 One can find said algorithms in the Algorithm appendix. \\
 Before starting the quantitative analysis over these integration schemes, we start with a qualitative inspection against the analytical solution in figure \ref{ex9:schemes_comparison}. \\
-Note that the integration timestep is $\Delta t = 0.001$ and $omega = 0.1$.
+Note that the integration timestep is $\Delta t = 0.001$ and $\omega = 0.1$.
 
 \begin{figure}[H]
     \centering
@@ -32,4 +32,36 @@ Now we study the energy conservation of the 2 algorithms. Again we plot the tota
 \end{figure}
 
 From this analysis we conclude, as we expected, that the velocity Verlet algorithm is symplectic while the Gear predictor-corrector is not. \\
-Lastly we focus on the velocity Verlet to evaluate its stability for different values of $\omega$. We choose for each iteration a timestep $\Delta t= 0.01\omega^{-1}$ and obtain the following
+Lastly we focus on the velocity Verlet to evaluate its stability for different values of $\omega$. We choose for each iteration a timestep $\Delta t= 0.01\omega^{-1}$ and obtain figures \ref{fig:stability_comparison}.
+
+\begin{figure}[h!]
+    \centering
+    % First row: Two images side by side
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{FIG/ex9/stability_comparison_0.png}
+        \caption{Position and velocity deviation for the velocity Verlet integration scheme for $\omega = 0.01$.}
+        \label{fig:stability_comparison_0}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{FIG/ex9/stability_comparison_1.png}
+        \caption{Position and velocity deviation for the velocity Verlet integration scheme for $\omega=1$.}
+        \label{fig:stability_comparison_1}
+    \end{minipage}
+    
+    % Second row: Single image below
+    \vspace{1em}
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{FIG/ex9/stability_comparison_2.png}
+        \caption{Position and velocity deviation for the velocity Verlet integration scheme for $\omega=100$.}
+        \label{fig:stability_comparison_2}
+    \end{minipage}
+    
+    \caption{Comparison of position and velocity deviations for the velocity Verlet integration scheme.}
+    \label{fig:stability_comparison}
+\end{figure}
+
+We observe that the deviation is smaller for small $\omega$.
