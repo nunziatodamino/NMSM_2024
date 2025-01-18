@@ -6,39 +6,32 @@ atom_style  atomic
 
 variable box_size           equal 10
 variable volume             equal ${box_size}*${box_size}*${box_size}
-variable numberDensity      equal 0.2
-variable nParticles         equal ${numberDensity}*${volume}
 
-# 1) NVE ensemble simulation
+# 1) NVT ensemble simulation with Nose-Hoover thermostat
 
-variable initialCutOff      equal 2^(1.0/6.0)
-variable finalCutOff        equal 4.0
-variable step               equal 0.2
-variable cutOffInterval     equal ${finalCutOff}-${initialCutOff}
-variable nsteps             equal ceil(${cutOffInterval}/${step})+1
+variable step               equal 0.025
+variable nsteps             equal 5
 
 label loop_start
 variable index loop         1 ${nsteps}
-variable r_cut              equal floor((${initialCutOff}+(${index}-1)*${step})*100)/100 #manual rounding to second decimal place 
+variable numberDensity      equal 0.2-${index}*${step}
+variable nParticles         equal ${numberDensity}*${volume}
 
-print "Simulation for r_cut = ${r_cut}"
+print "Simulation for density = ${numberDensity}"
 
-variable region_name string     simulation_box_${r_cut}
+variable region_name string     simulation_box_${numberDensity}
 region ${region_name} block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
 create_box 1 ${region_name}
 create_atoms                    1 random ${nParticles} 234567 NULL overlap 1.3
 
 mass        1 1.0
 velocity    all create 1.0 87242 mom yes dist gaussian
-pair_style  lj/cut ${r_cut}
+pair_style  lj/cut 2
 pair_coeff  1 1 1.0 1.0
 pair_modify tail yes
 
 neighbor     0.3 bin
 neigh_modify delay 0 every 10 check yes
-
-thermo_style custom step pe ke etotal temp press density
-thermo       10000
 
 print "Equilibration" 
 
@@ -49,9 +42,14 @@ unfix       equilibration
 
 print "Production" 
 
+variable    kinEnergy equal ke
+variable    temperature equal temp
 fix         production all nvt temp 2 2 1
 timestep    0.001
-run         150000
+fix         2 all ave/time 20 50 1000 v_kinEnergy v_temperature file average_${numberDensity}.out 
+thermo      10000
+thermo_style custom step pe ke etotal temp press density
+run         450000
 unfix       production
 clear
 next        index

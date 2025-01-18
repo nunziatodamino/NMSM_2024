@@ -37,8 +37,7 @@ pair_modify tail yes
 neighbor     0.3 bin
 neigh_modify delay 0 every 10 check yes
 
-thermo_style custom step pe ke etotal temp press density
-thermo       10000
+variable output_file string thermo_average_r${r_cut}.txt
 
 print "Equilibration" 
 
@@ -47,18 +46,24 @@ timestep    0.001
 run         50000
 unfix       equilibration
 
-comm_modify cutoff 5.5
-compute rdf_all all rdf 200 cutoff 5  
-variable rdf_file string rdf_${r_cut}.dat
-fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file ${rdf_file} mode vector
+comm_modify     cutoff 5.5
+compute         rdf_all all rdf 200 cutoff 5  
+variable        rdf_file string rdf_${r_cut}.dat
+fix             rdf_out all ave/time 100 1 100 c_rdf_all[*] file ${rdf_file} mode vector
 
 print "Production" 
 
-fix         production all nve
-timestep    0.001
-run         150000
-unfix       production
-unfix       rdf_out
+variable     potEnergy equal pe
+variable     kinEnergy equal ke
+variable     totEnergy equal etotal
+fix          production all nve
+timestep     0.001
+fix          2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_${r_cut}.out 
+thermo       10000
+thermo_style custom step pe ke etotal temp press density
+run          150000
+unfix        production
+unfix        rdf_out
 clear
-next        index
-jump        SELF loop_start
+next         index
+jump         SELF loop_start

@@ -1,0 +1,2879 @@
+LAMMPS (2 Aug 2023 - Update 3)
+# 1) System initialization
+
+units       lj
+boundary    p p p
+atom_style  atomic
+
+variable box_size           equal 10
+variable volume             equal ${box_size}*${box_size}*${box_size}
+variable volume             equal 10*${box_size}*${box_size}
+variable volume             equal 10*10*${box_size}
+variable volume             equal 10*10*10
+variable numberDensity      equal 0.2
+variable nParticles         equal ${numberDensity}*${volume}
+variable nParticles         equal 0.2*${volume}
+variable nParticles         equal 0.2*1000
+
+# 1) NVE ensemble simulation
+
+variable initialCutOff      equal 2^(1.0/6.0)
+variable finalCutOff        equal 4.0
+variable step               equal 0.2
+variable cutOffInterval     equal ${finalCutOff}-${initialCutOff}
+variable cutOffInterval     equal 4-${initialCutOff}
+variable cutOffInterval     equal 4-1.12246204830937
+variable nsteps             equal ceil(${cutOffInterval}/${step})+1
+variable nsteps             equal ceil(2.87753795169063/${step})+1
+variable nsteps             equal ceil(2.87753795169063/0.2)+1
+
+label loop_start
+variable index loop         1 ${nsteps}
+variable index loop         1 16
+variable r_cut              equal floor((${initialCutOff}+(${index}-1)*${step})*100)/100 #manual rounding to second decimal place
+variable r_cut              equal floor((1.12246204830937+(${index}-1)*${step})*100)/100 
+variable r_cut              equal floor((1.12246204830937+(1-1)*${step})*100)/100 
+variable r_cut              equal floor((1.12246204830937+(1-1)*0.2)*100)/100 
+
+print "Simulation for r_cut = ${r_cut}"
+Simulation for r_cut = 1.12
+
+variable region_name string     simulation_box_${r_cut}
+variable region_name string     simulation_box_1.12
+region ${region_name} block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_1.12 block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_1.12 block     0.0 10 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_1.12 block     0.0 10 0.0 10 0.0 ${box_size}
+region simulation_box_1.12 block     0.0 10 0.0 10 0.0 10
+create_box 1 ${region_name}
+create_box 1 simulation_box_1.12
+Created orthogonal box = (0 0 0) to (10 10 10)
+  1 by 1 by 1 MPI processor grid
+create_atoms                    1 random ${nParticles} 234567 NULL overlap 1.3
+create_atoms                    1 random 200 234567 NULL overlap 1.3
+Created 200 atoms
+  using lattice units in orthogonal box = (0 0 0) to (10 10 10)
+  create_atoms CPU = 0.004 seconds
+
+mass        1 1.0
+velocity    all create 1.0 87242 mom yes dist gaussian
+pair_style  lj/cut ${r_cut}
+pair_style  lj/cut 1.12
+pair_coeff  1 1 1.0 1.0
+pair_modify tail yes
+
+neighbor     0.3 bin
+neigh_modify delay 0 every 10 check yes
+
+variable output_file string thermo_average_r${r_cut}.txt
+variable output_file string thermo_average_r1.12.txt
+
+print "Equilibration"
+Equilibration
+
+fix         equilibration all nve
+timestep    0.001
+run         50000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 1.42
+  ghost atom cutoff = 1.42
+  binsize = 0.71, bins = 15 15 15
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.09 | 3.09 | 3.09 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+         0   1             -0.99119662     0              0.50130338    -0.1169176    
+     50000   0.94863639    -1.1044587      0              0.31138112     0.0084873579 
+Loop time of 0.117604 on 1 procs for 50000 steps with 200 atoms
+
+Performance: 36733465.993 tau/day, 425155.856 timesteps/s, 85.031 Matom-step/s
+100.0% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.028746   | 0.028746   | 0.028746   |   0.0 | 24.44
+Neigh   | 0.021695   | 0.021695   | 0.021695   |   0.0 | 18.45
+Comm    | 0.024707   | 0.024707   | 0.024707   |   0.0 | 21.01
+Output  | 8.549e-06  | 8.549e-06  | 8.549e-06  |   0.0 |  0.01
+Modify  | 0.035683   | 0.035683   | 0.035683   |   0.0 | 30.34
+Other   |            | 0.006764   |            |       |  5.75
+
+Nlocal:            200 ave         200 max         200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:            196 ave         196 max         196 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:            164 ave         164 max         164 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 164
+Ave neighs/atom = 0.82
+Neighbor list builds = 1066
+Dangerous builds = 0
+unfix       equilibration
+
+comm_modify cutoff 5.5
+compute rdf_all all rdf 200 cutoff 5
+variable rdf_file string rdf_${r_cut}.dat
+variable rdf_file string rdf_1.12.dat
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file ${rdf_file} mode vector
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file rdf_1.12.dat mode vector
+
+print "Production"
+Production
+
+variable    potEnergy equal pe
+variable    kinEnergy equal ke
+variable    totEnergy equal etotal
+fix         production all nve
+timestep    0.001
+fix         2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_${r_cut}.out
+fix         2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_1.12.out
+thermo      10000
+thermo_style custom step pe ke etotal temp press density
+run         150000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 1.42
+  ghost atom cutoff = 5.5
+  binsize = 0.71, bins = 15 15 15
+  2 neighbor lists, perpetual/occasional/extra = 1 1 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+  (2) compute rdf, occasional
+      attributes: half, newton on, cut 5.3
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.905 | 3.905 | 3.905 Mbytes
+   Step         PotEng         KinEng         TotEng          Temp          Press         Density    
+     50000  -1.1044587      1.4158398      0.31138112     0.94863639     0.0084873579   0.2          
+     60000  -1.1444189      1.4158276      0.27140862     0.94862818     0.015350989    0.2          
+     70000  -1.1088656      1.4402707      0.33140508     0.96500548    -0.021097347    0.2          
+     80000  -1.0922711      1.4237122      0.3314411      0.95391102    -0.001866771    0.2          
+     90000  -1.1055553      1.4570069      0.35145159     0.97621901    -0.050997657    0.2          
+    100000  -1.1101982      1.4516842      0.34148605     0.97265275    -0.041676336    0.2          
+    110000  -1.1283616      1.3948669      0.26650524     0.93458417     0.048406446    0.2          
+    120000  -1.155897       1.442384       0.286487       0.96642142    -0.022671098    0.2          
+    130000  -1.0744628      1.4359058      0.36144296     0.96208091    -0.017301973    0.2          
+    140000  -1.0866739      1.4531448      0.36647086     0.97363136    -0.044686035    0.2          
+    150000  -1.1165455      1.4379821      0.3214366      0.96347206    -0.016173183    0.2          
+    160000  -1.118463       1.4398789      0.32141597     0.96474301    -0.021067151    0.2          
+    170000  -1.1038884      1.4353317      0.33144332     0.96169626    -0.017013591    0.2          
+    180000  -1.112982       1.414432       0.30144998     0.94769314     0.016853343    0.2          
+    190000  -1.1375594      1.4389784      0.30141907     0.96413966    -0.011787569    0.2          
+    200000  -1.1134048      1.4097976      0.29639279     0.944588       0.015003161    0.2          
+Loop time of 1.34258 on 1 procs for 150000 steps with 200 atoms
+
+Performance: 9653076.763 tau/day, 111725.426 timesteps/s, 22.345 Matom-step/s
+99.9% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.10387    | 0.10387    | 0.10387    |   0.0 |  7.74
+Neigh   | 0.11632    | 0.11632    | 0.11632    |   0.0 |  8.66
+Comm    | 0.40876    | 0.40876    | 0.40876    |   0.0 | 30.45
+Output  | 7.6245e-05 | 7.6245e-05 | 7.6245e-05 |   0.0 |  0.01
+Modify  | 0.64794    | 0.64794    | 0.64794    |   0.0 | 48.26
+Other   |            | 0.06561    |            |       |  4.89
+
+Nlocal:            200 ave         200 max         200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:           1634 ave        1634 max        1634 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:            177 ave         177 max         177 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 177
+Ave neighs/atom = 0.885
+Neighbor list builds = 3269
+Dangerous builds = 0
+unfix       production
+unfix       rdf_out
+clear
+next        index
+jump        SELF loop_start
+variable index loop         1 ${nsteps}
+variable index loop         1 16
+variable r_cut              equal floor((${initialCutOff}+(${index}-1)*${step})*100)/100 #manual rounding to second decimal place
+variable r_cut              equal floor((1.12246204830937+(${index}-1)*${step})*100)/100 
+variable r_cut              equal floor((1.12246204830937+(2-1)*${step})*100)/100 
+variable r_cut              equal floor((1.12246204830937+(2-1)*0.2)*100)/100 
+
+print "Simulation for r_cut = ${r_cut}"
+Simulation for r_cut = 1.32
+
+variable region_name string     simulation_box_${r_cut}
+variable region_name string     simulation_box_1.32
+region ${region_name} block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_1.32 block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_1.32 block     0.0 10 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_1.32 block     0.0 10 0.0 10 0.0 ${box_size}
+region simulation_box_1.32 block     0.0 10 0.0 10 0.0 10
+create_box 1 ${region_name}
+create_box 1 simulation_box_1.32
+Created orthogonal box = (0 0 0) to (10 10 10)
+  1 by 1 by 1 MPI processor grid
+create_atoms                    1 random ${nParticles} 234567 NULL overlap 1.3
+create_atoms                    1 random 200 234567 NULL overlap 1.3
+Created 200 atoms
+  using lattice units in orthogonal box = (0 0 0) to (10 10 10)
+  create_atoms CPU = 0.001 seconds
+
+mass        1 1.0
+velocity    all create 1.0 87242 mom yes dist gaussian
+pair_style  lj/cut ${r_cut}
+pair_style  lj/cut 1.32
+pair_coeff  1 1 1.0 1.0
+pair_modify tail yes
+
+neighbor     0.3 bin
+neigh_modify delay 0 every 10 check yes
+
+variable output_file string thermo_average_r${r_cut}.txt
+variable output_file string thermo_average_r1.32.txt
+
+print "Equilibration"
+Equilibration
+
+fix         equilibration all nve
+timestep    0.001
+run         50000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 1.62
+  ghost atom cutoff = 1.62
+  binsize = 0.81, bins = 13 13 13
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.082 | 3.082 | 3.082 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+         0   1             -0.72716373     0              0.76533627    -0.069078262  
+     50000   1.0534995     -1.2198268      0              0.35252131     0.10710552   
+Loop time of 0.143278 on 1 procs for 50000 steps with 200 atoms
+
+Performance: 30151101.407 tau/day, 348971.081 timesteps/s, 69.794 Matom-step/s
+100.0% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.04807    | 0.04807    | 0.04807    |   0.0 | 33.55
+Neigh   | 0.029542   | 0.029542   | 0.029542   |   0.0 | 20.62
+Comm    | 0.025851   | 0.025851   | 0.025851   |   0.0 | 18.04
+Output  | 9.309e-06  | 9.309e-06  | 9.309e-06  |   0.0 |  0.01
+Modify  | 0.033241   | 0.033241   | 0.033241   |   0.0 | 23.20
+Other   |            | 0.006565   |            |       |  4.58
+
+Nlocal:            200 ave         200 max         200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:            255 ave         255 max         255 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:            328 ave         328 max         328 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 328
+Ave neighs/atom = 1.64
+Neighbor list builds = 1151
+Dangerous builds = 0
+unfix       equilibration
+
+comm_modify cutoff 5.5
+compute rdf_all all rdf 200 cutoff 5
+variable rdf_file string rdf_${r_cut}.dat
+variable rdf_file string rdf_1.32.dat
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file ${rdf_file} mode vector
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file rdf_1.32.dat mode vector
+
+print "Production"
+Production
+
+variable    potEnergy equal pe
+variable    kinEnergy equal ke
+variable    totEnergy equal etotal
+fix         production all nve
+timestep    0.001
+fix         2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_${r_cut}.out
+fix         2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_1.32.out
+thermo      10000
+thermo_style custom step pe ke etotal temp press density
+run         150000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 1.62
+  ghost atom cutoff = 5.5
+  binsize = 0.81, bins = 13 13 13
+  2 neighbor lists, perpetual/occasional/extra = 1 1 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+  (2) compute rdf, occasional
+      attributes: half, newton on, cut 5.3
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.862 | 3.862 | 3.862 Mbytes
+   Step         PotEng         KinEng         TotEng          Temp          Press         Density    
+     50000  -1.2198268      1.5723481      0.35252131     1.0534995      0.10710552     0.2          
+     60000  -1.3422703      1.6506931      0.30842284     1.105992       0.01262521     0.2          
+     70000  -1.2411371      1.610746       0.36960897     1.0792268      0.025729885    0.2          
+     80000  -1.2553072      1.5815873      0.32628003     1.05969        0.07349714     0.2          
+     90000  -1.3667053      1.6252717      0.25856643     1.0889593      0.089176492    0.2          
+    100000  -1.2709737      1.6273345      0.35636087     1.0903414     -0.0018737905   0.2          
+    110000  -1.3211535      1.6402674      0.31911395     1.0990066      0.017448325    0.2          
+    120000  -1.2463932      1.6181553      0.37176209     1.0841911      0.06116957     0.2          
+    130000  -1.25527        1.6082075      0.35293747     1.077526       0.069309952    0.2          
+    140000  -1.2709271      1.6145771      0.34365004     1.0817937      0.013115382    0.2          
+    150000  -1.2545254      1.6074737      0.35294838     1.0770343      0.066535433    0.2          
+    160000  -1.2517058      1.5841751      0.33246932     1.0614238      0.076590977    0.2          
+    170000  -1.2776049      1.604393       0.32678816     1.0749702      0.061892258    0.2          
+    180000  -1.2422034      1.6032608      0.36105738     1.0742116      0.049840081    0.2          
+    190000  -1.2701111      1.5970044      0.3268933      1.0700197      0.092351537    0.2          
+    200000  -1.218642       1.6128672      0.39422516     1.080648       0.0078282836   0.2          
+Loop time of 1.42714 on 1 procs for 150000 steps with 200 atoms
+
+Performance: 9081106.929 tau/day, 105105.404 timesteps/s, 21.021 Matom-step/s
+100.0% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.17653    | 0.17653    | 0.17653    |   0.0 | 12.37
+Neigh   | 0.13902    | 0.13902    | 0.13902    |   0.0 |  9.74
+Comm    | 0.4055     | 0.4055     | 0.4055     |   0.0 | 28.41
+Output  | 7.7687e-05 | 7.7687e-05 | 7.7687e-05 |   0.0 |  0.01
+Modify  | 0.64       | 0.64       | 0.64       |   0.0 | 44.85
+Other   |            | 0.06601    |            |       |  4.63
+
+Nlocal:            200 ave         200 max         200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:           1661 ave        1661 max        1661 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:            313 ave         313 max         313 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 313
+Ave neighs/atom = 1.565
+Neighbor list builds = 3418
+Dangerous builds = 0
+unfix       production
+unfix       rdf_out
+clear
+next        index
+jump        SELF loop_start
+variable index loop         1 ${nsteps}
+variable index loop         1 16
+variable r_cut              equal floor((${initialCutOff}+(${index}-1)*${step})*100)/100 #manual rounding to second decimal place
+variable r_cut              equal floor((1.12246204830937+(${index}-1)*${step})*100)/100 
+variable r_cut              equal floor((1.12246204830937+(3-1)*${step})*100)/100 
+variable r_cut              equal floor((1.12246204830937+(3-1)*0.2)*100)/100 
+
+print "Simulation for r_cut = ${r_cut}"
+Simulation for r_cut = 1.52
+
+variable region_name string     simulation_box_${r_cut}
+variable region_name string     simulation_box_1.52
+region ${region_name} block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_1.52 block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_1.52 block     0.0 10 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_1.52 block     0.0 10 0.0 10 0.0 ${box_size}
+region simulation_box_1.52 block     0.0 10 0.0 10 0.0 10
+create_box 1 ${region_name}
+create_box 1 simulation_box_1.52
+Created orthogonal box = (0 0 0) to (10 10 10)
+  1 by 1 by 1 MPI processor grid
+create_atoms                    1 random ${nParticles} 234567 NULL overlap 1.3
+create_atoms                    1 random 200 234567 NULL overlap 1.3
+Created 200 atoms
+  using lattice units in orthogonal box = (0 0 0) to (10 10 10)
+  create_atoms CPU = 0.001 seconds
+
+mass        1 1.0
+velocity    all create 1.0 87242 mom yes dist gaussian
+pair_style  lj/cut ${r_cut}
+pair_style  lj/cut 1.52
+pair_coeff  1 1 1.0 1.0
+pair_modify tail yes
+
+neighbor     0.3 bin
+neigh_modify delay 0 every 10 check yes
+
+variable output_file string thermo_average_r${r_cut}.txt
+variable output_file string thermo_average_r1.52.txt
+
+print "Equilibration"
+Equilibration
+
+fix         equilibration all nve
+timestep    0.001
+run         50000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 1.82
+  ghost atom cutoff = 1.82
+  binsize = 0.91, bins = 11 11 11
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.076 | 3.076 | 3.076 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+         0   1             -0.80716172     0              0.68533828    -0.095688066  
+     50000   1.2389966     -1.362689       0              0.48651342     0.066400281  
+Loop time of 0.188269 on 1 procs for 50000 steps with 200 atoms
+
+Performance: 22945871.141 tau/day, 265577.212 timesteps/s, 53.115 Matom-step/s
+99.9% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.071765   | 0.071765   | 0.071765   |   0.0 | 38.12
+Neigh   | 0.04547    | 0.04547    | 0.04547    |   0.0 | 24.15
+Comm    | 0.030158   | 0.030158   | 0.030158   |   0.0 | 16.02
+Output  | 1.35e-05   | 1.35e-05   | 1.35e-05   |   0.0 |  0.01
+Modify  | 0.033736   | 0.033736   | 0.033736   |   0.0 | 17.92
+Other   |            | 0.007127   |            |       |  3.79
+
+Nlocal:            200 ave         200 max         200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:            310 ave         310 max         310 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:            488 ave         488 max         488 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 488
+Ave neighs/atom = 2.44
+Neighbor list builds = 1223
+Dangerous builds = 0
+unfix       equilibration
+
+comm_modify cutoff 5.5
+compute rdf_all all rdf 200 cutoff 5
+variable rdf_file string rdf_${r_cut}.dat
+variable rdf_file string rdf_1.52.dat
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file ${rdf_file} mode vector
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file rdf_1.52.dat mode vector
+
+print "Production"
+Production
+
+variable    potEnergy equal pe
+variable    kinEnergy equal ke
+variable    totEnergy equal etotal
+fix         production all nve
+timestep    0.001
+fix         2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_${r_cut}.out
+fix         2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_1.52.out
+thermo      10000
+thermo_style custom step pe ke etotal temp press density
+run         150000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 1.82
+  ghost atom cutoff = 5.5
+  binsize = 0.91, bins = 11 11 11
+  2 neighbor lists, perpetual/occasional/extra = 1 1 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+  (2) compute rdf, occasional
+      attributes: half, newton on, cut 5.3
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.827 | 3.827 | 3.827 Mbytes
+   Step         PotEng         KinEng         TotEng          Temp          Press         Density    
+     50000  -1.362689       1.8492024      0.48651342     1.2389966      0.066400281    0.2          
+     60000  -1.3562094      1.8559832      0.49977384     1.2435398      0.057376895    0.2          
+     70000  -1.3171103      1.8090531      0.4919428      1.2120959      0.071696612    0.2          
+     80000  -1.4211614      1.8909506      0.46978919     1.2669686      0.058554036    0.2          
+     90000  -1.2715808      1.8086627      0.53708191     1.2118343      0.04896539     0.2          
+    100000  -1.3465638      1.8272426      0.4806788      1.2242831      0.10145917     0.2          
+    110000  -1.344335       1.8365365      0.49220156     1.2305102      0.11057818     0.2          
+    120000  -1.2947016      1.8255769      0.53087526     1.2231671      0.034778173    0.2          
+    130000  -1.2998457      1.8067622      0.5069165      1.210561       0.05602512     0.2          
+    140000  -1.4223539      1.8994757      0.47712179     1.2726806      0.088843505    0.2          
+    150000  -1.2972777      1.8039964      0.50671872     1.2087078      0.086709913    0.2          
+    160000  -1.234493       1.7730997      0.53860675     1.1880065      0.13078653     0.2          
+    170000  -1.3134422      1.8148096      0.50136737     1.2159528      0.11998778     0.2          
+    180000  -1.3615028      1.8614316      0.4999289      1.2471904      0.07106722     0.2          
+    190000  -1.291628       1.7839706      0.49234259     1.1952902      0.1849874      0.2          
+    200000  -1.3876634      1.8722514      0.48458799     1.2544398      0.12523604     0.2          
+Loop time of 1.56911 on 1 procs for 150000 steps with 200 atoms
+
+Performance: 8259455.673 tau/day, 95595.552 timesteps/s, 19.119 Matom-step/s
+99.7% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.25856    | 0.25856    | 0.25856    |   0.0 | 16.48
+Neigh   | 0.18968    | 0.18968    | 0.18968    |   0.0 | 12.09
+Comm    | 0.41066    | 0.41066    | 0.41066    |   0.0 | 26.17
+Output  | 0.00010826 | 0.00010826 | 0.00010826 |   0.0 |  0.01
+Modify  | 0.643      | 0.643      | 0.643      |   0.0 | 40.98
+Other   |            | 0.0671     |            |       |  4.28
+
+Nlocal:            200 ave         200 max         200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:           1652 ave        1652 max        1652 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:            503 ave         503 max         503 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 503
+Ave neighs/atom = 2.515
+Neighbor list builds = 3655
+Dangerous builds = 0
+unfix       production
+unfix       rdf_out
+clear
+next        index
+jump        SELF loop_start
+variable index loop         1 ${nsteps}
+variable index loop         1 16
+variable r_cut              equal floor((${initialCutOff}+(${index}-1)*${step})*100)/100 #manual rounding to second decimal place
+variable r_cut              equal floor((1.12246204830937+(${index}-1)*${step})*100)/100 
+variable r_cut              equal floor((1.12246204830937+(4-1)*${step})*100)/100 
+variable r_cut              equal floor((1.12246204830937+(4-1)*0.2)*100)/100 
+
+print "Simulation for r_cut = ${r_cut}"
+Simulation for r_cut = 1.72
+
+variable region_name string     simulation_box_${r_cut}
+variable region_name string     simulation_box_1.72
+region ${region_name} block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_1.72 block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_1.72 block     0.0 10 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_1.72 block     0.0 10 0.0 10 0.0 ${box_size}
+region simulation_box_1.72 block     0.0 10 0.0 10 0.0 10
+create_box 1 ${region_name}
+create_box 1 simulation_box_1.72
+Created orthogonal box = (0 0 0) to (10 10 10)
+  1 by 1 by 1 MPI processor grid
+create_atoms                    1 random ${nParticles} 234567 NULL overlap 1.3
+create_atoms                    1 random 200 234567 NULL overlap 1.3
+Created 200 atoms
+  using lattice units in orthogonal box = (0 0 0) to (10 10 10)
+  create_atoms CPU = 0.001 seconds
+
+mass        1 1.0
+velocity    all create 1.0 87242 mom yes dist gaussian
+pair_style  lj/cut ${r_cut}
+pair_style  lj/cut 1.72
+pair_coeff  1 1 1.0 1.0
+pair_modify tail yes
+
+neighbor     0.3 bin
+neigh_modify delay 0 every 10 check yes
+
+variable output_file string thermo_average_r${r_cut}.txt
+variable output_file string thermo_average_r1.72.txt
+
+print "Equilibration"
+Equilibration
+
+fix         equilibration all nve
+timestep    0.001
+run         50000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 2.02
+  ghost atom cutoff = 2.02
+  binsize = 1.01, bins = 10 10 10
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.073 | 3.073 | 3.073 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+         0   1             -0.8641776      0              0.6283224     -0.1170568    
+     50000   1.3499037     -1.4659136      0              0.54881772     0.077613489  
+Loop time of 0.232166 on 1 procs for 50000 steps with 200 atoms
+
+Performance: 18607356.361 tau/day, 215362.921 timesteps/s, 43.073 Matom-step/s
+100.0% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.099008   | 0.099008   | 0.099008   |   0.0 | 42.65
+Neigh   | 0.058096   | 0.058096   | 0.058096   |   0.0 | 25.02
+Comm    | 0.034241   | 0.034241   | 0.034241   |   0.0 | 14.75
+Output  | 1.4003e-05 | 1.4003e-05 | 1.4003e-05 |   0.0 |  0.01
+Modify  | 0.033711   | 0.033711   | 0.033711   |   0.0 | 14.52
+Other   |            | 0.007095   |            |       |  3.06
+
+Nlocal:            200 ave         200 max         200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:            362 ave         362 max         362 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:            698 ave         698 max         698 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 698
+Ave neighs/atom = 3.49
+Neighbor list builds = 1246
+Dangerous builds = 0
+unfix       equilibration
+
+comm_modify cutoff 5.5
+compute rdf_all all rdf 200 cutoff 5
+variable rdf_file string rdf_${r_cut}.dat
+variable rdf_file string rdf_1.72.dat
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file ${rdf_file} mode vector
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file rdf_1.72.dat mode vector
+
+print "Production"
+Production
+
+variable    potEnergy equal pe
+variable    kinEnergy equal ke
+variable    totEnergy equal etotal
+fix         production all nve
+timestep    0.001
+fix         2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_${r_cut}.out
+fix         2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_1.72.out
+thermo      10000
+thermo_style custom step pe ke etotal temp press density
+run         150000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 2.02
+  ghost atom cutoff = 5.5
+  binsize = 1.01, bins = 10 10 10
+  2 neighbor lists, perpetual/occasional/extra = 1 1 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+  (2) compute rdf, occasional
+      attributes: half, newton on, cut 5.3
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.812 | 3.812 | 3.812 Mbytes
+   Step         PotEng         KinEng         TotEng          Temp          Press         Density    
+     50000  -1.4659136      2.0147313      0.54881772     1.3499037      0.077613489    0.2          
+     60000  -1.3416349      1.9194653      0.57783043     1.2860739      0.19853884     0.2          
+     70000  -1.507894       2.0471083      0.53921421     1.3715968      0.15545507     0.2          
+     80000  -1.4136483      1.9705893      0.55694097     1.3203278      0.10625623     0.2          
+     90000  -1.3716671      1.9464219      0.57475482     1.3041353      0.049114004    0.2          
+    100000  -1.4557695      2.0134871      0.5577176      1.3490701      0.10764158     0.2          
+    110000  -1.3509413      1.9211823      0.57024102     1.2872243      0.12430253     0.2          
+    120000  -1.3611636      1.9515077      0.59034408     1.3075428      0.093992607    0.2          
+    130000  -1.3658307      1.935196       0.56936537     1.2966138      0.089896285    0.2          
+    140000  -1.2864801      1.872623       0.5861429      1.2546888      0.11056893     0.2          
+    150000  -1.4409061      1.9848254      0.54391928     1.3298662      0.10859933     0.2          
+    160000  -1.4318324      1.9806191      0.54878677     1.327048       0.10352716     0.2          
+    170000  -1.3042802      1.8828543      0.57857414     1.2615439      0.11409198     0.2          
+    180000  -1.4330498      1.9847538      0.55170405     1.3298183      0.16873146     0.2          
+    190000  -1.3285312      1.8963145      0.56778325     1.2705625      0.12609783     0.2          
+    200000  -1.5368272      2.0780335      0.54120635     1.3923173      0.09175976     0.2          
+Loop time of 1.70059 on 1 procs for 150000 steps with 200 atoms
+
+Performance: 7620871.624 tau/day, 88204.533 timesteps/s, 17.641 Matom-step/s
+100.0% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.35101    | 0.35101    | 0.35101    |   0.0 | 20.64
+Neigh   | 0.22811    | 0.22811    | 0.22811    |   0.0 | 13.41
+Comm    | 0.41291    | 0.41291    | 0.41291    |   0.0 | 24.28
+Output  | 9.9073e-05 | 9.9073e-05 | 9.9073e-05 |   0.0 |  0.01
+Modify  | 0.64151    | 0.64151    | 0.64151    |   0.0 | 37.72
+Other   |            | 0.06694    |            |       |  3.94
+
+Nlocal:            200 ave         200 max         200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:           1656 ave        1656 max        1656 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:            723 ave         723 max         723 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 723
+Ave neighs/atom = 3.615
+Neighbor list builds = 3773
+Dangerous builds = 0
+unfix       production
+unfix       rdf_out
+clear
+next        index
+jump        SELF loop_start
+variable index loop         1 ${nsteps}
+variable index loop         1 16
+variable r_cut              equal floor((${initialCutOff}+(${index}-1)*${step})*100)/100 #manual rounding to second decimal place
+variable r_cut              equal floor((1.12246204830937+(${index}-1)*${step})*100)/100 
+variable r_cut              equal floor((1.12246204830937+(5-1)*${step})*100)/100 
+variable r_cut              equal floor((1.12246204830937+(5-1)*0.2)*100)/100 
+
+print "Simulation for r_cut = ${r_cut}"
+Simulation for r_cut = 1.92
+
+variable region_name string     simulation_box_${r_cut}
+variable region_name string     simulation_box_1.92
+region ${region_name} block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_1.92 block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_1.92 block     0.0 10 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_1.92 block     0.0 10 0.0 10 0.0 ${box_size}
+region simulation_box_1.92 block     0.0 10 0.0 10 0.0 10
+create_box 1 ${region_name}
+create_box 1 simulation_box_1.92
+Created orthogonal box = (0 0 0) to (10 10 10)
+  1 by 1 by 1 MPI processor grid
+create_atoms                    1 random ${nParticles} 234567 NULL overlap 1.3
+create_atoms                    1 random 200 234567 NULL overlap 1.3
+Created 200 atoms
+  using lattice units in orthogonal box = (0 0 0) to (10 10 10)
+  create_atoms CPU = 0.001 seconds
+
+mass        1 1.0
+velocity    all create 1.0 87242 mom yes dist gaussian
+pair_style  lj/cut ${r_cut}
+pair_style  lj/cut 1.92
+pair_coeff  1 1 1.0 1.0
+pair_modify tail yes
+
+neighbor     0.3 bin
+neigh_modify delay 0 every 10 check yes
+
+variable output_file string thermo_average_r${r_cut}.txt
+variable output_file string thermo_average_r1.92.txt
+
+print "Equilibration"
+Equilibration
+
+fix         equilibration all nve
+timestep    0.001
+run         50000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 2.22
+  ghost atom cutoff = 2.22
+  binsize = 1.11, bins = 10 10 10
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.074 | 3.074 | 3.074 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+         0   1             -0.8834701      0              0.6090299     -0.12451058   
+     50000   1.3143899     -1.3704794      0              0.59124756     0.13851258   
+Loop time of 0.272645 on 1 procs for 50000 steps with 200 atoms
+
+Performance: 15844761.652 tau/day, 183388.445 timesteps/s, 36.678 Matom-step/s
+100.0% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.13047    | 0.13047    | 0.13047    |   0.0 | 47.85
+Neigh   | 0.062842   | 0.062842   | 0.062842   |   0.0 | 23.05
+Comm    | 0.038462   | 0.038462   | 0.038462   |   0.0 | 14.11
+Output  | 7.885e-06  | 7.885e-06  | 7.885e-06  |   0.0 |  0.00
+Modify  | 0.033447   | 0.033447   | 0.033447   |   0.0 | 12.27
+Other   |            | 0.007417   |            |       |  2.72
+
+Nlocal:            200 ave         200 max         200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:            439 ave         439 max         439 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:            897 ave         897 max         897 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 897
+Ave neighs/atom = 4.485
+Neighbor list builds = 1257
+Dangerous builds = 0
+unfix       equilibration
+
+comm_modify cutoff 5.5
+compute rdf_all all rdf 200 cutoff 5
+variable rdf_file string rdf_${r_cut}.dat
+variable rdf_file string rdf_1.92.dat
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file ${rdf_file} mode vector
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file rdf_1.92.dat mode vector
+
+print "Production"
+Production
+
+variable    potEnergy equal pe
+variable    kinEnergy equal ke
+variable    totEnergy equal etotal
+fix         production all nve
+timestep    0.001
+fix         2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_${r_cut}.out
+fix         2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_1.92.out
+thermo      10000
+thermo_style custom step pe ke etotal temp press density
+run         150000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 2.22
+  ghost atom cutoff = 5.5
+  binsize = 1.11, bins = 10 10 10
+  2 neighbor lists, perpetual/occasional/extra = 1 1 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+  (2) compute rdf, occasional
+      attributes: half, newton on, cut 5.3
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.807 | 3.807 | 3.807 Mbytes
+   Step         PotEng         KinEng         TotEng          Temp          Press         Density    
+     50000  -1.3704794      1.961727       0.59124756     1.3143899      0.13851258     0.2          
+     60000  -1.3575411      1.9498401      0.59229899     1.3064255      0.18546053     0.2          
+     70000  -1.3787669      1.9648046      0.58603772     1.316452       0.12091062     0.2          
+     80000  -1.3506391      1.9394074      0.58876825     1.2994354      0.11022201     0.2          
+     90000  -1.4860951      2.0725607      0.58646555     1.3886504      0.094218322    0.2          
+    100000  -1.4148762      1.9969874      0.58211122     1.338015       0.12506774     0.2          
+    110000  -1.2640054      1.8590173      0.59501191     1.2455727      0.1626458      0.2          
+    120000  -1.4166793      1.9971004      0.58042116     1.3380907      0.12599949     0.2          
+    130000  -1.3701232      1.9669218      0.59679859     1.3178705      0.11202432     0.2          
+    140000  -1.3922442      1.9771875      0.58494325     1.3247487      0.097818907    0.2          
+    150000  -1.4444767      2.0207712      0.57629452     1.3539506      0.13862704     0.2          
+    160000  -1.3536378      1.9466767      0.5930389      1.304306       0.15150192     0.2          
+    170000  -1.4165901      1.9904947      0.57390453     1.3336648      0.17340822     0.2          
+    180000  -1.3403934      1.9323184      0.59192495     1.2946857      0.16554206     0.2          
+    190000  -1.3899083      1.9795219      0.58961354     1.3263128      0.14353955     0.2          
+    200000  -1.4207924      2.0135687      0.59277632     1.3491248      0.081267473    0.2          
+Loop time of 1.8191 on 1 procs for 150000 steps with 200 atoms
+
+Performance: 7124392.225 tau/day, 82458.243 timesteps/s, 16.492 Matom-step/s
+99.8% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.45834    | 0.45834    | 0.45834    |   0.0 | 25.20
+Neigh   | 0.23828    | 0.23828    | 0.23828    |   0.0 | 13.10
+Comm    | 0.41712    | 0.41712    | 0.41712    |   0.0 | 22.93
+Output  | 8.8553e-05 | 8.8553e-05 | 8.8553e-05 |   0.0 |  0.00
+Modify  | 0.63919    | 0.63919    | 0.63919    |   0.0 | 35.14
+Other   |            | 0.06607    |            |       |  3.63
+
+Nlocal:            200 ave         200 max         200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:           1665 ave        1665 max        1665 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:            911 ave         911 max         911 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 911
+Ave neighs/atom = 4.555
+Neighbor list builds = 3751
+Dangerous builds = 0
+unfix       production
+unfix       rdf_out
+clear
+next        index
+jump        SELF loop_start
+variable index loop         1 ${nsteps}
+variable index loop         1 16
+variable r_cut              equal floor((${initialCutOff}+(${index}-1)*${step})*100)/100 #manual rounding to second decimal place
+variable r_cut              equal floor((1.12246204830937+(${index}-1)*${step})*100)/100 
+variable r_cut              equal floor((1.12246204830937+(6-1)*${step})*100)/100 
+variable r_cut              equal floor((1.12246204830937+(6-1)*0.2)*100)/100 
+
+print "Simulation for r_cut = ${r_cut}"
+Simulation for r_cut = 2.12
+
+variable region_name string     simulation_box_${r_cut}
+variable region_name string     simulation_box_2.12
+region ${region_name} block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_2.12 block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_2.12 block     0.0 10 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_2.12 block     0.0 10 0.0 10 0.0 ${box_size}
+region simulation_box_2.12 block     0.0 10 0.0 10 0.0 10
+create_box 1 ${region_name}
+create_box 1 simulation_box_2.12
+Created orthogonal box = (0 0 0) to (10 10 10)
+  1 by 1 by 1 MPI processor grid
+create_atoms                    1 random ${nParticles} 234567 NULL overlap 1.3
+create_atoms                    1 random 200 234567 NULL overlap 1.3
+Created 200 atoms
+  using lattice units in orthogonal box = (0 0 0) to (10 10 10)
+  create_atoms CPU = 0.001 seconds
+
+mass        1 1.0
+velocity    all create 1.0 87242 mom yes dist gaussian
+pair_style  lj/cut ${r_cut}
+pair_style  lj/cut 2.12
+pair_coeff  1 1 1.0 1.0
+pair_modify tail yes
+
+neighbor     0.3 bin
+neigh_modify delay 0 every 10 check yes
+
+variable output_file string thermo_average_r${r_cut}.txt
+variable output_file string thermo_average_r2.12.txt
+
+print "Equilibration"
+Equilibration
+
+fix         equilibration all nve
+timestep    0.001
+run         50000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 2.42
+  ghost atom cutoff = 2.42
+  binsize = 1.21, bins = 9 9 9
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.072 | 3.072 | 3.072 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+         0   1             -0.88032984     0              0.61217016    -0.12328254   
+     50000   1.3576506     -1.4292549      0              0.59703868     0.16857738   
+Loop time of 0.334234 on 1 procs for 50000 steps with 200 atoms
+
+Performance: 12925066.157 tau/day, 149595.673 timesteps/s, 29.919 Matom-step/s
+100.0% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.17126    | 0.17126    | 0.17126    |   0.0 | 51.24
+Neigh   | 0.077278   | 0.077278   | 0.077278   |   0.0 | 23.12
+Comm    | 0.043181   | 0.043181   | 0.043181   |   0.0 | 12.92
+Output  | 1.2166e-05 | 1.2166e-05 | 1.2166e-05 |   0.0 |  0.00
+Modify  | 0.034929   | 0.034929   | 0.034929   |   0.0 | 10.45
+Other   |            | 0.007579   |            |       |  2.27
+
+Nlocal:            200 ave         200 max         200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:            426 ave         426 max         426 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:           1186 ave        1186 max        1186 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 1186
+Ave neighs/atom = 5.93
+Neighbor list builds = 1247
+Dangerous builds = 0
+unfix       equilibration
+
+comm_modify cutoff 5.5
+compute rdf_all all rdf 200 cutoff 5
+variable rdf_file string rdf_${r_cut}.dat
+variable rdf_file string rdf_2.12.dat
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file ${rdf_file} mode vector
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file rdf_2.12.dat mode vector
+
+print "Production"
+Production
+
+variable    potEnergy equal pe
+variable    kinEnergy equal ke
+variable    totEnergy equal etotal
+fix         production all nve
+timestep    0.001
+fix         2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_${r_cut}.out
+fix         2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_2.12.out
+thermo      10000
+thermo_style custom step pe ke etotal temp press density
+run         150000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 2.42
+  ghost atom cutoff = 5.5
+  binsize = 1.21, bins = 9 9 9
+  2 neighbor lists, perpetual/occasional/extra = 1 1 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+  (2) compute rdf, occasional
+      attributes: half, newton on, cut 5.3
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.807 | 3.807 | 3.807 Mbytes
+   Step         PotEng         KinEng         TotEng          Temp          Press         Density    
+     50000  -1.4292549      2.0262935      0.59703868     1.3576506      0.16857738     0.2          
+     60000  -1.5484126      2.1326605      0.58424788     1.4289183      0.11973651     0.2          
+     70000  -1.5450353      2.1238589      0.57882363     1.4230211      0.16436958     0.2          
+     80000  -1.409425       2.007166       0.59774097     1.3448348      0.109603       0.2          
+     90000  -1.4152766      2.016904       0.60162733     1.3513594      0.1020889      0.2          
+    100000  -1.4029458      1.999928       0.59698218     1.3399852      0.12528968     0.2          
+    110000  -1.4485502      2.0377797      0.58922945     1.3653465      0.080819528    0.2          
+    120000  -1.487664       2.0762854      0.58862137     1.391146       0.11357496     0.2          
+    130000  -1.3906396      1.9818925      0.59125288     1.3279011      0.18228085     0.2          
+    140000  -1.4128786      2.0124551      0.59957652     1.3483786      0.10801423     0.2          
+    150000  -1.4224073      2.020894       0.59848671     1.3540328      0.067767802    0.2          
+    160000  -1.4645584      2.0615006      0.59694221     1.3812399      0.068960247    0.2          
+    170000  -1.4697534      2.0581791      0.5884257      1.3790145      0.11474696     0.2          
+    180000  -1.4629709      2.0490081      0.58603715     1.3728697      0.13115291     0.2          
+    190000  -1.3752294      1.9719008      0.59667134     1.3212066      0.19807947     0.2          
+    200000  -1.4573566      2.0502504      0.5928938      1.3737021      0.10863853     0.2          
+Loop time of 1.99912 on 1 procs for 150000 steps with 200 atoms
+
+Performance: 6482839.143 tau/day, 75032.860 timesteps/s, 15.007 Matom-step/s
+99.8% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.59521    | 0.59521    | 0.59521    |   0.0 | 29.77
+Neigh   | 0.28229    | 0.28229    | 0.28229    |   0.0 | 14.12
+Comm    | 0.417      | 0.417      | 0.417      |   0.0 | 20.86
+Output  | 8.9505e-05 | 8.9505e-05 | 8.9505e-05 |   0.0 |  0.00
+Modify  | 0.63818    | 0.63818    | 0.63818    |   0.0 | 31.92
+Other   |            | 0.06636    |            |       |  3.32
+
+Nlocal:            200 ave         200 max         200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:           1660 ave        1660 max        1660 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:           1204 ave        1204 max        1204 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 1204
+Ave neighs/atom = 6.02
+Neighbor list builds = 3786
+Dangerous builds = 0
+unfix       production
+unfix       rdf_out
+clear
+next        index
+jump        SELF loop_start
+variable index loop         1 ${nsteps}
+variable index loop         1 16
+variable r_cut              equal floor((${initialCutOff}+(${index}-1)*${step})*100)/100 #manual rounding to second decimal place
+variable r_cut              equal floor((1.12246204830937+(${index}-1)*${step})*100)/100 
+variable r_cut              equal floor((1.12246204830937+(7-1)*${step})*100)/100 
+variable r_cut              equal floor((1.12246204830937+(7-1)*0.2)*100)/100 
+
+print "Simulation for r_cut = ${r_cut}"
+Simulation for r_cut = 2.32
+
+variable region_name string     simulation_box_${r_cut}
+variable region_name string     simulation_box_2.32
+region ${region_name} block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_2.32 block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_2.32 block     0.0 10 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_2.32 block     0.0 10 0.0 10 0.0 ${box_size}
+region simulation_box_2.32 block     0.0 10 0.0 10 0.0 10
+create_box 1 ${region_name}
+create_box 1 simulation_box_2.32
+Created orthogonal box = (0 0 0) to (10 10 10)
+  1 by 1 by 1 MPI processor grid
+create_atoms                    1 random ${nParticles} 234567 NULL overlap 1.3
+create_atoms                    1 random 200 234567 NULL overlap 1.3
+Created 200 atoms
+  using lattice units in orthogonal box = (0 0 0) to (10 10 10)
+  create_atoms CPU = 0.001 seconds
+
+mass        1 1.0
+velocity    all create 1.0 87242 mom yes dist gaussian
+pair_style  lj/cut ${r_cut}
+pair_style  lj/cut 2.32
+pair_coeff  1 1 1.0 1.0
+pair_modify tail yes
+
+neighbor     0.3 bin
+neigh_modify delay 0 every 10 check yes
+
+variable output_file string thermo_average_r${r_cut}.txt
+variable output_file string thermo_average_r2.32.txt
+
+print "Equilibration"
+Equilibration
+
+fix         equilibration all nve
+timestep    0.001
+run         50000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 2.62
+  ghost atom cutoff = 2.62
+  binsize = 1.31, bins = 8 8 8
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.07 | 3.07 | 3.07 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+         0   1             -0.87887012     0              0.61362988    -0.12270508   
+     50000   1.3260016     -1.3874284      0              0.59162892     0.19974686   
+Loop time of 0.398832 on 1 procs for 50000 steps with 200 atoms
+
+Performance: 10831626.807 tau/day, 125366.051 timesteps/s, 25.073 Matom-step/s
+100.0% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.21674    | 0.21674    | 0.21674    |   0.0 | 54.34
+Neigh   | 0.091175   | 0.091175   | 0.091175   |   0.0 | 22.86
+Comm    | 0.048088   | 0.048088   | 0.048088   |   0.0 | 12.06
+Output  | 7.153e-06  | 7.153e-06  | 7.153e-06  |   0.0 |  0.00
+Modify  | 0.034853   | 0.034853   | 0.034853   |   0.0 |  8.74
+Other   |            | 0.007964   |            |       |  2.00
+
+Nlocal:            200 ave         200 max         200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:            517 ave         517 max         517 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:           1626 ave        1626 max        1626 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 1626
+Ave neighs/atom = 8.13
+Neighbor list builds = 1248
+Dangerous builds = 0
+unfix       equilibration
+
+comm_modify cutoff 5.5
+compute rdf_all all rdf 200 cutoff 5
+variable rdf_file string rdf_${r_cut}.dat
+variable rdf_file string rdf_2.32.dat
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file ${rdf_file} mode vector
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file rdf_2.32.dat mode vector
+
+print "Production"
+Production
+
+variable    potEnergy equal pe
+variable    kinEnergy equal ke
+variable    totEnergy equal etotal
+fix         production all nve
+timestep    0.001
+fix         2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_${r_cut}.out
+fix         2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_2.32.out
+thermo      10000
+thermo_style custom step pe ke etotal temp press density
+run         150000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 2.62
+  ghost atom cutoff = 5.5
+  binsize = 1.31, bins = 8 8 8
+  2 neighbor lists, perpetual/occasional/extra = 1 1 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+  (2) compute rdf, occasional
+      attributes: half, newton on, cut 5.3
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.803 | 3.803 | 3.803 Mbytes
+   Step         PotEng         KinEng         TotEng          Temp          Press         Density    
+     50000  -1.3874284      1.9790574      0.59162892     1.3260016      0.19974686     0.2          
+     60000  -1.4767449      2.0772862      0.60054124     1.3918165      0.14980221     0.2          
+     70000  -1.4311129      2.0302746      0.59916168     1.360318       0.16894276     0.2          
+     80000  -1.4510351      2.0486444      0.59760928     1.3726261      0.15032584     0.2          
+     90000  -1.481473       2.081743       0.60027        1.3948027      0.15972419     0.2          
+    100000  -1.4997209      2.0971887      0.59746784     1.4051516      0.13784099     0.2          
+    110000  -1.46611        2.0680493      0.60193931     1.3856277      0.11382896     0.2          
+    120000  -1.5220382      2.1187404      0.59670228     1.4195916      0.20699145     0.2          
+    130000  -1.4338214      2.0371903      0.60336892     1.3649517      0.13856958     0.2          
+    140000  -1.4467015      2.0429098      0.59620829     1.3687838      0.14497618     0.2          
+    150000  -1.4939302      2.0925557      0.59862547     1.4020474      0.15683553     0.2          
+    160000  -1.4152307      2.0158889      0.60065823     1.3506793      0.1198448      0.2          
+    170000  -1.424395       2.0237744      0.59937934     1.3559627      0.14390174     0.2          
+    180000  -1.4629303      2.0666922      0.60376191     1.3847184      0.15686381     0.2          
+    190000  -1.6205196      2.210106       0.5895864      1.480808       0.20493948     0.2          
+    200000  -1.3604387      1.9618778      0.60143902     1.314491       0.14598722     0.2          
+Loop time of 2.22209 on 1 procs for 150000 steps with 200 atoms
+
+Performance: 5832352.408 tau/day, 67504.079 timesteps/s, 13.501 Matom-step/s
+99.6% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.75623    | 0.75623    | 0.75623    |   0.0 | 34.03
+Neigh   | 0.32692    | 0.32692    | 0.32692    |   0.0 | 14.71
+Comm    | 0.42719    | 0.42719    | 0.42719    |   0.0 | 19.22
+Output  | 0.00010881 | 0.00010881 | 0.00010881 |   0.0 |  0.00
+Modify  | 0.64441    | 0.64441    | 0.64441    |   0.0 | 29.00
+Other   |            | 0.06722    |            |       |  3.03
+
+Nlocal:            200 ave         200 max         200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:           1710 ave        1710 max        1710 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:           1511 ave        1511 max        1511 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 1511
+Ave neighs/atom = 7.555
+Neighbor list builds = 3803
+Dangerous builds = 0
+unfix       production
+unfix       rdf_out
+clear
+next        index
+jump        SELF loop_start
+variable index loop         1 ${nsteps}
+variable index loop         1 16
+variable r_cut              equal floor((${initialCutOff}+(${index}-1)*${step})*100)/100 #manual rounding to second decimal place
+variable r_cut              equal floor((1.12246204830937+(${index}-1)*${step})*100)/100 
+variable r_cut              equal floor((1.12246204830937+(8-1)*${step})*100)/100 
+variable r_cut              equal floor((1.12246204830937+(8-1)*0.2)*100)/100 
+
+print "Simulation for r_cut = ${r_cut}"
+Simulation for r_cut = 2.52
+
+variable region_name string     simulation_box_${r_cut}
+variable region_name string     simulation_box_2.52
+region ${region_name} block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_2.52 block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_2.52 block     0.0 10 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_2.52 block     0.0 10 0.0 10 0.0 ${box_size}
+region simulation_box_2.52 block     0.0 10 0.0 10 0.0 10
+create_box 1 ${region_name}
+create_box 1 simulation_box_2.52
+Created orthogonal box = (0 0 0) to (10 10 10)
+  1 by 1 by 1 MPI processor grid
+create_atoms                    1 random ${nParticles} 234567 NULL overlap 1.3
+create_atoms                    1 random 200 234567 NULL overlap 1.3
+Created 200 atoms
+  using lattice units in orthogonal box = (0 0 0) to (10 10 10)
+  create_atoms CPU = 0.001 seconds
+
+mass        1 1.0
+velocity    all create 1.0 87242 mom yes dist gaussian
+pair_style  lj/cut ${r_cut}
+pair_style  lj/cut 2.52
+pair_coeff  1 1 1.0 1.0
+pair_modify tail yes
+
+neighbor     0.3 bin
+neigh_modify delay 0 every 10 check yes
+
+variable output_file string thermo_average_r${r_cut}.txt
+variable output_file string thermo_average_r2.52.txt
+
+print "Equilibration"
+Equilibration
+
+fix         equilibration all nve
+timestep    0.001
+run         50000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 2.82
+  ghost atom cutoff = 2.82
+  binsize = 1.41, bins = 8 8 8
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.07 | 3.07 | 3.07 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+         0   1             -0.87821939     0              0.61428061    -0.12244552   
+     50000   1.39792       -1.4818674      0              0.60452827     0.099413233  
+Loop time of 0.460506 on 1 procs for 50000 steps with 200 atoms
+
+Performance: 9380980.742 tau/day, 108576.166 timesteps/s, 21.715 Matom-step/s
+100.0% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.26913    | 0.26913    | 0.26913    |   0.0 | 58.44
+Neigh   | 0.097178   | 0.097178   | 0.097178   |   0.0 | 21.10
+Comm    | 0.0512     | 0.0512     | 0.0512     |   0.0 | 11.12
+Output  | 1.283e-05  | 1.283e-05  | 1.283e-05  |   0.0 |  0.00
+Modify  | 0.034782   | 0.034782   | 0.034782   |   0.0 |  7.55
+Other   |            | 0.008206   |            |       |  1.78
+
+Nlocal:            200 ave         200 max         200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:            609 ave         609 max         609 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:           1908 ave        1908 max        1908 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 1908
+Ave neighs/atom = 9.54
+Neighbor list builds = 1264
+Dangerous builds = 0
+unfix       equilibration
+
+comm_modify cutoff 5.5
+compute rdf_all all rdf 200 cutoff 5
+variable rdf_file string rdf_${r_cut}.dat
+variable rdf_file string rdf_2.52.dat
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file ${rdf_file} mode vector
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file rdf_2.52.dat mode vector
+
+print "Production"
+Production
+
+variable    potEnergy equal pe
+variable    kinEnergy equal ke
+variable    totEnergy equal etotal
+fix         production all nve
+timestep    0.001
+fix         2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_${r_cut}.out
+fix         2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_2.52.out
+thermo      10000
+thermo_style custom step pe ke etotal temp press density
+run         150000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 2.82
+  ghost atom cutoff = 5.5
+  binsize = 1.41, bins = 8 8 8
+  2 neighbor lists, perpetual/occasional/extra = 1 1 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+  (2) compute rdf, occasional
+      attributes: half, newton on, cut 5.3
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.793 | 3.793 | 3.793 Mbytes
+   Step         PotEng         KinEng         TotEng          Temp          Press         Density    
+     50000  -1.4818674      2.0863957      0.60452827     1.39792        0.099413233    0.2          
+     60000  -1.4775392      2.0808937      0.60335448     1.3942337      0.10361428     0.2          
+     70000  -1.3860626      1.9889811      0.60291849     1.3326507      0.105219       0.2          
+     80000  -1.4341326      2.0418553      0.6077227      1.3680773      0.16348206     0.2          
+     90000  -1.4842793      2.0857564      0.60147718     1.3974918      0.12064011     0.2          
+    100000  -1.5114367      2.1111483      0.59971162     1.4145048      0.18903261     0.2          
+    110000  -1.4568903      2.0612542      0.60436383     1.3810748      0.17053423     0.2          
+    120000  -1.4617799      2.0654896      0.60370969     1.3839127      0.12118377     0.2          
+    130000  -1.4505428      2.056012       0.60546916     1.3775625      0.1481503      0.2          
+    140000  -1.4329499      2.0384789      0.60552895     1.365815       0.14849614     0.2          
+    150000  -1.4380309      2.0455144      0.60748347     1.3705289      0.090755324    0.2          
+    160000  -1.4505779      2.0557424      0.60516447     1.3773818      0.1301056      0.2          
+    170000  -1.4575891      2.0630647      0.60547559     1.3822879      0.1664834      0.2          
+    180000  -1.3754503      1.9813178      0.60586749     1.3275161      0.12154797     0.2          
+    190000  -1.5175841      2.11931        0.60172593     1.4199732      0.13097697     0.2          
+    200000  -1.4541428      2.0601464      0.60600359     1.3803326      0.1479906      0.2          
+Loop time of 2.41044 on 1 procs for 150000 steps with 200 atoms
+
+Performance: 5376612.810 tau/day, 62229.315 timesteps/s, 12.446 Matom-step/s
+99.8% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.92877    | 0.92877    | 0.92877    |   0.0 | 38.53
+Neigh   | 0.34053    | 0.34053    | 0.34053    |   0.0 | 14.13
+Comm    | 0.42829    | 0.42829    | 0.42829    |   0.0 | 17.77
+Output  | 9.7377e-05 | 9.7377e-05 | 9.7377e-05 |   0.0 |  0.00
+Modify  | 0.64651    | 0.64651    | 0.64651    |   0.0 | 26.82
+Other   |            | 0.06623    |            |       |  2.75
+
+Nlocal:            200 ave         200 max         200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:           1620 ave        1620 max        1620 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:           1896 ave        1896 max        1896 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 1896
+Ave neighs/atom = 9.48
+Neighbor list builds = 3803
+Dangerous builds = 0
+unfix       production
+unfix       rdf_out
+clear
+next        index
+jump        SELF loop_start
+variable index loop         1 ${nsteps}
+variable index loop         1 16
+variable r_cut              equal floor((${initialCutOff}+(${index}-1)*${step})*100)/100 #manual rounding to second decimal place
+variable r_cut              equal floor((1.12246204830937+(${index}-1)*${step})*100)/100 
+variable r_cut              equal floor((1.12246204830937+(9-1)*${step})*100)/100 
+variable r_cut              equal floor((1.12246204830937+(9-1)*0.2)*100)/100 
+
+print "Simulation for r_cut = ${r_cut}"
+Simulation for r_cut = 2.72
+
+variable region_name string     simulation_box_${r_cut}
+variable region_name string     simulation_box_2.72
+region ${region_name} block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_2.72 block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_2.72 block     0.0 10 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_2.72 block     0.0 10 0.0 10 0.0 ${box_size}
+region simulation_box_2.72 block     0.0 10 0.0 10 0.0 10
+create_box 1 ${region_name}
+create_box 1 simulation_box_2.72
+Created orthogonal box = (0 0 0) to (10 10 10)
+  1 by 1 by 1 MPI processor grid
+create_atoms                    1 random ${nParticles} 234567 NULL overlap 1.3
+create_atoms                    1 random 200 234567 NULL overlap 1.3
+Created 200 atoms
+  using lattice units in orthogonal box = (0 0 0) to (10 10 10)
+  create_atoms CPU = 0.001 seconds
+
+mass        1 1.0
+velocity    all create 1.0 87242 mom yes dist gaussian
+pair_style  lj/cut ${r_cut}
+pair_style  lj/cut 2.72
+pair_coeff  1 1 1.0 1.0
+pair_modify tail yes
+
+neighbor     0.3 bin
+neigh_modify delay 0 every 10 check yes
+
+variable output_file string thermo_average_r${r_cut}.txt
+variable output_file string thermo_average_r2.72.txt
+
+print "Equilibration"
+Equilibration
+
+fix         equilibration all nve
+timestep    0.001
+run         50000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 3.02
+  ghost atom cutoff = 3.02
+  binsize = 1.51, bins = 7 7 7
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.069 | 3.069 | 3.069 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+         0   1             -0.87840353     0              0.61409647    -0.12251915   
+     50000   1.3293763     -1.3744631      0              0.60963113     0.14602681   
+Loop time of 0.54719 on 1 procs for 50000 steps with 200 atoms
+
+Performance: 7894887.800 tau/day, 91376.016 timesteps/s, 18.275 Matom-step/s
+100.0% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.33607    | 0.33607    | 0.33607    |   0.0 | 61.42
+Neigh   | 0.10935    | 0.10935    | 0.10935    |   0.0 | 19.98
+Comm    | 0.058093   | 0.058093   | 0.058093   |   0.0 | 10.62
+Output  | 1.154e-05  | 1.154e-05  | 1.154e-05  |   0.0 |  0.00
+Modify  | 0.034689   | 0.034689   | 0.034689   |   0.0 |  6.34
+Other   |            | 0.008969   |            |       |  1.64
+
+Nlocal:            200 ave         200 max         200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:            604 ave         604 max         604 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:           2307 ave        2307 max        2307 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 2307
+Ave neighs/atom = 11.535
+Neighbor list builds = 1271
+Dangerous builds = 0
+unfix       equilibration
+
+comm_modify cutoff 5.5
+compute rdf_all all rdf 200 cutoff 5
+variable rdf_file string rdf_${r_cut}.dat
+variable rdf_file string rdf_2.72.dat
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file ${rdf_file} mode vector
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file rdf_2.72.dat mode vector
+
+print "Production"
+Production
+
+variable    potEnergy equal pe
+variable    kinEnergy equal ke
+variable    totEnergy equal etotal
+fix         production all nve
+timestep    0.001
+fix         2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_${r_cut}.out
+fix         2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_2.72.out
+thermo      10000
+thermo_style custom step pe ke etotal temp press density
+run         150000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 3.02
+  ghost atom cutoff = 5.5
+  binsize = 1.51, bins = 7 7 7
+  2 neighbor lists, perpetual/occasional/extra = 1 1 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+  (2) compute rdf, occasional
+      attributes: half, newton on, cut 5.3
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.787 | 3.787 | 3.787 Mbytes
+   Step         PotEng         KinEng         TotEng          Temp          Press         Density    
+     50000  -1.3744631      1.9840942      0.60963113     1.3293763      0.14602681     0.2          
+     60000  -1.4136077      2.0229347      0.60932699     1.3554001      0.098527818    0.2          
+     70000  -1.5325252      2.1389623      0.60643701     1.4331405      0.067833576    0.2          
+     80000  -1.5678677      2.1718039      0.60393623     1.455145       0.13641993     0.2          
+     90000  -1.4213195      2.0299996      0.60868007     1.3601337      0.15360885     0.2          
+    100000  -1.4176495      2.0258334      0.60818392     1.3573423      0.14348848     0.2          
+    110000  -1.4513374      2.0609226      0.60958526     1.3808527      0.13787831     0.2          
+    120000  -1.4577687      2.0664121      0.60864341     1.3845307      0.056327711    0.2          
+    130000  -1.4757124      2.0816579      0.60594544     1.3947456      0.064245982    0.2          
+    140000  -1.4590916      2.0665196      0.60742797     1.3846027      0.11920178     0.2          
+    150000  -1.5328845      2.1374439      0.60455937     1.4321232      0.14875263     0.2          
+    160000  -1.5238653      2.1304891      0.60662378     1.4274634      0.11744706     0.2          
+    170000  -1.5644665      2.168685       0.60421858     1.4530553      0.13885053     0.2          
+    180000  -1.3849774      1.9947275      0.60975014     1.3365009      0.20801774     0.2          
+    190000  -1.4726519      2.0832682      0.61061638     1.3958246      0.1627638      0.2          
+    200000  -1.4268904      2.0367894      0.60989899     1.364683       0.042947077    0.2          
+Loop time of 2.68537 on 1 procs for 150000 steps with 200 atoms
+
+Performance: 4826145.099 tau/day, 55858.161 timesteps/s, 11.172 Matom-step/s
+99.7% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 1.1639     | 1.1639     | 1.1639     |   0.0 | 43.34
+Neigh   | 0.3765     | 0.3765     | 0.3765     |   0.0 | 14.02
+Comm    | 0.43232    | 0.43232    | 0.43232    |   0.0 | 16.10
+Output  | 9.1833e-05 | 9.1833e-05 | 9.1833e-05 |   0.0 |  0.00
+Modify  | 0.64536    | 0.64536    | 0.64536    |   0.0 | 24.03
+Other   |            | 0.06724    |            |       |  2.50
+
+Nlocal:            200 ave         200 max         200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:           1711 ave        1711 max        1711 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:           2355 ave        2355 max        2355 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 2355
+Ave neighs/atom = 11.775
+Neighbor list builds = 3834
+Dangerous builds = 0
+unfix       production
+unfix       rdf_out
+clear
+next        index
+jump        SELF loop_start
+variable index loop         1 ${nsteps}
+variable index loop         1 16
+variable r_cut              equal floor((${initialCutOff}+(${index}-1)*${step})*100)/100 #manual rounding to second decimal place
+variable r_cut              equal floor((1.12246204830937+(${index}-1)*${step})*100)/100 
+variable r_cut              equal floor((1.12246204830937+(10-1)*${step})*100)/100 
+variable r_cut              equal floor((1.12246204830937+(10-1)*0.2)*100)/100 
+
+print "Simulation for r_cut = ${r_cut}"
+Simulation for r_cut = 2.92
+
+variable region_name string     simulation_box_${r_cut}
+variable region_name string     simulation_box_2.92
+region ${region_name} block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_2.92 block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_2.92 block     0.0 10 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_2.92 block     0.0 10 0.0 10 0.0 ${box_size}
+region simulation_box_2.92 block     0.0 10 0.0 10 0.0 10
+create_box 1 ${region_name}
+create_box 1 simulation_box_2.92
+Created orthogonal box = (0 0 0) to (10 10 10)
+  1 by 1 by 1 MPI processor grid
+create_atoms                    1 random ${nParticles} 234567 NULL overlap 1.3
+create_atoms                    1 random 200 234567 NULL overlap 1.3
+Created 200 atoms
+  using lattice units in orthogonal box = (0 0 0) to (10 10 10)
+  create_atoms CPU = 0.001 seconds
+
+mass        1 1.0
+velocity    all create 1.0 87242 mom yes dist gaussian
+pair_style  lj/cut ${r_cut}
+pair_style  lj/cut 2.92
+pair_coeff  1 1 1.0 1.0
+pair_modify tail yes
+
+neighbor     0.3 bin
+neigh_modify delay 0 every 10 check yes
+
+variable output_file string thermo_average_r${r_cut}.txt
+variable output_file string thermo_average_r2.92.txt
+
+print "Equilibration"
+Equilibration
+
+fix         equilibration all nve
+timestep    0.001
+run         50000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 3.22
+  ghost atom cutoff = 3.22
+  binsize = 1.61, bins = 7 7 7
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.078 | 3.078 | 3.078 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+         0   1             -0.87742936     0              0.61507064    -0.12213037   
+     50000   1.405815      -1.4872317      0              0.61094717     0.11227932   
+Loop time of 0.641453 on 1 procs for 50000 steps with 200 atoms
+
+Performance: 6734705.977 tau/day, 77947.986 timesteps/s, 15.590 Matom-step/s
+100.0% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.41558    | 0.41558    | 0.41558    |   0.0 | 64.79
+Neigh   | 0.1182     | 0.1182     | 0.1182     |   0.0 | 18.43
+Comm    | 0.062276   | 0.062276   | 0.062276   |   0.0 |  9.71
+Output  | 1.3397e-05 | 1.3397e-05 | 1.3397e-05 |   0.0 |  0.00
+Modify  | 0.03599    | 0.03599    | 0.03599    |   0.0 |  5.61
+Other   |            | 0.009401   |            |       |  1.47
+
+Nlocal:            200 ave         200 max         200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:            704 ave         704 max         704 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:           2851 ave        2851 max        2851 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 2851
+Ave neighs/atom = 14.255
+Neighbor list builds = 1302
+Dangerous builds = 0
+unfix       equilibration
+
+comm_modify cutoff 5.5
+compute rdf_all all rdf 200 cutoff 5
+variable rdf_file string rdf_${r_cut}.dat
+variable rdf_file string rdf_2.92.dat
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file ${rdf_file} mode vector
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file rdf_2.92.dat mode vector
+
+print "Production"
+Production
+
+variable    potEnergy equal pe
+variable    kinEnergy equal ke
+variable    totEnergy equal etotal
+fix         production all nve
+timestep    0.001
+fix         2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_${r_cut}.out
+fix         2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_2.92.out
+thermo      10000
+thermo_style custom step pe ke etotal temp press density
+run         150000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 3.22
+  ghost atom cutoff = 5.5
+  binsize = 1.61, bins = 7 7 7
+  2 neighbor lists, perpetual/occasional/extra = 1 1 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+  (2) compute rdf, occasional
+      attributes: half, newton on, cut 5.3
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.792 | 3.792 | 3.792 Mbytes
+   Step         PotEng         KinEng         TotEng          Temp          Press         Density    
+     50000  -1.4872317      2.0981788      0.61094717     1.405815       0.11227932     0.2          
+     60000  -1.4239014      2.0350816      0.61118021     1.3635387      0.070994287    0.2          
+     70000  -1.5360704      2.1432258      0.60715537     1.4359972      0.14300619     0.2          
+     80000  -1.51584        2.1241112      0.60827125     1.4231901      0.17821534     0.2          
+     90000  -1.3542362      1.9661311      0.61189498     1.3173408      0.10848371     0.2          
+    100000  -1.486174       2.0962018      0.61002779     1.4044903      0.14352266     0.2          
+    110000  -1.4583141      2.0672007      0.60888661     1.3850591      0.19075304     0.2          
+    120000  -1.4642739      2.0700437      0.60576973     1.3869639      0.2969894      0.2          
+    130000  -1.4966721      2.1077115      0.61103942     1.412202       0.060594269    0.2          
+    140000  -1.562705       2.1695612      0.60685613     1.4536423      0.076552525    0.2          
+    150000  -1.526091       2.1335598      0.60746882     1.4295208      0.14952947     0.2          
+    160000  -1.5054798      2.1160432      0.61056342     1.4177844      0.090795738    0.2          
+    170000  -1.3505615      1.9635321      0.61297067     1.3155994      0.12651176     0.2          
+    180000  -1.3684335      1.9794016      0.61096805     1.3262322      0.1653166      0.2          
+    190000  -1.5551737      2.1620098      0.60683609     1.4485828      0.16456682     0.2          
+    200000  -1.466244       2.0766383      0.61039435     1.3913825      0.09970038     0.2          
+Loop time of 2.92858 on 1 procs for 150000 steps with 200 atoms
+
+Performance: 4425346.097 tau/day, 51219.284 timesteps/s, 10.244 Matom-step/s
+99.7% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 1.4053     | 1.4053     | 1.4053     |   0.0 | 47.99
+Neigh   | 0.38957    | 0.38957    | 0.38957    |   0.0 | 13.30
+Comm    | 0.42656    | 0.42656    | 0.42656    |   0.0 | 14.57
+Output  | 9.4077e-05 | 9.4077e-05 | 9.4077e-05 |   0.0 |  0.00
+Modify  | 0.6403     | 0.6403     | 0.6403     |   0.0 | 21.86
+Other   |            | 0.06676    |            |       |  2.28
+
+Nlocal:            200 ave         200 max         200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:           1658 ave        1658 max        1658 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:           2827 ave        2827 max        2827 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 2827
+Ave neighs/atom = 14.135
+Neighbor list builds = 3796
+Dangerous builds = 0
+unfix       production
+unfix       rdf_out
+clear
+next        index
+jump        SELF loop_start
+variable index loop         1 ${nsteps}
+variable index loop         1 16
+variable r_cut              equal floor((${initialCutOff}+(${index}-1)*${step})*100)/100 #manual rounding to second decimal place
+variable r_cut              equal floor((1.12246204830937+(${index}-1)*${step})*100)/100 
+variable r_cut              equal floor((1.12246204830937+(11-1)*${step})*100)/100 
+variable r_cut              equal floor((1.12246204830937+(11-1)*0.2)*100)/100 
+
+print "Simulation for r_cut = ${r_cut}"
+Simulation for r_cut = 3.12
+
+variable region_name string     simulation_box_${r_cut}
+variable region_name string     simulation_box_3.12
+region ${region_name} block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_3.12 block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_3.12 block     0.0 10 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_3.12 block     0.0 10 0.0 10 0.0 ${box_size}
+region simulation_box_3.12 block     0.0 10 0.0 10 0.0 10
+create_box 1 ${region_name}
+create_box 1 simulation_box_3.12
+Created orthogonal box = (0 0 0) to (10 10 10)
+  1 by 1 by 1 MPI processor grid
+create_atoms                    1 random ${nParticles} 234567 NULL overlap 1.3
+create_atoms                    1 random 200 234567 NULL overlap 1.3
+Created 200 atoms
+  using lattice units in orthogonal box = (0 0 0) to (10 10 10)
+  create_atoms CPU = 0.001 seconds
+
+mass        1 1.0
+velocity    all create 1.0 87242 mom yes dist gaussian
+pair_style  lj/cut ${r_cut}
+pair_style  lj/cut 3.12
+pair_coeff  1 1 1.0 1.0
+pair_modify tail yes
+
+neighbor     0.3 bin
+neigh_modify delay 0 every 10 check yes
+
+variable output_file string thermo_average_r${r_cut}.txt
+variable output_file string thermo_average_r3.12.txt
+
+print "Equilibration"
+Equilibration
+
+fix         equilibration all nve
+timestep    0.001
+run         50000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 3.42
+  ghost atom cutoff = 3.42
+  binsize = 1.71, bins = 6 6 6
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.08 | 3.08 | 3.08 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+         0   1             -0.87792125     0              0.61457875    -0.12232685   
+     50000   1.3897493     -1.4620305      0              0.61217032     0.12775706   
+Loop time of 0.771338 on 1 procs for 50000 steps with 200 atoms
+
+Performance: 5600658.321 tau/day, 64822.434 timesteps/s, 12.964 Matom-step/s
+100.0% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.52264    | 0.52264    | 0.52264    |   0.0 | 67.76
+Neigh   | 0.13071    | 0.13071    | 0.13071    |   0.0 | 16.95
+Comm    | 0.071486   | 0.071486   | 0.071486   |   0.0 |  9.27
+Output  | 1.3894e-05 | 1.3894e-05 | 1.3894e-05 |   0.0 |  0.00
+Modify  | 0.035445   | 0.035445   | 0.035445   |   0.0 |  4.60
+Other   |            | 0.01104    |            |       |  1.43
+
+Nlocal:            200 ave         200 max         200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:            825 ave         825 max         825 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:           3373 ave        3373 max        3373 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 3373
+Ave neighs/atom = 16.865
+Neighbor list builds = 1258
+Dangerous builds = 0
+unfix       equilibration
+
+comm_modify cutoff 5.5
+compute rdf_all all rdf 200 cutoff 5
+variable rdf_file string rdf_${r_cut}.dat
+variable rdf_file string rdf_3.12.dat
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file ${rdf_file} mode vector
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file rdf_3.12.dat mode vector
+
+print "Production"
+Production
+
+variable    potEnergy equal pe
+variable    kinEnergy equal ke
+variable    totEnergy equal etotal
+fix         production all nve
+timestep    0.001
+fix         2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_${r_cut}.out
+fix         2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_3.12.out
+thermo      10000
+thermo_style custom step pe ke etotal temp press density
+run         150000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 3.42
+  ghost atom cutoff = 5.5
+  binsize = 1.71, bins = 6 6 6
+  2 neighbor lists, perpetual/occasional/extra = 1 1 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+  (2) compute rdf, occasional
+      attributes: half, newton on, cut 5.3
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.786 | 3.786 | 3.786 Mbytes
+   Step         PotEng         KinEng         TotEng          Temp          Press         Density    
+     50000  -1.4620305      2.0742008      0.61217032     1.3897493      0.12775706     0.2          
+     60000  -1.4228296      2.0345261      0.61169659     1.3631666      0.16936496     0.2          
+     70000  -1.476058       2.0875376      0.61147963     1.3986852      0.13576863     0.2          
+     80000  -1.4408495      2.0516785      0.61082905     1.374659       0.11033749     0.2          
+     90000  -1.4055594      2.0168624      0.61130306     1.3513316      0.15421045     0.2          
+    100000  -1.4627298      2.0726987      0.60996891     1.3887428      0.21448484     0.2          
+    110000  -1.4651497      2.0776864      0.6125367      1.3920847      0.12826724     0.2          
+    120000  -1.5389229      2.1503228      0.61139991     1.4407523      0.12738413     0.2          
+    130000  -1.4886348      2.0999008      0.611266       1.4069687      0.1396469      0.2          
+    140000  -1.4499621      2.0610831      0.61112107     1.3809602      0.15846616     0.2          
+    150000  -1.5498099      2.1588823      0.60907244     1.4464873      0.19524865     0.2          
+    160000  -1.4086393      2.0207876      0.61214836     1.3539616      0.17974159     0.2          
+    170000  -1.3957287      2.0071904      0.61146173     1.3448512      0.2658531      0.2          
+    180000  -1.5298314      2.1411248      0.61129339     1.4345895      0.070936341    0.2          
+    190000  -1.4476474      2.0592442      0.6115968      1.3797281      0.12332173     0.2          
+    200000  -1.4690429      2.0824687      0.6134258      1.3952889      0.17758435     0.2          
+Loop time of 3.28833 on 1 procs for 150000 steps with 200 atoms
+
+Performance: 3941208.900 tau/day, 45615.844 timesteps/s, 9.123 Matom-step/s
+99.7% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 1.7198     | 1.7198     | 1.7198     |   0.0 | 52.30
+Neigh   | 0.43926    | 0.43926    | 0.43926    |   0.0 | 13.36
+Comm    | 0.42272    | 0.42272    | 0.42272    |   0.0 | 12.86
+Output  | 0.00010687 | 0.00010687 | 0.00010687 |   0.0 |  0.00
+Modify  | 0.64       | 0.64       | 0.64       |   0.0 | 19.46
+Other   |            | 0.06641    |            |       |  2.02
+
+Nlocal:            200 ave         200 max         200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:           1676 ave        1676 max        1676 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:           3327 ave        3327 max        3327 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 3327
+Ave neighs/atom = 16.635
+Neighbor list builds = 3848
+Dangerous builds = 0
+unfix       production
+unfix       rdf_out
+clear
+next        index
+jump        SELF loop_start
+variable index loop         1 ${nsteps}
+variable index loop         1 16
+variable r_cut              equal floor((${initialCutOff}+(${index}-1)*${step})*100)/100 #manual rounding to second decimal place
+variable r_cut              equal floor((1.12246204830937+(${index}-1)*${step})*100)/100 
+variable r_cut              equal floor((1.12246204830937+(12-1)*${step})*100)/100 
+variable r_cut              equal floor((1.12246204830937+(12-1)*0.2)*100)/100 
+
+print "Simulation for r_cut = ${r_cut}"
+Simulation for r_cut = 3.32
+
+variable region_name string     simulation_box_${r_cut}
+variable region_name string     simulation_box_3.32
+region ${region_name} block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_3.32 block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_3.32 block     0.0 10 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_3.32 block     0.0 10 0.0 10 0.0 ${box_size}
+region simulation_box_3.32 block     0.0 10 0.0 10 0.0 10
+create_box 1 ${region_name}
+create_box 1 simulation_box_3.32
+Created orthogonal box = (0 0 0) to (10 10 10)
+  1 by 1 by 1 MPI processor grid
+create_atoms                    1 random ${nParticles} 234567 NULL overlap 1.3
+create_atoms                    1 random 200 234567 NULL overlap 1.3
+Created 200 atoms
+  using lattice units in orthogonal box = (0 0 0) to (10 10 10)
+  create_atoms CPU = 0.001 seconds
+
+mass        1 1.0
+velocity    all create 1.0 87242 mom yes dist gaussian
+pair_style  lj/cut ${r_cut}
+pair_style  lj/cut 3.32
+pair_coeff  1 1 1.0 1.0
+pair_modify tail yes
+
+neighbor     0.3 bin
+neigh_modify delay 0 every 10 check yes
+
+variable output_file string thermo_average_r${r_cut}.txt
+variable output_file string thermo_average_r3.32.txt
+
+print "Equilibration"
+Equilibration
+
+fix         equilibration all nve
+timestep    0.001
+run         50000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 3.62
+  ghost atom cutoff = 3.62
+  binsize = 1.81, bins = 6 6 6
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.083 | 3.083 | 3.083 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+         0   1             -0.87766128     0              0.61483872    -0.12222298   
+     50000   1.4129251     -1.4960176      0              0.61277315     0.10843294   
+Loop time of 0.880893 on 1 procs for 50000 steps with 200 atoms
+
+Performance: 4904115.901 tau/day, 56760.601 timesteps/s, 11.352 Matom-step/s
+100.0% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.62305    | 0.62305    | 0.62305    |   0.0 | 70.73
+Neigh   | 0.13858    | 0.13858    | 0.13858    |   0.0 | 15.73
+Comm    | 0.07379    | 0.07379    | 0.07379    |   0.0 |  8.38
+Output  | 1.3122e-05 | 1.3122e-05 | 1.3122e-05 |   0.0 |  0.00
+Modify  | 0.034298   | 0.034298   | 0.034298   |   0.0 |  3.89
+Other   |            | 0.01116    |            |       |  1.27
+
+Nlocal:            200 ave         200 max         200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:            816 ave         816 max         816 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:           4026 ave        4026 max        4026 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 4026
+Ave neighs/atom = 20.13
+Neighbor list builds = 1287
+Dangerous builds = 0
+unfix       equilibration
+
+comm_modify cutoff 5.5
+compute rdf_all all rdf 200 cutoff 5
+variable rdf_file string rdf_${r_cut}.dat
+variable rdf_file string rdf_3.32.dat
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file ${rdf_file} mode vector
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file rdf_3.32.dat mode vector
+
+print "Production"
+Production
+
+variable    potEnergy equal pe
+variable    kinEnergy equal ke
+variable    totEnergy equal etotal
+fix         production all nve
+timestep    0.001
+fix         2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_${r_cut}.out
+fix         2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_3.32.out
+thermo      10000
+thermo_style custom step pe ke etotal temp press density
+run         150000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 3.62
+  ghost atom cutoff = 5.5
+  binsize = 1.81, bins = 6 6 6
+  2 neighbor lists, perpetual/occasional/extra = 1 1 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+  (2) compute rdf, occasional
+      attributes: half, newton on, cut 5.3
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.779 | 3.779 | 3.779 Mbytes
+   Step         PotEng         KinEng         TotEng          Temp          Press         Density    
+     50000  -1.4960176      2.1087907      0.61277315     1.4129251      0.10843294     0.2          
+     60000  -1.3712907      1.9854795      0.61418888     1.3303046      0.1423972      0.2          
+     70000  -1.5007634      2.113352       0.61258863     1.4159813      0.14819115     0.2          
+     80000  -1.513851       2.1258013      0.61195027     1.4243225      0.1629714      0.2          
+     90000  -1.4444198      2.0563133      0.61189347     1.3777644      0.12104674     0.2          
+    100000  -1.4385179      2.0517319      0.61321405     1.3746948      0.088076004    0.2          
+    110000  -1.37804        1.9910999      0.61305985     1.3340703      0.029243457    0.2          
+    120000  -1.4630018      2.0738168      0.61081498     1.389492       0.17911981     0.2          
+    130000  -1.5083745      2.1211497      0.61277521     1.4212058      0.17795765     0.2          
+    140000  -1.5306094      2.1407815      0.61017216     1.4343595      0.30211568     0.2          
+    150000  -1.3658285      1.9789189      0.61309038     1.3259088      0.12307677     0.2          
+    160000  -1.4697688      2.0821114      0.6123426      1.3950495      0.13444736     0.2          
+    170000  -1.4160687      2.028954       0.61288527     1.3594332      0.13227708     0.2          
+    180000  -1.3850749      1.9989192      0.61384429     1.3393094      0.16530275     0.2          
+    190000  -1.4686116      2.0807791      0.61216753     1.3941568      0.1275272      0.2          
+    200000  -1.4360451      2.0480595      0.61201442     1.3722342      0.13630713     0.2          
+Loop time of 3.68707 on 1 procs for 150000 steps with 200 atoms
+
+Performance: 3514985.268 tau/day, 40682.700 timesteps/s, 8.137 Matom-step/s
+99.8% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 2.1039     | 2.1039     | 2.1039     |   0.0 | 57.06
+Neigh   | 0.45246    | 0.45246    | 0.45246    |   0.0 | 12.27
+Comm    | 0.41388    | 0.41388    | 0.41388    |   0.0 | 11.23
+Output  | 9.4183e-05 | 9.4183e-05 | 9.4183e-05 |   0.0 |  0.00
+Modify  | 0.65122    | 0.65122    | 0.65122    |   0.0 | 17.66
+Other   |            | 0.06553    |            |       |  1.78
+
+Nlocal:            200 ave         200 max         200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:           1640 ave        1640 max        1640 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:           4036 ave        4036 max        4036 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 4036
+Ave neighs/atom = 20.18
+Neighbor list builds = 3829
+Dangerous builds = 0
+unfix       production
+unfix       rdf_out
+clear
+next        index
+jump        SELF loop_start
+variable index loop         1 ${nsteps}
+variable index loop         1 16
+variable r_cut              equal floor((${initialCutOff}+(${index}-1)*${step})*100)/100 #manual rounding to second decimal place
+variable r_cut              equal floor((1.12246204830937+(${index}-1)*${step})*100)/100 
+variable r_cut              equal floor((1.12246204830937+(13-1)*${step})*100)/100 
+variable r_cut              equal floor((1.12246204830937+(13-1)*0.2)*100)/100 
+
+print "Simulation for r_cut = ${r_cut}"
+Simulation for r_cut = 3.52
+
+variable region_name string     simulation_box_${r_cut}
+variable region_name string     simulation_box_3.52
+region ${region_name} block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_3.52 block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_3.52 block     0.0 10 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_3.52 block     0.0 10 0.0 10 0.0 ${box_size}
+region simulation_box_3.52 block     0.0 10 0.0 10 0.0 10
+create_box 1 ${region_name}
+create_box 1 simulation_box_3.52
+Created orthogonal box = (0 0 0) to (10 10 10)
+  1 by 1 by 1 MPI processor grid
+create_atoms                    1 random ${nParticles} 234567 NULL overlap 1.3
+create_atoms                    1 random 200 234567 NULL overlap 1.3
+Created 200 atoms
+  using lattice units in orthogonal box = (0 0 0) to (10 10 10)
+  create_atoms CPU = 0.001 seconds
+
+mass        1 1.0
+velocity    all create 1.0 87242 mom yes dist gaussian
+pair_style  lj/cut ${r_cut}
+pair_style  lj/cut 3.52
+pair_coeff  1 1 1.0 1.0
+pair_modify tail yes
+
+neighbor     0.3 bin
+neigh_modify delay 0 every 10 check yes
+
+variable output_file string thermo_average_r${r_cut}.txt
+variable output_file string thermo_average_r3.52.txt
+
+print "Equilibration"
+Equilibration
+
+fix         equilibration all nve
+timestep    0.001
+run         50000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 3.82
+  ghost atom cutoff = 3.82
+  binsize = 1.91, bins = 6 6 6
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.086 | 3.086 | 3.086 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+         0   1             -0.87781776     0              0.61468224    -0.12228551   
+     50000   1.4296976     -1.5216394      0              0.61218424     0.1584962    
+Loop time of 1.05028 on 1 procs for 50000 steps with 200 atoms
+
+Performance: 4113200.914 tau/day, 47606.492 timesteps/s, 9.521 Matom-step/s
+100.0% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.77507    | 0.77507    | 0.77507    |   0.0 | 73.80
+Neigh   | 0.14616    | 0.14616    | 0.14616    |   0.0 | 13.92
+Comm    | 0.082253   | 0.082253   | 0.082253   |   0.0 |  7.83
+Output  | 9.392e-06  | 9.392e-06  | 9.392e-06  |   0.0 |  0.00
+Modify  | 0.034714   | 0.034714   | 0.034714   |   0.0 |  3.31
+Other   |            | 0.01206    |            |       |  1.15
+
+Nlocal:            200 ave         200 max         200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:            884 ave         884 max         884 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:           4836 ave        4836 max        4836 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 4836
+Ave neighs/atom = 24.18
+Neighbor list builds = 1293
+Dangerous builds = 0
+unfix       equilibration
+
+comm_modify cutoff 5.5
+compute rdf_all all rdf 200 cutoff 5
+variable rdf_file string rdf_${r_cut}.dat
+variable rdf_file string rdf_3.52.dat
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file ${rdf_file} mode vector
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file rdf_3.52.dat mode vector
+
+print "Production"
+Production
+
+variable    potEnergy equal pe
+variable    kinEnergy equal ke
+variable    totEnergy equal etotal
+fix         production all nve
+timestep    0.001
+fix         2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_${r_cut}.out
+fix         2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_3.52.out
+thermo      10000
+thermo_style custom step pe ke etotal temp press density
+run         150000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 3.82
+  ghost atom cutoff = 5.5
+  binsize = 1.91, bins = 6 6 6
+  2 neighbor lists, perpetual/occasional/extra = 1 1 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+  (2) compute rdf, occasional
+      attributes: half, newton on, cut 5.3
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.788 | 3.788 | 3.788 Mbytes
+   Step         PotEng         KinEng         TotEng          Temp          Press         Density    
+     50000  -1.5216394      2.1338237      0.61218424     1.4296976      0.1584962      0.2          
+     60000  -1.461843       2.0760204      0.61417734     1.3909684      0.087309177    0.2          
+     70000  -1.4455834      2.0591077      0.61352428     1.3796366      0.11944945     0.2          
+     80000  -1.4374829      2.0515979      0.61411505     1.374605       0.12567379     0.2          
+     90000  -1.5347549      2.1476306      0.61287572     1.4389485      0.16139269     0.2          
+    100000  -1.3632374      1.9773303      0.61409284     1.3248444      0.18447504     0.2          
+    110000  -1.3839984      1.9981347      0.61413627     1.3387837      0.2083799      0.2          
+    120000  -1.4877545      2.1002749      0.61252038     1.4072194      0.13730949     0.2          
+    130000  -1.4972864      2.1105749      0.61328848     1.4141205      0.1255432      0.2          
+    140000  -1.3988672      2.011249       0.6123818      1.3475705      0.090348324    0.2          
+    150000  -1.396421       2.0102491      0.61382808     1.3469006      0.18253048     0.2          
+    160000  -1.5821613      2.1942345      0.61207327     1.4701739      0.13247748     0.2          
+    170000  -1.4780655      2.0905181      0.61245254     1.4006821      0.14774173     0.2          
+    180000  -1.4048406      2.0186046      0.61376395     1.3524989      0.13915407     0.2          
+    190000  -1.5351183      2.1473009      0.61218268     1.4387276      0.15251944     0.2          
+    200000  -1.3898927      2.0043698      0.61447716     1.3429614      0.11791765     0.2          
+Loop time of 4.22355 on 1 procs for 150000 steps with 200 atoms
+
+Performance: 3068505.705 tau/day, 35515.112 timesteps/s, 7.103 Matom-step/s
+99.9% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 2.6033     | 2.6033     | 2.6033     |   0.0 | 61.64
+Neigh   | 0.47311    | 0.47311    | 0.47311    |   0.0 | 11.20
+Comm    | 0.43844    | 0.43844    | 0.43844    |   0.0 | 10.38
+Output  | 0.00010081 | 0.00010081 | 0.00010081 |   0.0 |  0.00
+Modify  | 0.64221    | 0.64221    | 0.64221    |   0.0 | 15.21
+Other   |            | 0.06638    |            |       |  1.57
+
+Nlocal:            200 ave         200 max         200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:           1668 ave        1668 max        1668 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:           4537 ave        4537 max        4537 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 4537
+Ave neighs/atom = 22.685
+Neighbor list builds = 3813
+Dangerous builds = 0
+unfix       production
+unfix       rdf_out
+clear
+next        index
+jump        SELF loop_start
+variable index loop         1 ${nsteps}
+variable index loop         1 16
+variable r_cut              equal floor((${initialCutOff}+(${index}-1)*${step})*100)/100 #manual rounding to second decimal place
+variable r_cut              equal floor((1.12246204830937+(${index}-1)*${step})*100)/100 
+variable r_cut              equal floor((1.12246204830937+(14-1)*${step})*100)/100 
+variable r_cut              equal floor((1.12246204830937+(14-1)*0.2)*100)/100 
+
+print "Simulation for r_cut = ${r_cut}"
+Simulation for r_cut = 3.72
+
+variable region_name string     simulation_box_${r_cut}
+variable region_name string     simulation_box_3.72
+region ${region_name} block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_3.72 block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_3.72 block     0.0 10 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_3.72 block     0.0 10 0.0 10 0.0 ${box_size}
+region simulation_box_3.72 block     0.0 10 0.0 10 0.0 10
+create_box 1 ${region_name}
+create_box 1 simulation_box_3.72
+Created orthogonal box = (0 0 0) to (10 10 10)
+  1 by 1 by 1 MPI processor grid
+create_atoms                    1 random ${nParticles} 234567 NULL overlap 1.3
+create_atoms                    1 random 200 234567 NULL overlap 1.3
+Created 200 atoms
+  using lattice units in orthogonal box = (0 0 0) to (10 10 10)
+  create_atoms CPU = 0.001 seconds
+
+mass        1 1.0
+velocity    all create 1.0 87242 mom yes dist gaussian
+pair_style  lj/cut ${r_cut}
+pair_style  lj/cut 3.72
+pair_coeff  1 1 1.0 1.0
+pair_modify tail yes
+
+neighbor     0.3 bin
+neigh_modify delay 0 every 10 check yes
+
+variable output_file string thermo_average_r${r_cut}.txt
+variable output_file string thermo_average_r3.72.txt
+
+print "Equilibration"
+Equilibration
+
+fix         equilibration all nve
+timestep    0.001
+run         50000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 4.02
+  ghost atom cutoff = 4.02
+  binsize = 2.01, bins = 5 5 5
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.091 | 3.091 | 3.091 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+         0   1             -0.877834       0              0.614666      -0.122292     
+     50000   1.4424669     -1.5410767      0              0.61180518     0.20189916   
+Loop time of 1.26531 on 1 procs for 50000 steps with 200 atoms
+
+Performance: 3414188.944 tau/day, 39516.076 timesteps/s, 7.903 Matom-step/s
+100.0% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.96431    | 0.96431    | 0.96431    |   0.0 | 76.21
+Neigh   | 0.16596    | 0.16596    | 0.16596    |   0.0 | 13.12
+Comm    | 0.088166   | 0.088166   | 0.088166   |   0.0 |  6.97
+Output  | 1.3247e-05 | 1.3247e-05 | 1.3247e-05 |   0.0 |  0.00
+Modify  | 0.033799   | 0.033799   | 0.033799   |   0.0 |  2.67
+Other   |            | 0.01306    |            |       |  1.03
+
+Nlocal:            200 ave         200 max         200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:            960 ave         960 max         960 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:           5811 ave        5811 max        5811 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 5811
+Ave neighs/atom = 29.055
+Neighbor list builds = 1264
+Dangerous builds = 0
+unfix       equilibration
+
+comm_modify cutoff 5.5
+compute rdf_all all rdf 200 cutoff 5
+variable rdf_file string rdf_${r_cut}.dat
+variable rdf_file string rdf_3.72.dat
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file ${rdf_file} mode vector
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file rdf_3.72.dat mode vector
+
+print "Production"
+Production
+
+variable    potEnergy equal pe
+variable    kinEnergy equal ke
+variable    totEnergy equal etotal
+fix         production all nve
+timestep    0.001
+fix         2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_${r_cut}.out
+fix         2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_3.72.out
+thermo      10000
+thermo_style custom step pe ke etotal temp press density
+run         150000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 4.02
+  ghost atom cutoff = 5.5
+  binsize = 2.01, bins = 5 5 5
+  2 neighbor lists, perpetual/occasional/extra = 1 1 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+  (2) compute rdf, occasional
+      attributes: half, newton on, cut 5.3
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.783 | 3.783 | 3.783 Mbytes
+   Step         PotEng         KinEng         TotEng          Temp          Press         Density    
+     50000  -1.5410767      2.1528819      0.61180518     1.4424669      0.20189916     0.2          
+     60000  -1.4692948      2.0818093      0.61251445     1.3948471      0.19431622     0.2          
+     70000  -1.5166128      2.1298         0.61318717     1.4270017      0.23749538     0.2          
+     80000  -1.4635481      2.0773428      0.6137947      1.3918545      0.14570696     0.2          
+     90000  -1.4537852      2.0666526      0.61286738     1.3846919      0.18365334     0.2          
+    100000  -1.4254371      2.0397009      0.61426374     1.3666337      0.16279175     0.2          
+    110000  -1.483549       2.0969303      0.61338137     1.4049784      0.086153153    0.2          
+    120000  -1.5278865      2.1413934      0.6135069      1.4347695      0.11746832     0.2          
+    130000  -1.4605968      2.074845       0.61424822     1.3901809      0.096357569    0.2          
+    140000  -1.5642958      2.1773697      0.6130739      1.4588742      0.23979985     0.2          
+    150000  -1.5136615      2.1274299      0.61376836     1.4254136      0.035025198    0.2          
+    160000  -1.4101263      2.0236855      0.61355927     1.3559032      0.20473687     0.2          
+    170000  -1.5096272      2.1224993      0.61287207     1.4221101      0.12939826     0.2          
+    180000  -1.4526871      2.0655765      0.61288941     1.3839708      0.16123452     0.2          
+    190000  -1.5095524      2.1232664      0.61371402     1.422624       0.15361763     0.2          
+    200000  -1.5268558      2.1398855      0.6130297      1.4337591      0.14031085     0.2          
+Loop time of 4.8573 on 1 procs for 150000 steps with 200 atoms
+
+Performance: 2668149.107 tau/day, 30881.355 timesteps/s, 6.176 Matom-step/s
+99.9% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 3.1709     | 3.1709     | 3.1709     |   0.0 | 65.28
+Neigh   | 0.54749    | 0.54749    | 0.54749    |   0.0 | 11.27
+Comm    | 0.4276     | 0.4276     | 0.4276     |   0.0 |  8.80
+Output  | 0.00010454 | 0.00010454 | 0.00010454 |   0.0 |  0.00
+Modify  | 0.64464    | 0.64464    | 0.64464    |   0.0 | 13.27
+Other   |            | 0.06661    |            |       |  1.37
+
+Nlocal:            200 ave         200 max         200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:           1636 ave        1636 max        1636 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:           5551 ave        5551 max        5551 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 5551
+Ave neighs/atom = 27.755
+Neighbor list builds = 3827
+Dangerous builds = 0
+unfix       production
+unfix       rdf_out
+clear
+next        index
+jump        SELF loop_start
+variable index loop         1 ${nsteps}
+variable index loop         1 16
+variable r_cut              equal floor((${initialCutOff}+(${index}-1)*${step})*100)/100 #manual rounding to second decimal place
+variable r_cut              equal floor((1.12246204830937+(${index}-1)*${step})*100)/100 
+variable r_cut              equal floor((1.12246204830937+(15-1)*${step})*100)/100 
+variable r_cut              equal floor((1.12246204830937+(15-1)*0.2)*100)/100 
+
+print "Simulation for r_cut = ${r_cut}"
+Simulation for r_cut = 3.92
+
+variable region_name string     simulation_box_${r_cut}
+variable region_name string     simulation_box_3.92
+region ${region_name} block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_3.92 block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_3.92 block     0.0 10 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_3.92 block     0.0 10 0.0 10 0.0 ${box_size}
+region simulation_box_3.92 block     0.0 10 0.0 10 0.0 10
+create_box 1 ${region_name}
+create_box 1 simulation_box_3.92
+Created orthogonal box = (0 0 0) to (10 10 10)
+  1 by 1 by 1 MPI processor grid
+create_atoms                    1 random ${nParticles} 234567 NULL overlap 1.3
+create_atoms                    1 random 200 234567 NULL overlap 1.3
+Created 200 atoms
+  using lattice units in orthogonal box = (0 0 0) to (10 10 10)
+  create_atoms CPU = 0.001 seconds
+
+mass        1 1.0
+velocity    all create 1.0 87242 mom yes dist gaussian
+pair_style  lj/cut ${r_cut}
+pair_style  lj/cut 3.92
+pair_coeff  1 1 1.0 1.0
+pair_modify tail yes
+
+neighbor     0.3 bin
+neigh_modify delay 0 every 10 check yes
+
+variable output_file string thermo_average_r${r_cut}.txt
+variable output_file string thermo_average_r3.92.txt
+
+print "Equilibration"
+Equilibration
+
+fix         equilibration all nve
+timestep    0.001
+run         50000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 4.22
+  ghost atom cutoff = 4.22
+  binsize = 2.11, bins = 5 5 5
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.095 | 3.095 | 3.095 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+         0   1             -0.87774047     0              0.61475953    -0.1222546    
+     50000   1.4249566     -1.5134787      0              0.61326907     0.15004767   
+Loop time of 1.45352 on 1 procs for 50000 steps with 200 atoms
+
+Performance: 2972085.643 tau/day, 34399.139 timesteps/s, 6.880 Matom-step/s
+100.0% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 1.1346     | 1.1346     | 1.1346     |   0.0 | 78.06
+Neigh   | 0.17456    | 0.17456    | 0.17456    |   0.0 | 12.01
+Comm    | 0.094702   | 0.094702   | 0.094702   |   0.0 |  6.52
+Output  | 1.0833e-05 | 1.0833e-05 | 1.0833e-05 |   0.0 |  0.00
+Modify  | 0.03509    | 0.03509    | 0.03509    |   0.0 |  2.41
+Other   |            | 0.01458    |            |       |  1.00
+
+Nlocal:            200 ave         200 max         200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:           1025 ave        1025 max        1025 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:           6474 ave        6474 max        6474 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 6474
+Ave neighs/atom = 32.37
+Neighbor list builds = 1272
+Dangerous builds = 0
+unfix       equilibration
+
+comm_modify cutoff 5.5
+compute rdf_all all rdf 200 cutoff 5
+variable rdf_file string rdf_${r_cut}.dat
+variable rdf_file string rdf_3.92.dat
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file ${rdf_file} mode vector
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file rdf_3.92.dat mode vector
+
+print "Production"
+Production
+
+variable    potEnergy equal pe
+variable    kinEnergy equal ke
+variable    totEnergy equal etotal
+fix         production all nve
+timestep    0.001
+fix         2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_${r_cut}.out
+fix         2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_3.92.out
+thermo      10000
+thermo_style custom step pe ke etotal temp press density
+run         150000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 4.22
+  ghost atom cutoff = 5.5
+  binsize = 2.11, bins = 5 5 5
+  2 neighbor lists, perpetual/occasional/extra = 1 1 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+  (2) compute rdf, occasional
+      attributes: half, newton on, cut 5.3
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.783 | 3.783 | 3.783 Mbytes
+   Step         PotEng         KinEng         TotEng          Temp          Press         Density    
+     50000  -1.5134787      2.1267478      0.61326907     1.4249566      0.15004767     0.2          
+     60000  -1.5971483      2.2096604      0.61251205     1.4805095      0.24089867     0.2          
+     70000  -1.5414121      2.1548667      0.61345461     1.4437968      0.14831893     0.2          
+     80000  -1.4418515      2.0559903      0.61413889     1.377548       0.18827167     0.2          
+     90000  -1.5212702      2.1349228      0.61365259     1.430434       0.16925423     0.2          
+    100000  -1.4274675      2.041542       0.61407455     1.3678674      0.25386778     0.2          
+    110000  -1.4337433      2.0472516      0.61350834     1.3716929      0.036932434    0.2          
+    120000  -1.4001296      2.0141641      0.6140345      1.3495237      0.1876335      0.2          
+    130000  -1.5084275      2.1218996      0.61347207     1.4217083      0.12457891     0.2          
+    140000  -1.5244636      2.1379811      0.61351746     1.4324831      0.11356801     0.2          
+    150000  -1.506265       2.1199951      0.61373011     1.4204322      0.048286749    0.2          
+    160000  -1.4841584      2.0978543      0.61369595     1.4055975      0.070045512    0.2          
+    170000  -1.3797878      1.9940026      0.61421485     1.3360152      0.19450776     0.2          
+    180000  -1.459519       2.0729493      0.61343032     1.3889108      0.21182902     0.2          
+    190000  -1.6039433      2.2176642      0.61372097     1.4858722      0.15514414     0.2          
+    200000  -1.4871939      2.100685       0.61349115     1.4074942      0.16337378     0.2          
+Loop time of 5.51814 on 1 procs for 150000 steps with 200 atoms
+
+Performance: 2348619.529 tau/day, 27183.096 timesteps/s, 5.437 Matom-step/s
+100.0% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 3.8161     | 3.8161     | 3.8161     |   0.0 | 69.16
+Neigh   | 0.56325    | 0.56325    | 0.56325    |   0.0 | 10.21
+Comm    | 0.42993    | 0.42993    | 0.42993    |   0.0 |  7.79
+Output  | 9.7253e-05 | 9.7253e-05 | 9.7253e-05 |   0.0 |  0.00
+Modify  | 0.64225    | 0.64225    | 0.64225    |   0.0 | 11.64
+Other   |            | 0.06649    |            |       |  1.20
+
+Nlocal:            200 ave         200 max         200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:           1588 ave        1588 max        1588 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:           6447 ave        6447 max        6447 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 6447
+Ave neighs/atom = 32.235
+Neighbor list builds = 3805
+Dangerous builds = 0
+unfix       production
+unfix       rdf_out
+clear
+next        index
+jump        SELF loop_start
+variable index loop         1 ${nsteps}
+variable index loop         1 16
+variable r_cut              equal floor((${initialCutOff}+(${index}-1)*${step})*100)/100 #manual rounding to second decimal place
+variable r_cut              equal floor((1.12246204830937+(${index}-1)*${step})*100)/100 
+variable r_cut              equal floor((1.12246204830937+(16-1)*${step})*100)/100 
+variable r_cut              equal floor((1.12246204830937+(16-1)*0.2)*100)/100 
+
+print "Simulation for r_cut = ${r_cut}"
+Simulation for r_cut = 4.12
+
+variable region_name string     simulation_box_${r_cut}
+variable region_name string     simulation_box_4.12
+region ${region_name} block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_4.12 block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_4.12 block     0.0 10 0.0 ${box_size} 0.0 ${box_size}
+region simulation_box_4.12 block     0.0 10 0.0 10 0.0 ${box_size}
+region simulation_box_4.12 block     0.0 10 0.0 10 0.0 10
+create_box 1 ${region_name}
+create_box 1 simulation_box_4.12
+Created orthogonal box = (0 0 0) to (10 10 10)
+  1 by 1 by 1 MPI processor grid
+create_atoms                    1 random ${nParticles} 234567 NULL overlap 1.3
+create_atoms                    1 random 200 234567 NULL overlap 1.3
+Created 200 atoms
+  using lattice units in orthogonal box = (0 0 0) to (10 10 10)
+  create_atoms CPU = 0.001 seconds
+
+mass        1 1.0
+velocity    all create 1.0 87242 mom yes dist gaussian
+pair_style  lj/cut ${r_cut}
+pair_style  lj/cut 4.12
+pair_coeff  1 1 1.0 1.0
+pair_modify tail yes
+
+neighbor     0.3 bin
+neigh_modify delay 0 every 10 check yes
+
+variable output_file string thermo_average_r${r_cut}.txt
+variable output_file string thermo_average_r4.12.txt
+
+print "Equilibration"
+Equilibration
+
+fix         equilibration all nve
+timestep    0.001
+run         50000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 4.42
+  ghost atom cutoff = 4.42
+  binsize = 2.21, bins = 5 5 5
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.098 | 3.098 | 3.098 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+         0   1             -0.87776081     0              0.61473919    -0.12226273   
+     50000   1.3895737     -1.4600073      0              0.61393148     0.18366298   
+Loop time of 1.72291 on 1 procs for 50000 steps with 200 atoms
+
+Performance: 2507388.348 tau/day, 29020.698 timesteps/s, 5.804 Matom-step/s
+100.0% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 1.3851     | 1.3851     | 1.3851     |   0.0 | 80.39
+Neigh   | 0.18713    | 0.18713    | 0.18713    |   0.0 | 10.86
+Comm    | 0.10044    | 0.10044    | 0.10044    |   0.0 |  5.83
+Output  | 1.0743e-05 | 1.0743e-05 | 1.0743e-05 |   0.0 |  0.00
+Modify  | 0.034742   | 0.034742   | 0.034742   |   0.0 |  2.02
+Other   |            | 0.01553    |            |       |  0.90
+
+Nlocal:            200 ave         200 max         200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:           1184 ave        1184 max        1184 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:           7367 ave        7367 max        7367 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 7367
+Ave neighs/atom = 36.835
+Neighbor list builds = 1280
+Dangerous builds = 0
+unfix       equilibration
+
+comm_modify cutoff 5.5
+compute rdf_all all rdf 200 cutoff 5
+variable rdf_file string rdf_${r_cut}.dat
+variable rdf_file string rdf_4.12.dat
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file ${rdf_file} mode vector
+fix rdf_out all ave/time 100 1 100 c_rdf_all[*] file rdf_4.12.dat mode vector
+
+print "Production"
+Production
+
+variable    potEnergy equal pe
+variable    kinEnergy equal ke
+variable    totEnergy equal etotal
+fix         production all nve
+timestep    0.001
+fix         2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_${r_cut}.out
+fix         2 all ave/time 20 50 1000 v_potEnergy v_kinEnergy v_totEnergy file average_4.12.out
+thermo      10000
+thermo_style custom step pe ke etotal temp press density
+run         150000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 10 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 4.42
+  ghost atom cutoff = 5.5
+  binsize = 2.21, bins = 5 5 5
+  2 neighbor lists, perpetual/occasional/extra = 1 1 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+  (2) compute rdf, occasional
+      attributes: half, newton on, cut 5.3
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.755 | 3.755 | 3.755 Mbytes
+   Step         PotEng         KinEng         TotEng          Temp          Press         Density    
+     50000  -1.4600073      2.0739388      0.61393148     1.3895737      0.18366298     0.2          
+     60000  -1.4940945      2.1085178      0.61442332     1.4127422      0.17660691     0.2          
+     70000  -1.5450808      2.1592146      0.61413377     1.4467099      0.18329339     0.2          
+     80000  -1.5650185      2.1789902      0.61397173     1.45996        0.081908303    0.2          
+     90000  -1.4789876      2.0929467      0.61395918     1.4023094      0.16006447     0.2          
+    100000  -1.4680575      2.0821286      0.61407106     1.395061       0.15956569     0.2          
+    110000  -1.4017802      2.0157745      0.61399433     1.3506027      0.18162138     0.2          
+    120000  -1.5248491      2.1383617      0.61351255     1.4327381      0.21607298     0.2          
+    130000  -1.4995681      2.1140918      0.61452365     1.4164769      0.15551222     0.2          
+    140000  -1.5164692      2.1301089      0.61363972     1.4272087      0.1684401      0.2          
+    150000  -1.6051209      2.2181462      0.61302539     1.4861951      0.14335341     0.2          
+    160000  -1.5011113      2.1145557      0.61344442     1.4167877      0.12813936     0.2          
+    170000  -1.3841316      1.9982767      0.61414501     1.3388788      0.19302073     0.2          
+    180000  -1.4482862      2.0617751      0.61348899     1.3814239      0.18618071     0.2          
+    190000  -1.4180934      2.0317367      0.61364329     1.3612976      0.16433685     0.2          
+    200000  -1.5190503      2.1322181      0.61316784     1.4286219      0.19326904     0.2          
+Loop time of 6.27933 on 1 procs for 150000 steps with 200 atoms
+
+Performance: 2063914.735 tau/day, 23887.902 timesteps/s, 4.778 Matom-step/s
+99.9% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 4.5495     | 4.5495     | 4.5495     |   0.0 | 72.45
+Neigh   | 0.59618    | 0.59618    | 0.59618    |   0.0 |  9.49
+Comm    | 0.42213    | 0.42213    | 0.42213    |   0.0 |  6.72
+Output  | 0.00010119 | 0.00010119 | 0.00010119 |   0.0 |  0.00
+Modify  | 0.64428    | 0.64428    | 0.64428    |   0.0 | 10.26
+Other   |            | 0.06716    |            |       |  1.07
+
+Nlocal:            200 ave         200 max         200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:           1658 ave        1658 max        1658 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:           7528 ave        7528 max        7528 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 7528
+Ave neighs/atom = 37.64
+Neighbor list builds = 3824
+Dangerous builds = 0
+unfix       production
+unfix       rdf_out
+clear
+next        index
+jump        SELF loop_start
+Total wall time: 0:00:58

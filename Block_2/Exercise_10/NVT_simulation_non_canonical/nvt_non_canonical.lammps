@@ -1,0 +1,56 @@
+# 1) System initialization
+
+units       lj
+boundary    p p p
+atom_style  atomic
+
+variable box_size           equal 10
+variable volume             equal ${box_size}*${box_size}*${box_size}
+
+# 1) NVT ensemble simulation with velocity rescaling
+
+variable step               equal 0.025
+variable nsteps             equal 5
+
+label loop_start
+variable index loop         1 ${nsteps}
+variable numberDensity      equal 0.2-${index}*${step}
+variable nParticles         equal ${numberDensity}*${volume}
+
+print "Simulation for density = ${numberDensity}"
+
+variable region_name string     simulation_box_${numberDensity}
+region ${region_name} block     0.0 ${box_size} 0.0 ${box_size} 0.0 ${box_size}
+create_box 1 ${region_name}
+create_atoms                    1 random ${nParticles} 234567 NULL overlap 1.3
+
+mass        1 1.0
+velocity    all create 1.0 87242 mom yes dist gaussian
+pair_style  lj/cut 2
+pair_coeff  1 1 1.0 1.0
+pair_modify tail yes
+
+neighbor     0.3 bin
+neigh_modify delay 0 every 10 check yes
+
+print "Equilibration" 
+
+fix         equilibration all temp/rescale 1000 2.0 2.0 0.02 0.5
+timestep    0.001
+run         50000
+unfix       equilibration
+
+print "Production" 
+
+variable    kinEnergy equal ke
+variable    temperature equal temp
+fix         production all temp/rescale 100 2.0 2.0 0.02 0.5
+timestep    0.001
+fix         2 all ave/time 20 50 1000 v_kinEnergy v_temperature file average_${numberDensity}.out 
+thermo      10000
+thermo_style custom step pe ke etotal temp press density
+run         450000
+unfix       production
+clear
+next        index
+jump        SELF loop_start
