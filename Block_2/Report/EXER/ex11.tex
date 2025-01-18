@@ -18,6 +18,61 @@ Implying that we are in the diffusion regime. We can then simply estimate the ti
 
 $$ \sigma ^ 2 = 6Dt = 6 \frac{k_BT}{3\pi\eta\sigma} t \qquad \iff \qquad t \sim 4 \cdot 10^{-7}\ s $$
 
-If we instead start our calculations considering $\tilde{\sigma} = 5 \ \mu m$, we have
+\subsection*{Numerical exercise} We consider a gas of $N = 1000$ non interacting Brownian particle in a simulation for the reference units are set as $\sigma = 1$, $\varepsilon = 1$ and $m=1$. 
+The simulation box is a cubic box of side $L = 20\sigma$, where periodic boundary conditions are considered. We start by setting all the particles in the origin of our simulation box. \\
+In order to study the diffusity properties of the system we decided to study it in unwrapped coordinates. \\
+\paragraph{Brownian motion in the bulk} In absence of any potential we study the system in the overdamped limit, by implementing for its evolution a first order integrator such as the Euler-Maruyama integrator, which algorithm can be found in the relative section. \\
+We study the system mean square displacement for varying temperature values $0.1 < T^* < 2$ while $\gamma^* = 1$, and obtain figure \ref{ex11:msd_temp}.
 
-$$ \tilde{\sigma} ^ 2 = 6Dt = \qquad \iff \qquad t \sim 4 \cdot 10^{-1}\ s $$
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{FIG/ex11/msd_temp.png}
+    \caption{Mean square displacement for $0.1 < T^* < 2$ while $\gamma^* = 1$}
+    \label{ex11:msd_temp}
+\end{figure}
+
+All MSD are proportional to time as expected and clearly higher the temperature, higher the kinetic energy and consequently the diffusivity. \\
+Suppose instead we fix $T^* = 1$ and vary the friction coefficient $10 < \gamma^* < 100 $. Then we obtain \ref{ex11:msd_coeff}
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{FIG/ex11/msd_friction.png}
+    \caption{Mean square displacement for $10 < \gamma^* < 100$ while $T^* = 1$}
+    \label{ex11:msd_coeff}
+\end{figure}
+
+Then we obtain the converse, higher the friction coefficient, lower the diffusivity. Finally we can plot the distribution of the $N$ particles along the x axis for
+ $T^* = 1$ and $\gamma^* = 1$. We obtain \ref{ex11:x_pos} :
+
+ \begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{FIG/ex11/x_component.png}
+    \caption{Distribution of the x position for 1000 Brownian particles}
+    \label{ex11:x_pos}
+\end{figure}
+
+As expected, due to a non zero diffusivity, particles spreads over time.
+
+\paragraph{Brownian motion in an harmonic trap} Suppose now we set an harmonic trap in the simulation box origin. 
+Then if we plot the MSD by varying the harmonic constant $0.1 < K^* < 10$ by letting the other parameter be unitary we obtain figure \ref{ex11:msd_harm}:
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{FIG/ex11/mds_hconst.png}
+    \caption{Mean square displacement for $0.1 < K^* < 10$ while $T^* = 1$, $\gamma^* = 1$ }
+    \label{ex11:msd_harm}
+\end{figure}
+
+As we can see the higher the harmonic constant is higher the more pronounced the caging effect around the harmonic trap is. 
+This can be seen also by the x position distribution in presence of $K^* = 10$ in figure \ref{ex11:x_pos_harm}
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{FIG/ex11/x_component_harm.png}
+    \caption{Distribution of the x position for 1000 Brownian particles with $K^* = 10$}
+    \label{ex11:x_pos_harm}
+\end{figure}
+
+In this case the harmonic trap prevents the natural diffusivity seen in the bulk case, caging the particles.
+
+

@@ -1,0 +1,49 @@
+\chapter*{Exercise 13 : Exercise on the cell list}
+We want to simulate in a square box of side $B=100$, $N$ Brownian particles with reflective boundary condition, with a mutual repulsive potential. \\
+Half of the particle will have radius $R_1 = 1.25$ and the other half $R_2 = 1$ in order to prevent the system crystallization at $T^*=1$. \\
+The initial positions will be initialized randomly inside the box and a non-compenetration check will be enforced through the evolution, that happens through the Euler-Maruyama algorithm.
+The repulsive potential $U(r_{ij}) = \varepsilon \exp(-r_{ij}^2 / 2 \sigma_{ij})$ depends on the reference length $\sigma_{ij} = R_i + R_j$. We will cutoff the resulting force at $r_{cut} = 4\sigma_{ij}$. Moreover we set $k_B = 1$ and the diffusity through the mobility parameter $D_i = \mu_i T $ that depends on the particle radius $\mu_i = 1/R_i$. 
+In order to achieve a large $N$ in our simulation, we will use the linked list cell method, in order to reduce the force calculation routine time complexity from $\mathcal{O}(N^2)$ to $\mathcal{O}(N)$. Given that $\max(r_{cut}) = 8R_1$ we choose this as side of our cell in the algorithm, so that is guaranteed that all force calculation are within the cutoff radius. \\
+Now that we are set, in order to study the diffusivity we plot the mean square displacement along the x position of the particle of type 1 and 2, and of all the particles, for different values of $\rho = N/B^2$. 
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.45\textwidth]{FIG/ex13/MSD_particle_number2.png} 
+    \hspace{0.05\textwidth}
+    \includegraphics[width=0.45\textwidth]{FIG/ex13/MSD_particle_number2_particle1.png}
+    \caption{(Left) MSD for $\rho = 2\cdot 10^{-4}$. (Right) MSD for particles of type 1 and 2.}
+    \label{fig:combined2}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.45\textwidth]{FIG/ex13/MSD_particle_number10.png} 
+    \hspace{0.05\textwidth}
+    \includegraphics[width=0.45\textwidth]{FIG/ex13/MSD_particle_number10_particle1.png}
+    \caption{(Left) MSD for $\rho = 1\cdot 10^{-3}$. (Right) MSD for particles of type 1 and 2}
+    \label{fig:combined2}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.45\textwidth]{FIG/ex13/MSD_particle_number50.png} 
+    \hspace{0.05\textwidth}
+    \includegraphics[width=0.45\textwidth]{FIG/ex13/MSD_particle_number50_particle1.png}
+    \caption{(Left) MSD for $\rho = 5\cdot 10^{-3}$. (Right) MSD for particles of type 1 and 2.}
+    \label{fig:combined3}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.45\textwidth]{FIG/ex13/MSD_particle_number200.png} 
+    \hspace{0.05\textwidth}
+    \includegraphics[width=0.45\textwidth]{FIG/ex13/MSD_particle_number200_particle1.png}
+    \caption{(Left) MSD for $\rho = 0.02$. (Right) MSD for particles of type 1 and 2.}
+    \label{fig:combined2}
+\end{figure}
+
+
+
+We observe that the MSD follows $2D_i t$ up to a saturation due to the square confinement. For high $\rho$ we don't observe a caging in the MSD for lower times, 
+but we observe it in the computation time, as the system makes at roughly half timestep begins to make many attempts ($\sim 10^6-10^{7}$) to try to pass to non-compenetration check. \\
+In general we can see that the MSD for the 2 particles are roughly the same, while we can see that for particle 1 we have a slightly lower diffusivity.

@@ -42,15 +42,15 @@ unfix       equilibration
 
 print "Production" 
 
-variable    kinEnergy equal ke
-variable    temperature equal temp
-fix         production all nvt temp 2 2 1
-timestep    0.001
-fix         2 all ave/time 20 50 1000 v_kinEnergy v_temperature file average_${numberDensity}.out 
-thermo      10000
+variable     kinEnergy equal ke
+variable     temperature equal temp
+fix          production all nvt temp 2 2 1
+timestep     0.001
+fix          2 all ave/time 20 50 1000 v_kinEnergy v_temperature file average_${numberDensity}.out 
+thermo       10000
 thermo_style custom step pe ke etotal temp press density
-run         450000
-unfix       production
+run          450000
+unfix        production
 clear
-next        index
-jump        SELF loop_start
+next         index
+jump         SELF loop_start

@@ -9,8 +9,18 @@ LENGTH_UNIT = 1
 ENERGY_UNIT = 1
 
 @numba.njit
-def first_order_integrator_component(initial_position_component : float, force_constant, force_component_function , temperature : float, friction_coeff : float, \
-                           box_size : float, step_number : int, final_time : float):
+def first_order_integrator_component(
+    initial_position_component : float, 
+    force_constant, force_component_function , 
+    temperature : float, 
+    friction_coeff : float, 
+    box_size : float, 
+    step_number : int, 
+    final_time : float
+    ):
+    """
+    Implements the Euler-Maruyama algorithm for one position component
+    """
     position_time_list_component = np.zeros(step_number)
     position_time_list_component_unwrapped = np.zeros(step_number)
     position_time_list_component[0] = initial_position_component
@@ -43,6 +53,9 @@ def brownian_motion(
         final_time : float,
         particle_number : int
         ):
+    """
+    Routine for the brownian motion evolution. Evaluates the mean square displacemt
+    """
     msd = np.zeros(step_number)
     for _ in range(particle_number):
         _, position_x_un = first_order_integrator_component(initial_position[0], force_constant, force_component_function, temperature, friction_coeff, box_size, step_number, final_time)

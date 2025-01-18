@@ -42,9 +42,9 @@ For each run we discard 50000 steps for equilibration and consider 150000 steps 
 We observe that at greater cutoff radii the total energy time series stabilize faster and with less variance around the mean value, which is higher for higher cutoff radii. \\
 We plot at title of example the energy time series of the cutoff radius $r_c = 2^{1/6}\sigma$ and $r_c = 4\sigma$ after equilibration to show this in figure \ref{ex10:en_comparison}:
 
-\begin{figure}[H]
+\begin{figure}[htp]
     \centering
-    \includegraphics[width=0.9\textwidth]{FIG/ex10/energy_time_series.png}
+    \includegraphics[width=0.8\textwidth]{FIG/ex10/energy_time_series.png}
     \caption{Energy time series comparison after equilibration for the cutoff radius $r_c = 2^{1/6}\sigma$ and $r_c = 4\sigma$}
     \label{ex10:en_comparison}
 \end{figure}
@@ -94,3 +94,7 @@ For a simulation with 50000 steps for equilibration and 450000 for production we
     \caption{Table showing values for the mean temperature and kinetic energy for different values of number density for the non-canonical and canonical thermostat}
     \label{ex10:table}
 \end{table}
+
+In both thermostat the mean kinetic energy is consistent with the expected value. \\
+In the non-canonical iteration of the NVT ensemble we observe that there are no fluctuactions for the mean temperature, so that is not consistent with the prediction that we expect for a canonical ensemble, while in the canonical iteration we see consistent fluctuactions. \\
+As before all additional data can be found in the relative log.lammps file.

@@ -63,35 +63,6 @@ def cell_linked_list(
     return cell_list, head_list
 
 #@numba.njit
-def neighbor_list_square_opt(square_size: float, cell_length: float):
-    """Create a neighbor map for all cells without applying periodic boundary conditions (PBC)."""
-    if square_size % cell_length != 0:
-        raise ValueError(
-            f"Invalid dimensions: square_size ({square_size}) is not divisible by cell_length ({cell_length})."
-        )
-    
-    num_cells_per_dim = int(square_size / cell_length)
-    max_neighbors = 8  # A cell can have at most 8 neighbors in 2D (excluding itself)
-    neighbors_array = -1 * np.ones((num_cells_per_dim**2, max_neighbors), dtype=np.int64)
-    
-    for cell_x in range(num_cells_per_dim):
-        for cell_y in range(num_cells_per_dim):
-            current_cell = cell_x + cell_y * num_cells_per_dim
-            neighbor_idx = 0
-            for dy in [-1, 0, 1]:
-                for dx in [-1, 0, 1]:
-                    if dx == 0 and dy == 0:
-                        continue 
-                    nx = cell_x + dx
-                    ny = cell_y + dy
-                    if 0 <= nx < num_cells_per_dim and 0 <= ny < num_cells_per_dim:
-                        neighbor_cell = nx + ny * num_cells_per_dim
-                        neighbors_array[current_cell, neighbor_idx] = neighbor_cell
-                        neighbor_idx += 1
-    
-    return neighbors_array
-
-#@numba.njit
 def neighbor_list_square(square_size: float, cell_length: float):
     """Create a neighbor map for all cells without applying periodic boundary conditions (PBC)."""
     
@@ -121,7 +92,6 @@ def neighbor_list_square(square_size: float, cell_length: float):
 #@numba.njit
 def repulsive_potential(force_constant, distance_squared, ref_distance):
     return force_constant * np.exp (- distance_squared / (2 * ref_distance**2) )
-
 
 def force_evaluation(
     square_size : float,
@@ -155,13 +125,13 @@ def force_evaluation(
                         dy = position_list[i][1] - position_list[j][1]
                         distance_sq = dx**2 + dy**2
                         ref_distance = radii_list[i] + radii_list[j]
-                        force_x_list[i] +=  (dx / ref_distance**2) * repulsive_potential(force_constant, distance_sq, ref_distance)
-                        force_y_list[i] +=  (dy / ref_distance**2) * repulsive_potential(force_constant, distance_sq, ref_distance)  
+                        if distance_sq < (16 * ref_distance**2):
+                            force_x_list[i] +=  (dx / ref_distance**2) * repulsive_potential(force_constant, distance_sq, ref_distance)
+                            force_y_list[i] +=  (dy / ref_distance**2) * repulsive_potential(force_constant, distance_sq, ref_distance)  
                     j = cell_list[j]
                 i = cell_list[i]
                 
     return force_x_list, force_y_list
-
 
 #@numba.njit
 def first_order_integrator_component(
@@ -223,7 +193,6 @@ def position_check(
                 i = cell_list[i]
     if index_list == [] : return [], False
     return index_list, True
-
 
 def plt_particles(position, radii_list, particle_number, square_size):
     plt.figure(figsize=(8, 8))

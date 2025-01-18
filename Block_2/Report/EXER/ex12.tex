@@ -1,0 +1,23 @@
+\chapter*{Exercise 12 : The multiple histogram method}
+We are going to use in this exercise the multiple histogram method (MHM) to evaluate the energy variance per degree of freedom:
+$$C_N(\beta) = \frac{1}{N} (\langle E^2 \rangle -\langle E \rangle^2) $$ 
+For the grafted polymer model saw in chapter 6, where $N$ is the number of monomers. \\
+Then we will find the maximum value of the inverse $\beta$ for which the maximum $C_N(\beta)$ is achieved, for different values of $N$. \\
+Finally these value are plotted against $N^\phi$ where $\phi = 1/2$, to extrapolate the infinite size limit. \\
+
+Before showing the results we comment briefly on the implementation of the MHM. 
+In general in the MHM one has to put particular attention in evaluating the partition function, specifically in order to avoid over/under-flow due to the 
+floating point structure, and specifically some special implementations are required, such as the log-sum-exp trick. \\
+But due to the low number of degrees of freedom in our system we proceeded to a naive implementation of the algorithm, given that we are well within the floating point boundary. \\
+Notice that anyway our algorithm is not scalable for large system, and a proper implementation is necessary in that case. \\
+Also, to reduce our computation time, we raised the threshold to $10^{-3}$. \\
+We present our results in figure \ref{ex12:infinite_size}.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=0.5\textwidth]{FIG/ex12/infinite_size.png}
+    \caption{Infinite size limit determination}
+    \label{ex12:infinite_size}
+\end{figure}
+
+As is clear, the evaluation is wrong, as it presents a negative temperature. This is due to the fact that the points are evaluated without error due to time constraint, so the whole procedure of best fit fails. \\
