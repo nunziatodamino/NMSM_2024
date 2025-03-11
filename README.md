@@ -1,6 +1,6 @@
 # Numerical Methods for Soft Matter (NMSM) 2024-2025
 
-![logo_unipd|500](/home/nunziato-damino/Documents/Github/NMSM_2024/logo_unipd.gif)
+![logo_unipd|500](logo_unipd.gif)
 
 The following repository contains the exercises for the UniPD course **Numerical Methods for Soft Matter** for the academic year 2024-2025.
 The main focus of the course is mainly about Monte Carlo methods applied to Statistical Mechanics and Molecular dynamics.
