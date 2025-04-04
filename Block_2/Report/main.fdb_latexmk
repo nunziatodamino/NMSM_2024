@@ -1,13 +1,13 @@
 # Fdb version 4
-["bibtex main"] 1737237059.13537 "main.aux" "main.bbl" "main" 1737237061.05053 0
+["bibtex main"] 1737237059.13537 "main.aux" "main.bbl" "main" 1743757659.61969 0
   "./biblio.bib" 1737190858.78031 1251 4191477abf8cc4c2d93b6b0109509567 ""
   "/usr/share/texlive/texmf-dist/bibtex/bst/base/plain.bst" 1292289607 20613 bd3fbfa9f64872b81ac57a0dd2ed855f ""
-  "main.aux" 1737237060.83117 9011 a664a5db3670df1ed776b40669623fbf "pdflatex"
+  "main.aux" 1743757659.41079 9011 a664a5db3670df1ed776b40669623fbf "pdflatex"
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1737237059.21176 "/home/nunziato-damino/Documents/Github/NMSM_2024/Block_2/Report/main.tex" "main.pdf" "main" 1737237061.05064 0
+["pdflatex"] 1743757657.77524 "/home/nunziato-damino/Documents/Github/NMSM_2024/Block_2/Report/main.tex" "main.pdf" "main" 1743757659.61981 0
   "/etc/texmf/web2c/texmf.cnf" 1730382086.88477 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/home/nunziato-damino/Documents/Github/NMSM_2024/Block_2/Report/main.tex" 1737234839.00885 1566 e5e74b852fbc1220a76aa11990cbc263 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -179,7 +179,7 @@
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1734295108 8242278 40482eeaedbcf6d43f51b0a704281aa8 ""
   "EXER/ex10.tex" 1737227414.25941 6221 0fddd2ab0aa87d2dcf3c9fee96f851e0 ""
   "EXER/ex11.tex" 1737236660.17762 4353 b4a92f6cd04ae367c0fdba474b611c5f ""
-  "EXER/ex12.tex" 1737236759.89228 1810 96e61bc81d7d97892656a66edb3fe608 ""
+  "EXER/ex12.tex" 1743757657.62077 1803 7455425e16f673a315cace548e289767 ""
   "EXER/ex13.tex" 1737237057.21311 3429 58f2f2eabb40bdc112d7957d23e16248 ""
   "EXER/ex8.tex" 1737190870.38235 5621 7027610d1f3f5064519aa5cf5f99a6ae ""
   "EXER/ex9.tex" 1737235510.52635 3979 1cfa9c8798830de65db7f4d4aa3f552c ""
@@ -190,7 +190,7 @@
   "FIG/ex11/msd_temp.png" 1737216667.57861 78862 21617e56fbaa6fb1fb82e9f7a25fe11c ""
   "FIG/ex11/x_component.png" 1737216686.13159 362943 a805d497bccdfcfed4959b5f18eee00a ""
   "FIG/ex11/x_component_harm.png" 1737216690.73559 337908 ac0cad37aa3a74d25829618afad435b5 ""
-  "FIG/ex12/infinite_size.png" 1737226040.13972 39649 0f30b5d044a3ae6c64bd752f707d7179 ""
+  "FIG/ex12/infinite_size.png" 1743757338.48252 42341 5c51218faa503e2fd28a2ace1b9e4a44 ""
   "FIG/ex13/MSD_particle_number10.png" 1737234773.76291 83404 a67ee9c65e0ea813aeca25d33fde9d31 ""
   "FIG/ex13/MSD_particle_number10_particle1.png" 1737234775.54393 107611 bf3e7dc96ed734f9704c823e3706b1b0 ""
   "FIG/ex13/MSD_particle_number2.png" 1737234764.16877 98020 239900a4dd1f6de27f0160c779f0647c ""
@@ -208,9 +208,9 @@
   "FIG/ex9/stability_comparison_1.png" 1737191399.26332 115009 03f1a182d22303ad813bddc82335a3db ""
   "FIG/ex9/stability_comparison_2.png" 1737191508.58995 25330 73e836c22d094b1894e8711fae652bb7 ""
   "FIG/ex9/verlet_energy_dev.png" 1737191386.22347 91719 355816c1acdea3b89af3224ee41cd4a4 ""
-  "main.aux" 1737237060.83117 9011 a664a5db3670df1ed776b40669623fbf "pdflatex"
+  "main.aux" 1743757659.41079 9011 a664a5db3670df1ed776b40669623fbf "pdflatex"
   "main.bbl" 1737237059.20814 429 5fa53fc337460c3210aeeb6f54e3f8f7 "bibtex main"
-  "main.out" 1737237059.53714 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+  "main.out" 1743757658.10978 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
   "main.tex" 1737234839.00885 1566 e5e74b852fbc1220a76aa11990cbc263 ""
   (generated)
   "main.aux"
