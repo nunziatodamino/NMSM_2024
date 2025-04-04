@@ -11,13 +11,13 @@ Comprehensive reports about the underlying Physics and aspects of the simulation
 ## Block 1 (**Sampling methods and Monte Carlo techniques**)
 
 ### **Lecture 1: [Volume Estimation and Sampling Methods](https://github.com/nunziatodamino/NMSM_2024/tree/main/Block%201/Exercise_1)**  
-Estimate the volume of ellipsoids using the hit-and-miss Monte Carlo method. Compare results for different parameters (e.g., ellipsoid axes) and improve sampling efficiency for challenging cases.
+Estimate the volume of ellipsoids using the hit-and-miss Monte Carlo method. Compare results for different parameters (e.g., ellipsoid axes) and study of  sampling efficiency for different cases.
 
 ### **Lecture 2: [Rejection and Inversion Sampling](https://github.com/nunziatodamino/NMSM_2024/tree/main/Block%201/Exercise_2)**  
 Generate random numbers from non-trivial PDFs (e.g., ρ(x) ∝ x e⁻ˣ²) using inversion and rejection methods. Validate results via histograms and compare with theoretical distributions.
 
 ### **Lecture 3: [Importance Sampling and Integration](https://github.com/nunziatodamino/NMSM_2024/tree/main/Block%201/Exercise_3)**  
-Compute integrals using crude Monte Carlo and optimized importance sampling. Derive closed-form solutions for Gaussian mixtures and compare errors between uniform and normal sampling.
+Compute integrals using crude Monte Carlo and optimized importance sampling. Compare errors between uniform and normal sampling.
 
 ### **Lecture 4: [Markov Chain Classification](https://github.com/nunziatodamino/NMSM_2024/tree/main/Block%201/Exercise_4)**  
 Classify states of Markov chains (transient/recurrent, periodicity) by analyzing transition matrices. Draw digraphs to visualize state connectivity.
@@ -37,10 +37,10 @@ Simulate the Brusselator chemical reaction model with the Gillespie algorithm. I
 Convert physical units (e.g., time steps for Argon/Krypton) and simulate LJ fluids using off-lattice Monte Carlo. Compute equations of state at T* = 0.9 and T* = 2.
 
 ### **Lecture 9: [Harmonic Oscillator Integrators](https://github.com/nunziatodamino/NMSM_2024/tree/main/Block_2/Exercise_9)**  
-Compare Velocity Verlet and predictor-corrector algorithms for solving harmonic oscillator equations. Analyze energy conservation and stability for varying ωΔt.
+Compare Velocity Verlet and Gear 5th predictor-corrector algorithms for solving harmonic oscillator equations. Analyze energy conservation and stability for varying ωΔt.
 
-### **Lecture 10: [LJ Fluid in NVE/NYT Ensembles](https://github.com/nunziatodamino/NMSM_2024/tree/main/Block_2/Exercise_10)**  
-Simulate LJ fluids in microcanonical (NVE) and thermostatted (Berendsen/Nose-Hoover) ensembles. Validate equipartition, compute radial distribution functions, and study cutoff effects. These exercises are carried in the **LAMMPS** suite.
+### **Lecture 10: [LJ Fluid in NVE/NVT Ensembles](https://github.com/nunziatodamino/NMSM_2024/tree/main/Block_2/Exercise_10)**  
+Simulate LJ fluids in microcanonical (NVE) and thermostatted (velocity rescaling and Nose-Hoover) ensembles. Compute radial distribution functions and study cutoff effects. Also for the NVT ensembles ensure that the thermostats are canonical. These exercises are carried in the **LAMMPS** suite.
 
 ### **Lecture 11: [Brownian Dynamics](https://github.com/nunziatodamino/NMSM_2024/tree/main/Block_2/Exercise_11)**  
 Simulate Brownian motion in bulk and harmonic traps. Analyze mean-square displacement, temperature/friction effects, and compare displacement distributions to theory.
@@ -49,7 +49,7 @@ Simulate Brownian motion in bulk and harmonic traps. Analyze mean-square displac
 Apply the Multiple Histogram Method (MHM) to study criticality in a grafted polymer model. Compute energy variance, perform finite-size scaling, and extrapolate β_c for infinite systems. 
 
 ### **Lecture 13: [Cell List Algorithm for Brownian Particles](https://github.com/nunziatodamino/NMSM_2024/tree/main/Block_2/Exercise_13)**  
-Simulate N Brownian particles with repulsive interactions in a 2D box using the cell list algorithm. Study diffusivity via mean-square displacement Δ(t) for particles A (R_A = 1.25) and B (R_B = 1) at varying densities ρ.
+Simulate N Brownian particles with repulsive interactions in a 2D box using the cell linked list algorithm. Study diffusivity via mean-square displacement Δ(t) for particles A (R_A = 1.25) and B (R_B = 1) at varying densities ρ.
 
 --- 
 
