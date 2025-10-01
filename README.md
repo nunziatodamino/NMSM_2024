@@ -51,6 +51,10 @@ Apply the Multiple Histogram Method (MHM) to study criticality in a grafted poly
 ### **Lecture 13: [Cell List Algorithm for Brownian Particles](https://github.com/nunziatodamino/NMSM_2024/tree/main/Block_2/Exercise_13)**  
 Simulate N Brownian particles with repulsive interactions in a 2D box using the cell linked list algorithm. Study diffusivity via mean-square displacement Δ(t) for particles A (R_A = 1.25) and B (R_B = 1) at varying densities ρ.
 
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
 --- 
 
 ### Disclaimer
