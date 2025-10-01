@@ -55,12 +55,3 @@ Simulate N Brownian particles with repulsive interactions in a 2D box using the 
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
---- 
-
-### Disclaimer
-
-This software is provided "as is," without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and noninfringement. In no event shall the authors or contributors be liable for any claim, damages, or other liability arising from or in connection with the software.
-
-Additionally, I do not claim ownership over the exercises included in this project. They are sourced from external materials, and all rights remain with their respective owners. This software is distributed solely for educational and informational purposes.
-
----
